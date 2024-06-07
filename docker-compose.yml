@@ -1,0 +1,43 @@
+
+services:
+    app:
+        build:
+          context: .
+          args:
+            - DEV=true
+        container_name: bwg_combat_backend_app
+        env_file: .env
+        ports:
+            - "8000:8000"
+        volumes:
+            - ./app:/app
+        command: >
+            sh -c "python manage.py wait_for_db &&
+                   python manage.py migrate &&
+                   python manage.py runserver 0.0.0.0:8000"
+        environment:
+            - DB_HOST=db
+            - DB_NAME=${MONGO_DB_NAME}
+            - DB_USER=${MONGO_DB_USERNAME}
+            - DB_PASS=${MONGO_DB_PASSWORD}
+        depends_on:
+            - db
+
+    db:
+        image: mongo:5.0.27
+        container_name: bwg_combat_db
+        restart: always
+        env_file: .env
+        environment:
+          - MONGO_INITDB_ROOT_USERNAME=root
+          - MONGO_INITDB_ROOT_PASSWORD=root
+          - MONGO_INITDB_DATABASE=${MONGO_DB_NAME}
+          - MONGO_INITDB_USERNAME=${MONGO_DB_USERNAME}
+          - MONGO_INITDB_PASSWORD=${MONGO_DB_PASSWORD}
+        volumes:
+          - dev-db-data:/var/lib/mongo/data
+        ports:
+          - 27017:27017
+
+volumes:
+    dev-db-data:
