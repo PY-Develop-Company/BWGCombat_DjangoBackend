@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
-import mongoengine
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'djongo',
     'core',
 ]
 
@@ -78,12 +76,12 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 DATABASES = {
     'default': {
-            'ENGINE': 'djongo',
-            'NAME': os.environ.get('MONGO_DB_NAME'),
-            'HOST': os.environ.get('MONGO_DB_HOST'),
-            'USER': os.environ.get('MONGO_DB_USERNAME'),
-            'PASSWORD': os.environ.get('MONGO_DB_PASSWORD'),
-            'PORT': os.environ.get('MONGO_DB_PORT'),
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DB_NAME'),
+            'HOST': os.environ.get('DB_HOST'),
+            'USER': os.environ.get('DB_USER'),
+            'PASSWORD': os.environ.get('DB_PASS'),
+            'PORT': os.environ.get('DB_PORT'),
        }
 }
 
