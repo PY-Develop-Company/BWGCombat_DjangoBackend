@@ -15,10 +15,10 @@ services:
                    python manage.py migrate &&
                    gunicorn app.wsgi:application --bind 0.0.0.0:8000"
         environment:
-            - DB_HOST=db
-            - DB_NAME=bwg_combat_mongo_db
-            - DB_USER=root
-            - DB_PASS=root
+            - DB_HOST=${DB_HOST}
+            - DB_NAME=${DB_NAME}
+            - DB_USER=${DB_USER}
+            - DB_PASS=${DB_PASS}
         env_file:
           - .env
         depends_on:
@@ -28,7 +28,7 @@ services:
         image: postgres:16-alpine
         container_name: bwg_combat_db
         environment:
-          - POSTGRES_DB=bwg_combat_mongo_db
+          - POSTGRES_DB=bwgcombat_db
           - POSTGRES_USER=root
           - POSTGRES_PASSWORD=root
         env_file:

@@ -16,7 +16,6 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -24,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o2e3xt!_)wd1vk592zr9-#ml@^xlzw-*0*@c54v$if4u7d=nvh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 
 # Application definition
@@ -81,7 +80,7 @@ DATABASES = {
             'HOST': os.environ.get('DB_HOST'),
             'USER': os.environ.get('DB_USER'),
             'PASSWORD': os.environ.get('DB_PASS'),
-            'PORT': os.environ.get('DB_PORT'),
+            'PORT': 5432
        }
 }
 
