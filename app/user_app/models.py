@@ -31,12 +31,18 @@ class CustomUserManager(BaseUserManager):
         return self._create_user(tg_username, tg_id, password, **extra_fields)
 
 
+class Language(models.Model):
+    lang_id = models.IntegerField(blank=False, primary_key=True)
+    lang_code = models.CharField(blank=False, unique=True, max_length=2)
+    lang_name = models.CharField(blank=True, unique=False, default='', max_length=100)
+
+
 class User(AbstractBaseUser, PermissionsMixin):
-    tg_id = models.BigIntegerField(blank=False, unique=True, primary_key=True)
+    tg_id = models.BigIntegerField(blank=False, primary_key=True)
     tg_username = models.CharField(blank=False, unique=True, max_length=255)
     firstname = models.CharField(blank=True, default='', max_length=255)
     lastname = models.CharField(blank=True, default='', max_length=255)
-    interface_lang = models.CharField(blank=True, default='en', max_length=255)
+    interface_lang = models.ForeignKey(Language, to_field='lang_code', default='en', on_delete=models.CASCADE)
     email = None
 
     is_active = models.BooleanField(default=True)
@@ -65,4 +71,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return str(self.firstname) + ' ' + str(self.lastname) if self.firstname else self.tg_username[1:]
-
