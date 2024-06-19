@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'app.urls'
+ROOT_URLCONF = 'user_app.urls'
 
 TEMPLATES = [
     {
@@ -114,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Kyiv'
 
 USE_I18N = True
 
@@ -135,9 +135,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # print(STATIC_ROOT)
 # print()
 
-STATICFILES_DIRS = [
-    "/var/www/app/staticfiles/"
-]
+# STATICFILES_DIRS = [
+#     "/var/www/app/staticfiles/"
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
