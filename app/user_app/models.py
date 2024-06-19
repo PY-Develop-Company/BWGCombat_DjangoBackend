@@ -40,8 +40,8 @@ class Language(models.Model):
 class User(AbstractBaseUser, PermissionsMixin):
     tg_id = models.BigIntegerField(blank=False, primary_key=True)
     tg_username = models.CharField(blank=False, unique=True, max_length=255)
-    firstname = models.CharField(blank=True, default='', max_length=255)
-    lastname = models.CharField(blank=True, default='', max_length=255)
+    firstname = models.CharField(blank=True, null=True, default='', max_length=255)
+    lastname = models.CharField(blank=True, null=True, default='', max_length=255)
     interface_lang = models.ForeignKey(Language, to_field='lang_code', default='en', on_delete=models.CASCADE)
     email = None
 
@@ -70,4 +70,4 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.is_admin
 
     def get_full_name(self):
-        return str(self.firstname) + ' ' + str(self.lastname) if self.firstname else self.tg_username[1:]
+        return str(self.firstname) + ' ' + str(self.lastname) if self.firstname else self.tg_username
