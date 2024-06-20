@@ -20,6 +20,9 @@ def add_user(request):
             first_name = data['firstname']
             last_name = data['lastname']
             interface_lang = data['interface_lang_id']
+            is_admin = data['is_admin']
+            is_staff = is_admin
+            password = data['password'] if 'password' in data else None
 
             # Додавання користувача до бази даних
             user = User.objects.create(
@@ -27,23 +30,26 @@ def add_user(request):
                 tg_id=tg_id,
                 firstname=first_name,
                 lastname=last_name,
-                # костиль, пароль треба допускати як nullable
-                password='123',
+                # password=password,
                 is_active=True,
-                is_staff=False,
-                is_admin=False,
+                is_staff=is_staff,
+                is_admin=is_admin,
                 interface_lang_id=interface_lang
             )
+            if password:
+                user.set_password(password)
+            else:
+                user.set_unusable_password()
             user.save()
 
             return HttpResponse('The user has been registered successfully')
 
         except django.db.IntegrityError:
-            # костиль, треба нормальна перевірка перед спробою виконання INSERT INTO
+            # резервна перевірка
             return HttpResponse('The user already exists and successfully found')
 
-        except KeyError:
-            print('error key')
+        except KeyError as ke:
+            print(ke)
             return JsonResponse({'status': 'error', 'message': 'Invalid data'})
         except json.JSONDecodeError:
             print('error decode')

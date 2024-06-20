@@ -8,7 +8,11 @@ class CustomUserManager(BaseUserManager):
         if not tg_username or not tg_id:
             raise ValueError("You haven't passed tg_username and/or tg_id")
         user = self.model(tg_username=tg_username, tg_id=tg_id, **extra_fields)
-        user.set_password(password)
+        if password:
+            user.set_password(password)
+        else:
+            print('ми потрапляємо сюди навіть коли пароль додався на попередньому етапі')
+            user.set_unusable_password()
         user.save(using=self._db)
         return user
 
