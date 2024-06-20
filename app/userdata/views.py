@@ -1,12 +1,11 @@
-from django.contrib.auth.decorators import login_required
 from .helper import add_gold_coins_to_user
 from .models import UserData
 from rest_framework.decorators import api_view
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework import status
 from .serializer import User_data_Serializer
 from django.shortcuts import get_object_or_404
+
 
 @api_view(["GET"])
 def get_user_info(request):

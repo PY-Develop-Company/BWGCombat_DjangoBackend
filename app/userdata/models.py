@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User  ### need to import CustomUser
+from user_app.models import User
 from django.utils.timezone import now
 
 # Create your models here.
@@ -8,7 +8,7 @@ from django.utils.timezone import now
 class UserData(models.Model):
     user_id = models.OneToOneField(
         User, primary_key=True, on_delete=models.CASCADE
-    )  ### replace User to CustomUser later
+    )
     gold_balance = models.BigIntegerField(null=False, default=0)
     g_token = models.FloatField(null=False, default=0)
     last_visited = models.DateTimeField(null=False, default=now)
