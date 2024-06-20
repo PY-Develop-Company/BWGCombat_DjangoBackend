@@ -5,35 +5,50 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('userdata', '0003_alter_task_reward_id'),
+        ("userdata", "0003_alter_task_reward_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='rank',
-            name='reward_id',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='userdata.reward'),
+            model_name="rank",
+            name="reward_id",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="userdata.reward",
+            ),
         ),
         migrations.AlterField(
-            model_name='stage',
-            name='rank_id',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='userdata.rank'),
+            model_name="stage",
+            name="rank_id",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="userdata.rank",
+            ),
         ),
         migrations.AlterField(
-            model_name='stage',
-            name='reward_id',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='userdata.reward'),
+            model_name="stage",
+            name="reward_id",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="userdata.reward",
+            ),
         ),
         migrations.AlterField(
-            model_name='userdata',
-            name='rank_id',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='userdata.rank'),
+            model_name="userdata",
+            name="rank_id",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to="userdata.rank"
+            ),
         ),
         migrations.AlterField(
-            model_name='userdata',
-            name='stage_id',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='userdata.stage'),
+            model_name="userdata",
+            name="stage_id",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to="userdata.stage"
+            ),
         ),
     ]

@@ -5,45 +5,56 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('userdata', '0001_initial'),
+        ("userdata", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='stage',
-            name='name',
-            field=models.CharField(default='custom', max_length=255),
+            model_name="stage",
+            name="name",
+            field=models.CharField(default="custom", max_length=255),
         ),
         migrations.AlterField(
-            model_name='rank',
-            name='name',
-            field=models.CharField(default='custom', max_length=255),
+            model_name="rank",
+            name="name",
+            field=models.CharField(default="custom", max_length=255),
         ),
         migrations.AlterField(
-            model_name='rank',
-            name='reward_id',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='userdata.reward'),
+            model_name="rank",
+            name="reward_id",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="userdata.reward",
+            ),
         ),
         migrations.AlterField(
-            model_name='reward',
-            name='name',
-            field=models.CharField(default='custom', max_length=200),
+            model_name="reward",
+            name="name",
+            field=models.CharField(default="custom", max_length=200),
         ),
         migrations.AlterField(
-            model_name='stage',
-            name='reward_id',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='userdata.reward'),
+            model_name="stage",
+            name="reward_id",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="userdata.reward",
+            ),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='name',
-            field=models.CharField(default='custom', max_length=255),
+            model_name="task",
+            name="name",
+            field=models.CharField(default="custom", max_length=255),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='reward_id',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='userdata.reward'),
+            model_name="task",
+            name="reward_id",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="userdata.reward",
+            ),
         ),
     ]

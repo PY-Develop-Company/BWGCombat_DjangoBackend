@@ -5,15 +5,18 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('userdata', '0002_stage_name_alter_rank_name_alter_rank_reward_id_and_more'),
+        ("userdata", "0002_stage_name_alter_rank_name_alter_rank_reward_id_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='task',
-            name='reward_id',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='userdata.reward'),
+            model_name="task",
+            name="reward_id",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="userdata.reward",
+            ),
         ),
     ]
