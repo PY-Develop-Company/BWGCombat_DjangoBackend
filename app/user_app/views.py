@@ -1,5 +1,4 @@
 import django.db
-from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -7,8 +6,8 @@ from .models import User
 import json
 
 
-def home(request):
-    return HttpResponse('home')
+def user_home(request):
+    return HttpResponse('user home')
 
 
 @method_decorator(csrf_exempt, name='dispatch')

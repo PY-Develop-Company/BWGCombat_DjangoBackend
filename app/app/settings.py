@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'user_app.urls'
+ROOT_URLCONF = 'app.urls'
 
 TEMPLATES = [
     {
@@ -126,14 +126,6 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# print()
-# print(os.getcwd())
-# print()
-# print(BASE_DIR)
-# print()
-# print(STATIC_ROOT)
-# print()
 
 # STATICFILES_DIRS = [
 #     "/var/www/app/staticfiles/"
