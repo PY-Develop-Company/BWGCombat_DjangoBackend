@@ -4,6 +4,8 @@ from django.utils.timezone import now
 
 # Create your models here.
 
+### need to make seeder
+
 
 class UserData(models.Model):
     user_id = models.OneToOneField(
@@ -13,10 +15,10 @@ class UserData(models.Model):
     g_token = models.FloatField(null=False, default=0)
     last_visited = models.DateTimeField(null=False, default=now)
     rank_id = models.OneToOneField(
-        "Rank", null=False, blank=False, on_delete=models.CASCADE
+        "Rank", null=True, blank=False, on_delete=models.CASCADE, default=None
     )
     stage_id = models.OneToOneField(
-        "Stage", null=False, blank=False, on_delete=models.CASCADE
+        "Stage", null=True, blank=False, on_delete=models.CASCADE, default=None
     )
 
 
