@@ -11,7 +11,7 @@ class CustomUserManager(BaseUserManager):
         if password:
             user.set_password(password)
         else:
-            print('ми потрапляємо сюди навіть коли пароль додався на попередньому етапі')
+            # print('ми потрапляємо сюди навіть коли пароль додався на попередньому етапі')
             user.set_unusable_password()
         user.save(using=self._db)
         return user
@@ -79,4 +79,4 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Fren(models.Model):
     fren_tg_id = models.BigIntegerField(blank=False, primary_key=True)
-    inviter_tg_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    inviter_tg_id = models.ForeignKey(User, unique=False, on_delete=models.CASCADE, related_name='referrals')

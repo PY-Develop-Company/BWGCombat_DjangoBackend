@@ -1,8 +1,14 @@
 import django.db
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from .models import User
+from django.views.decorators.http import require_POST, require_GET
+from rest_framework.decorators import api_view
+
+from .models import User, Fren
+
+# from aiogram import Bot
+# from aiogram.utils.deep_linking import create_start_link
+
 import json
 
 
@@ -53,3 +59,54 @@ def add_user(request):
     except json.JSONDecodeError:
         print('error decode')
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
+
+
+@csrf_exempt
+@require_POST
+def add_referral(request):
+    try:
+        data = json.loads(request.body)
+        fren_tg_id = int(data['fren_tg_id'])
+        inviter_tg_id = int(data['inviter_tg_id'])
+
+        inviter_user = User.objects.get(tg_id=inviter_tg_id)
+
+        # Додавання реферала до бази даних
+        fren = Fren(fren_tg_id=fren_tg_id, inviter_tg_id=inviter_user)
+        fren.save()
+
+        return HttpResponse('The user has been registered successfully')
+    except django.db.IntegrityError:
+        # резервна перевірка
+        return HttpResponse('Database Integrity error')
+
+    except KeyError as ke:
+        print(ke)
+        return JsonResponse({'status': 'error', 'message': 'Invalid data'})
+    except json.JSONDecodeError:
+        print('error decode')
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
+
+
+@api_view(["GET"])
+def get_user_referrals(request):
+    tg_id = request.data.get("tg_id")
+
+    print(request.data)
+    print(request.body)
+
+    # print('json.loads(request.body)')
+    # print(data)
+
+    print()
+    print(1)
+    print(tg_id)
+    print(1)
+    print()
+    user = User.objects.get(tg_id=tg_id)
+    referrals = user.referrals.all()
+
+    for referral in referrals:
+        print(referral)
+
+    return HttpResponse(referrals)
