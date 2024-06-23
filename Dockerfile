@@ -2,6 +2,7 @@ FROM python:3.11-alpine
 LABEL maintainer="https://github.com/PY-Develop-Company"
 
 ENV PYTHONUNBUFFERED 1
+ENV PATH="/py/bin:$PATH"
 
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./app /app
@@ -18,7 +19,5 @@ RUN python /py/bin/pip install -r /tmp/requirements.txt && \
     apk del .tmp-build-deps
 RUN adduser --disabled-password --no-create-home django-user
 
-
-ENV PATH="/py/bin:$PATH"
 
 USER django-user

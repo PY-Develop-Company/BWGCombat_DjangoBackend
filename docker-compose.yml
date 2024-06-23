@@ -3,7 +3,6 @@ services:
     app:
         build:
           context: .
-        container_name: backend_app_service
         ports:
             - "8000:8000"
         volumes:
@@ -24,23 +23,19 @@ services:
 
     db:
         image: postgres:16-alpine
-        container_name: db_service
         environment:
             - POSTGRES_DB=${DB_NAME}
             - POSTGRES_USER=${DB_USER}
             - POSTGRES_PASSWORD=${DB_PASS}
-        env_file:
-            - .env
+        ports:
+            - "5432:5432"
         volumes:
             - dev-db-data:/var/lib/postgresql/data
-        ports:
-            - 5432:5432
 
     nginx:
         build: ./nginx
-        container_name: nginx_service
         ports:
-            - 80:80
+            - "80:80"
         depends_on:
             - app
 
