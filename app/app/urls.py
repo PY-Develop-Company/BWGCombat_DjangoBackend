@@ -27,5 +27,7 @@ urlpatterns = [
     path('', views.home),
     path('home/', views.home),
     path('user/', include("user_app.urls")),
+    path("balance/", include("userdata.urls")),
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
