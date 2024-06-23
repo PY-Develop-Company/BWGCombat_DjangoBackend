@@ -40,6 +40,9 @@ class Language(models.Model):
     lang_code = models.CharField(blank=False, unique=True, max_length=2)
     lang_name = models.CharField(blank=True, unique=False, default='', max_length=100)
 
+    def __str__(self) -> str:
+        return self.lang_code
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     tg_id = models.BigIntegerField(blank=False, primary_key=True)
