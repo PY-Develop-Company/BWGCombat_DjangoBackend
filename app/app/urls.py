@@ -27,7 +27,8 @@ urlpatterns = [
     path('', views.home),
     path('home/', views.home),
     path('user/', include("user_app.urls")),
-    path("balance/", include("userdata.urls")),
+    path('levels/', include("levels_app.urls")),
+    path('clicker/', include("clicker_app.urls")),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

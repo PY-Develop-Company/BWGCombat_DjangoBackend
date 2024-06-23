@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
+from django.utils.timezone import now
+
+from levels_app.models import Rank, Stage
 
 
 class CustomUserManager(BaseUserManager):
@@ -78,6 +81,45 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return str(self.firstname) + ' ' + str(self.lastname) if self.firstname else self.tg_username
+
+
+class UserData(models.Model):
+    user_id = models.OneToOneField(
+        User, primary_key=True, on_delete=models.CASCADE
+    )
+    gold_balance = models.BigIntegerField(null=False, default=0)
+    g_token = models.FloatField(null=False, default=0)
+    last_visited = models.DateTimeField(null=False, default=now)
+    rank_id = models.OneToOneField(
+        Rank, null=True, blank=False, on_delete=models.CASCADE, default=None
+    )
+    stage_id = models.OneToOneField(
+        Stage, null=True, blank=False, on_delete=models.CASCADE, default=None
+    )
+
+    def add_gold_coins(self, coins: int):
+        self.gold_balance += int(coins)
+        self.save()
+
+    def set_gold_coins(self, coins: int):
+        self.gold_balance = int(coins)
+        self.save()
+
+    def remove_gold_coins(self, coins: int):
+        self.gold_balance -= int(coins)
+        self.save()
+
+    def add_g_token_coins(self, coins: int):
+        self.g_token += int(coins)
+        self.save()
+
+    def set_g_token_coins(self, coins: int):
+        self.g_token = int(coins)
+        self.save()
+
+    def remove_g_token_coins(self, coins: int):
+        self.g_token -= int(coins)
+        self.save()
 
 
 class Fren(models.Model):
