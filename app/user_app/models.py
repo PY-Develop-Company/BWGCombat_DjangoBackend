@@ -46,7 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     tg_username = models.CharField(blank=False, unique=True, max_length=255)
     firstname = models.CharField(blank=True, null=True, default='', max_length=255)
     lastname = models.CharField(blank=True, null=True, default='', max_length=255)
-    interface_lang = models.ForeignKey(Language, to_field='lang_code', default='en', on_delete=models.CASCADE)
+    interface_lang = models.ForeignKey(Language, to_field='lang_code', default='en', on_delete=models.SET_DEFAULT)
     email = None
 
     is_active = models.BooleanField(default=True)
@@ -75,3 +75,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return str(self.firstname) + ' ' + str(self.lastname) if self.firstname else self.tg_username
+
+
+class Fren(models.Model):
+    fren_tg_id = models.BigIntegerField(blank=False, primary_key=True)
+    inviter_tg_id = models.ForeignKey(User, on_delete=models.CASCADE)
