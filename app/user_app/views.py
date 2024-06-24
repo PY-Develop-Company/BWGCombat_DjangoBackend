@@ -39,7 +39,7 @@ def get_user_info(request):
 
 @api_view(["POST"])
 def add_coins_to_user(request):
-    coins = request.data.get("clicks") ### multiply by coins_per_click
+    coins = request.data.get("clicks")
     user_id = request.data.get("user_id")
 
     user_data = UserData.objects.filter(user_id=user_id).first()
@@ -54,7 +54,7 @@ def remove_coins_from_user(request):
     user_id = request.data.get("user_id")
 
     user_data = UserData.objects.filter(user_id=user_id).first()
-    user_data.remove_coins(coins)
+    user_data.remove_gold_coins(coins)
     info = User_data_Serializer(user_data)
     return Response({"user_info": info.data}, status=status.HTTP_200_OK)
 
