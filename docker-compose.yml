@@ -3,10 +3,12 @@ services:
     app:
         build:
           context: .
+          dockerfile: Dockerfile
         ports:
             - "8000:8000"
         volumes:
             - ./app:/app
+#            - static_volume:/staticfiles
         command: >
             sh -c "python manage.py wait_for_db &&
                    python manage.py migrate &&
@@ -39,5 +41,18 @@ services:
         depends_on:
             - app
 
+    ngrok:
+        build:
+          context: .
+          dockerfile: Dockerfile.ngrok
+        ports:
+          - "4040:4040"
+        depends_on:
+          - app
+        environment:
+          - NGROK_AUTHTOKEN=2hyOEjV8xRnoRwhOOhCwXf6bubL_7m1o528sV8MdUsq23cim2
+          - NGROK_PORT=app:8000
+
 volumes:
     dev-db-data:
+#    static_volume:
