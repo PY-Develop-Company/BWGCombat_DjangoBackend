@@ -10,5 +10,6 @@ urlpatterns = [
     path("add_coins/", views.add_coins_to_user, name="add_coins"),
     path("rem_coins/", views.remove_coins_from_user, name="rem_coins"),
     path('add_referal/', views.add_referral, name='add_referral'),
-    path('get_user_referrals/', views.get_user_referrals, name='get_user_referrals')
+    path('get_user_referrals/', views.get_user_referrals, name='get_user_referrals'),
 ]
+

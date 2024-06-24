@@ -52,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     tg_username = models.CharField(blank=False, unique=True, max_length=255)
     firstname = models.CharField(blank=True, null=True, default='', max_length=255)
     lastname = models.CharField(blank=True, null=True, default='', max_length=255)
-    interface_lang = models.ForeignKey(Language, to_field='lang_code', default='en', on_delete=models.SET_DEFAULT)
+    interface_lang = models.ForeignKey(Language, to_field='lang_code', null=True, default=None, on_delete=models.SET_DEFAULT)
     email = None
 
     is_active = models.BooleanField(default=True)
@@ -87,9 +87,12 @@ class UserData(models.Model):
     user_id = models.OneToOneField(
         User, primary_key=True, on_delete=models.CASCADE
     )
+
     gold_balance = models.BigIntegerField(null=False, default=0)
     g_token = models.FloatField(null=False, default=0)
+
     last_visited = models.DateTimeField(null=False, default=now)
+
     rank_id = models.OneToOneField(
         Rank, null=True, blank=False, on_delete=models.CASCADE, default=None
     )
@@ -97,8 +100,11 @@ class UserData(models.Model):
         Stage, null=True, blank=False, on_delete=models.CASCADE, default=None
     )
 
+    click_multiplier = models.IntegerField(null = False, blank=False, default=1)
+    energy = models.BigIntegerField(null = False, blank=False, default=100)     ### ask for default value
+
     def add_gold_coins(self, coins: int):
-        self.gold_balance += int(coins)
+        self.gold_balance += int(coins)*self.click_multiplier
         self.save()
 
     def set_gold_coins(self, coins: int):
