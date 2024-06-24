@@ -1,0 +1,8 @@
+FROM wernight/ngrok
+
+# Set environment variables (replace with your actual authtoken)
+ENV NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+ENV NGROK_PORT=${NGROK_PORT}
+
+# Default command to run when starting the container
+CMD ["ngrok", "http", "app:8000"]

@@ -3,6 +3,7 @@ services:
     app:
         build:
           context: .
+          dockerfile: Dockerfile
         ports:
             - "8000:8000"
         volumes:
@@ -38,6 +39,18 @@ services:
             - "80:80"
         depends_on:
             - app
+
+    ngrok:
+        build:
+          context: .
+          dockerfile: Dockerfile.ngrok
+        ports:
+          - "4040:4040"
+        depends_on:
+          - app
+        environment:
+          - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+          - NGROK_PORT=app:${NGROK_PORT}
 
 volumes:
     dev-db-data:
