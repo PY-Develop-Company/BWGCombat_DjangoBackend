@@ -20,8 +20,13 @@ DB_USER=root
 DB_PASS=root
 DB_PORT=5432
 
+NGROK_AUTHTOKEN=__token__
+NGROK_PORT=8000
+
 JWT_SIGNING_KEY=some_key
 ```
+You can get NGROK_AUTHTOKEN via link (https://dashboard.ngrok.com)
+
 Then run following commands to configure Docker and install all requirements:
 ```
 docker-compose build
@@ -43,10 +48,8 @@ Useful commands:
 docker-compose run --rm app sh -c ""
 ```
 
-### Run backend and tgbot 
-- open installed ngrok console app
-  - run command "ngrok config add-authtoken your_token"
-  - run command "ngrok http http://localhost:8000"
-  - copy https link (tunel to http://localhost:8000)
-  - put link to bot config 
-  - run backend and then bot
+## Get access to backend from dedicated PC
+
+- visit http://localhost:4040
+- send link to friend for further collaboration;  
+![img_1.png](img_1.png)
