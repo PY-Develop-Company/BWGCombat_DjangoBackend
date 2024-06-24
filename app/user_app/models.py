@@ -3,7 +3,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 from django.utils import timezone
 from django.utils.timezone import now
 
-from levels_app.models import Rank, Stage
+from levels_app.models import Rank, Stage, Task
 
 
 class CustomUserManager(BaseUserManager):
@@ -126,6 +126,14 @@ class UserData(models.Model):
     def remove_g_token_coins(self, coins: int):
         self.g_token -= int(coins)
         self.save()
+
+class User_tasks(models.Model):
+    user = models.ForeignKey(User, null = False, blank=False, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, null = False, blank=False, on_delete=models.DO_NOTHING)
+    time = models.DateTimeField(null=False, blank=False, default=now)
+
+    def __str__(self) -> str:
+        return self.user.tg_username + self.task.name        
 
 
 class Fren(models.Model):
