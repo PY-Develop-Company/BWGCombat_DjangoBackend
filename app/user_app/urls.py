@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 
@@ -11,4 +13,4 @@ urlpatterns = [
     path("rem_coins/", views.remove_coins_from_user, name="rem_coins"),
     path('add_referal/', views.add_referral, name='add_referral'),
     path('get_user_referrals/', views.get_user_referrals, name='get_user_referrals')
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
