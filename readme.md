@@ -19,6 +19,8 @@ DB_HOST=db
 DB_USER=root
 DB_PASS=root
 DB_PORT=5432
+
+JWT_SIGNING_KEY=some_key
 ```
 Then run following commands to configure Docker and install all requirements:
 ```

@@ -1,6 +1,20 @@
 from rest_framework import serializers
 from .models import UserData
 from levels_app.models import Rank, Stage, Task, Reward
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Customizes JWT default Serializer to add more information about user"""
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['tg_username'] = user.tg_username
+        token['tg_id'] = user.tg_id
+
+        return token
+
+
 
 class RewardRelatedField(serializers.RelatedField):
     def to_representation(self, obj:Reward):

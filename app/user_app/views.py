@@ -15,6 +15,13 @@ from .models import User, UserData, Fren
 
 import json
 from .serializer import User_data_Serializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from user_app.serializer import CustomTokenObtainPairSerializer
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    # Replace the serializer with your custom
+    serializer_class = CustomTokenObtainPairSerializer
 
 
 def user_home(request):
