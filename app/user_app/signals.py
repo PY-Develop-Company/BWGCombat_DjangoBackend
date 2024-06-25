@@ -4,8 +4,7 @@ from .models import User
 from user_app.models import UserData
 
 @receiver(post_save, sender=User)
-def add_userData_record(sender, instance, created, **kwargs):
-    print('here')
+def add_user_data_record(sender, instance, created, **kwargs):
     if created:
 
         user_data = UserData.objects.create(user_id=instance)### set nullable to 

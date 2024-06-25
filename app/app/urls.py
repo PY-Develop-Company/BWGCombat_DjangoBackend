@@ -23,9 +23,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', views.home),
     path('home/', views.home),
+
+    path('admin/', admin.site.urls),
+
     path('user/', include("user_app.urls")),
     path('levels/', include("levels_app.urls")),
     path('clicker/', include("clicker_app.urls")),
@@ -34,4 +36,5 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 
