@@ -22,6 +22,8 @@ DB_PORT=5432
 
 NGROK_AUTHTOKEN=__token__
 NGROK_PORT=8000
+
+JWT_SIGNING_KEY=some_key
 ```
 You can get NGROK_AUTHTOKEN via link (https://dashboard.ngrok.com)
 

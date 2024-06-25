@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class Rank(models.Model):
@@ -38,8 +39,14 @@ class Task(models.Model):
 
 
 class Reward(models.Model):
+
+    class RewardType(models.TextChoices):
+        GOLD = '1', _("Gold")
+        GOLD_PER_CLICK = '2', _("Gold_per_click")
+
     name = models.CharField(max_length=200, blank=False, null=False)
     amount = models.BigIntegerField(null=False)
+    reward_type = models.CharField(null = True, choices=RewardType, default=RewardType.GOLD)
 
     def __str__(self):
         return f"{self.name}"
