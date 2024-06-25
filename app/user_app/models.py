@@ -134,13 +134,12 @@ class UserData(models.Model):
         self.g_token -= int(coins)
         self.save()
 
-    def get_referral_count(self):
-        return self.referrals.count()
-
     def referrals_quantity_check(self, expected_quantity):
-        pass
+        user = User.objects.get(tg_id=self.user_id)
+        refs_quantity = user.referrals.count()
+        return True if refs_quantity >= expected_quantity else False
 
-    def receive_reward(self, task):
+    def receive_reward(self, task: Task):
         pass
 
 
