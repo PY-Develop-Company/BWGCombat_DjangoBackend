@@ -5,15 +5,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0001_initial'),
+        ("user_app", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='interface_lang',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='user_app.language', to_field='lang_code'),
+            model_name="user",
+            name="interface_lang",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="user_app.language",
+                to_field="lang_code",
+            ),
         ),
     ]

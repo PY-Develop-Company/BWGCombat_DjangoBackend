@@ -6,15 +6,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0002_alter_user_interface_lang_fren'),
+        ("user_app", "0002_alter_user_interface_lang_fren"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='fren',
-            name='inviter_tg_id',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='referrals', to=settings.AUTH_USER_MODEL),
+            model_name="fren",
+            name="inviter_tg_id",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="referrals",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

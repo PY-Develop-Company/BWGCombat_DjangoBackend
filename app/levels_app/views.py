@@ -2,4 +2,4 @@ from django.http import HttpResponse
 
 
 def levels_home(request):
-    return HttpResponse('levels home')
+    return HttpResponse("levels home")

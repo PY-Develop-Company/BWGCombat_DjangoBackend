@@ -5,49 +5,134 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Reward',
+            name="Reward",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('amount', models.BigIntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("amount", models.BigIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='Rank',
+            name="Rank",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('next_rank', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='next_rank_from_rank', to='levels_app.rank')),
-                ('reward_id', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='levels_app.reward')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "next_rank",
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="next_rank_from_rank",
+                        to="levels_app.rank",
+                    ),
+                ),
+                (
+                    "reward_id",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="levels_app.reward",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Task',
+            name="Task",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('text', models.TextField(null=True)),
-                ('reward_id', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='levels_app.reward')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("text", models.TextField(null=True)),
+                (
+                    "reward_id",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="levels_app.reward",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Stage',
+            name="Stage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('next_rank', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='next_rank_from_stage', to='levels_app.rank')),
-                ('next_stage', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='next_stage_from_stage', to='levels_app.stage')),
-                ('rank_id', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='levels_app.rank')),
-                ('reward_id', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='levels_app.reward')),
-                ('tasks_id', models.ManyToManyField(to='levels_app.task')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "next_rank",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="next_rank_from_stage",
+                        to="levels_app.rank",
+                    ),
+                ),
+                (
+                    "next_stage",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="next_stage_from_stage",
+                        to="levels_app.stage",
+                    ),
+                ),
+                (
+                    "rank_id",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="levels_app.rank",
+                    ),
+                ),
+                (
+                    "reward_id",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="levels_app.reward",
+                    ),
+                ),
+                ("tasks_id", models.ManyToManyField(to="levels_app.task")),
             ],
         ),
     ]

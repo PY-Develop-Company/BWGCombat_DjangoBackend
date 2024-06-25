@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0007_alter_user_interface_lang'),
+        ("user_app", "0007_alter_user_interface_lang"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userdata',
-            name='energy',
+            model_name="userdata",
+            name="energy",
             field=models.BigIntegerField(default=100),
         ),
     ]

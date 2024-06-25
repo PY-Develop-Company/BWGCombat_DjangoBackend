@@ -6,22 +6,35 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0001_initial'),
+        ("user_app", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='interface_lang',
-            field=models.ForeignKey(default='en', on_delete=django.db.models.deletion.SET_DEFAULT, to='user_app.language', to_field='lang_code'),
+            model_name="user",
+            name="interface_lang",
+            field=models.ForeignKey(
+                default="en",
+                on_delete=django.db.models.deletion.SET_DEFAULT,
+                to="user_app.language",
+                to_field="lang_code",
+            ),
         ),
         migrations.CreateModel(
-            name='Fren',
+            name="Fren",
             fields=[
-                ('fren_tg_id', models.BigIntegerField(primary_key=True, serialize=False)),
-                ('inviter_tg_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "fren_tg_id",
+                    models.BigIntegerField(primary_key=True, serialize=False),
+                ),
+                (
+                    "inviter_tg_id",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]
