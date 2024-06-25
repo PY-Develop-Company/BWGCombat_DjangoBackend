@@ -5,7 +5,7 @@ from .models import User, UserData
 
 @receiver(post_save, sender=User)
 def add_user_data_record(sender, instance, created, **kwargs):
-    print('here')
+    # print('here')
     if created:
 
         user_data = UserData.objects.create(user_id=instance)

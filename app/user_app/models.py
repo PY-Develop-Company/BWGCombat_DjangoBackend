@@ -1,9 +1,9 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from django.utils.timezone import now
 
-from levels_app.models import Rank, Stage
+from app.levels_app.models import Rank, Stage
 
 
 class CustomUserManager(BaseUserManager):
@@ -81,6 +81,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return str(self.firstname) + ' ' + str(self.lastname) if self.firstname else self.tg_username
+
+    # def receive_reward(self, reward_type, amount):
+    #     pass
+
+    # def delete(self, args, **kwargs):
+    #     # Ensure related UserData is deleted first to avoid integrity errors
+    #     with transaction.atomic():
+    #         self.userdata.delete()
+    #         # LogEntry.objects.filter(user_id=instance.userdata.user.id).delete()
+    #         super().delete(args, **kwargs)
 
 
 class UserData(models.Model):
