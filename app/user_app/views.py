@@ -41,8 +41,10 @@ def get_user_info(request):
 
 @api_view(["POST"])
 def add_coins_to_user(request):
-    coins = request.data.get("clicks")
-    user_id = request.data.get("user_id")
+    coins = request.data.get("totalClicks")
+    user_id = request.data.get("userId")
+    sus_activity = request.data.get("suspiciousActivity")
+    
 
     user_data = UserData.objects.filter(user_id=user_id).first()
     user_data.add_gold_coins(coins)
