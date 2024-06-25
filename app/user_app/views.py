@@ -1,7 +1,7 @@
 import django.db
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST, require_GET
+# from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -24,7 +24,11 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 
 def user_home(request):
-    return HttpResponse("user home")
+    data = json.loads(request.body)
+    if data:
+        fren_id = data['fren_id']
+    return HttpResponse('user home')
+
 
 
 @api_view(["GET"])
@@ -69,7 +73,8 @@ def add_user(request):
         interface_lang = data["interface_lang_id"]
         is_admin = data["is_admin"]
         is_staff = is_admin
-        password = data["password"] if "password" in data else None
+        password = data['password'] if 'password' in data else None
+        # is_subscribed = data['is_subscribed']
 
         # Додавання користувача до бази даних
         user = User.objects.create(
@@ -103,7 +108,7 @@ def add_user(request):
 
 
 @csrf_exempt
-@require_POST
+@api_view(["POST"])
 def add_referral(request):
     try:
         data = json.loads(request.body)
@@ -129,22 +134,12 @@ def add_referral(request):
         return JsonResponse({"status": "error", "message": "Invalid JSON"})
 
 
+@csrf_exempt
 @api_view(["GET"])
 def get_user_referrals(request):
-    tg_id = request.data.get("tg_id")
+    data = json.loads(request.body)
 
-    print(request.data)
-    print(request.body)
-
-    # print('json.loads(request.body)')
-    # print(data)
-
-    print()
-    print(1)
-    print(tg_id)
-    print(1)
-    print()
-    user = User.objects.get(tg_id=tg_id)
+    user = User.objects.get(tg_id=data["tg_id"])
     referrals = user.referrals.all()
 
     for referral in referrals:
