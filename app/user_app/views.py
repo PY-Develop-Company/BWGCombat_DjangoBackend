@@ -31,7 +31,6 @@ def user_home(request):
     return HttpResponse('user home')
 
 
-
 @api_view(["GET"])
 def get_user_info(request):
     user = request.user

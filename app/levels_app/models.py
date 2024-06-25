@@ -43,10 +43,11 @@ class Reward(models.Model):
     class RewardType(models.TextChoices):
         GOLD = '1', _("Gold")
         GOLD_PER_CLICK = '2', _("Gold_per_click")
+        G_TOKEN = '3', _("G_Token")
 
     name = models.CharField(max_length=200, blank=False, null=False)
     amount = models.BigIntegerField(null=False)
-    reward_type = models.CharField(null = True, choices=RewardType, default=RewardType.GOLD)
+    reward_type = models.CharField(null=True, choices=RewardType, default=RewardType.GOLD)
 
     def __str__(self):
         return f"{self.name}"

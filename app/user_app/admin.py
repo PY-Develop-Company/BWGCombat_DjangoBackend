@@ -1,6 +1,6 @@
 from .models import User, Language
 from django.contrib import admin
-from .models import UserData, User_tasks
+from .models import UserData, UsersTasks
 
 
 class UserDataAdmin(admin.ModelAdmin):
@@ -14,5 +14,5 @@ class UserTasksAdmin(admin.ModelAdmin):
 admin.site.register(User)
 admin.site.register(Language)
 admin.site.register(UserData, UserDataAdmin)
-admin.site.register(User_tasks, UserTasksAdmin)
+admin.site.register(UsersTasks, UserTasksAdmin)
 

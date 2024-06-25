@@ -5,6 +5,7 @@ from django.utils.timezone import now
 
 from levels_app.models import Rank, Stage, Task
 
+
 class CustomUserManager(BaseUserManager):
     def _create_user(self, tg_username, tg_id, password, **extra_fields):
         if not tg_username or not tg_id:
@@ -48,7 +49,7 @@ class Language(models.Model):
 
 class User(AbstractBaseUser, PermissionsMixin):
     tg_id = models.BigIntegerField(blank=False, primary_key=True)
-    tg_username = models.CharField(blank=False, unique=True, max_length=255)
+    tg_username = models.CharField(null=True, blank=False, unique=True, max_length=255)
     firstname = models.CharField(blank=True, null=True, default='', max_length=255)
     lastname = models.CharField(blank=True, null=True, default='', max_length=255)
     interface_lang = models.ForeignKey(Language, to_field='lang_code', null=True, default=None, on_delete=models.SET_DEFAULT)
@@ -81,9 +82,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         return str(self.firstname) + ' ' + str(self.lastname) if self.firstname else self.tg_username
 
-    # def receive_reward(self, reward_type, amount):
-    #     pass
-
     # def delete(self, args, **kwargs):
     #     # Ensure related UserData is deleted first to avoid integrity errors
     #     with transaction.atomic():
@@ -113,7 +111,7 @@ class UserData(models.Model):
     energy = models.BigIntegerField(null = False, blank=False, default=100)     ### ask for default value
 
     def add_gold_coins(self, coins: int):
-        self.gold_balance += int(coins)*self.click_multiplier
+        self.gold_balance += int(coins)*int(self.click_multiplier)
         self.save()
 
     def set_gold_coins(self, coins: int):
@@ -136,9 +134,19 @@ class UserData(models.Model):
         self.g_token -= int(coins)
         self.save()
 
-class User_tasks(models.Model):
-    user = models.ForeignKey(User, null = False, blank=False, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, null = False, blank=False, on_delete=models.DO_NOTHING)
+    def get_referral_count(self):
+        return self.referrals.count()
+
+    def referrals_quantity_check(self, expected_quantity):
+        pass
+
+    def receive_reward(self, task):
+        pass
+
+
+class UsersTasks(models.Model):
+    user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.DO_NOTHING)
     time = models.DateTimeField(null=False, blank=False, default=now)
 
     def __str__(self) -> str:
