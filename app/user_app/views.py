@@ -36,7 +36,7 @@ def user_home(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_user_info(request):
-    user_id = request.data.get('userId')
+    user_id = request.query_params.get('userId')
     user_data = get_object_or_404(UserData, user_id=user_id)
     serializer = User_data_Serializer(user_data)
     return Response({"info": serializer.data}, status=status.HTTP_200_OK)
