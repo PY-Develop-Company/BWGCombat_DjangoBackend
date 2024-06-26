@@ -3,10 +3,12 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 # from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
+
 from .models import User, UserData, Fren
 
 # from aiogram import Bot
@@ -32,24 +34,24 @@ def user_home(request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def get_user_info(request):
-    user = request.user
-    user_data = get_object_or_404(UserData, user_id=user.tg_id)
+    user_id = request.data.get('userId')
+    user_data = get_object_or_404(UserData, user_id=user_id)
     serializer = User_data_Serializer(user_data)
-    return Response({"user_info": serializer.data}, status=status.HTTP_200_OK)
+    return Response({"info": serializer.data}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def add_coins_to_user(request):
     coins = request.data.get("totalClicks")
     user_id = request.data.get("userId")
-    sus_activity = request.data.get("suspiciousActivity")
-    
 
-    user_data = UserData.objects.filter(user_id=user_id).first()
+    user_data = UserData.objects.get(user_id=user_id)
     user_data.add_gold_coins(coins)
     info = User_data_Serializer(user_data)
-    return Response({"balam": info.data}, status=status.HTTP_200_OK)
+    return Response({"user_info": info.data}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -63,17 +65,19 @@ def remove_coins_from_user(request):
     return Response({"user_info": info.data}, status=status.HTTP_200_OK)
 
 
+
+
 @csrf_exempt
 @api_view(["POST"])
 def add_user(request):
     try:
         data = json.loads(request.body)
-        tg_username = data["tg_username"]
-        tg_id = data["tg_id"]
-        first_name = data["firstname"]
-        last_name = data["lastname"]
-        interface_lang = data["interface_lang_id"]
-        is_admin = data["is_admin"]
+        tg_username = data['tg_username']
+        tg_id = data['tg_id']
+        first_name = data['firstname']
+        last_name = data['lastname']
+        interface_lang = data['interface_lang_id']
+        is_admin = data['is_admin']
         is_staff = is_admin
         password = data['password'] if 'password' in data else None
         # is_subscribed = data['is_subscribed']
@@ -88,7 +92,7 @@ def add_user(request):
             is_active=True,
             is_staff=is_staff,
             is_admin=is_admin,
-            interface_lang_id=interface_lang,
+            interface_lang_id=interface_lang
         )
         if password:
             user.set_password(password)
@@ -96,17 +100,17 @@ def add_user(request):
             user.set_unusable_password()
         user.save()
 
-        return HttpResponse("The user has been registered successfully")
+        return HttpResponse('The user has been registered successfully')
     except django.db.IntegrityError:
         # резервна перевірка
-        return HttpResponse("The user already exists and successfully found")
+        return HttpResponse('The user already exists and successfully found')
 
     except KeyError as ke:
         print(ke)
-        return JsonResponse({"status": "error", "message": "Invalid data"})
+        return JsonResponse({'status': 'error', 'message': 'Invalid data'})
     except json.JSONDecodeError:
-        print("error decode")
-        return JsonResponse({"status": "error", "message": "Invalid JSON"})
+        print('error decode')
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
 
 
 @csrf_exempt
@@ -114,8 +118,8 @@ def add_user(request):
 def add_referral(request):
     try:
         data = json.loads(request.body)
-        fren_tg_id = int(data["fren_tg_id"])
-        inviter_tg_id = int(data["inviter_tg_id"])
+        fren_tg_id = int(data['fren_tg_id'])
+        inviter_tg_id = int(data['inviter_tg_id'])
 
         inviter_user = User.objects.get(tg_id=inviter_tg_id)
 
@@ -123,17 +127,17 @@ def add_referral(request):
         fren = Fren(fren_tg_id=fren_tg_id, inviter_tg_id=inviter_user)
         fren.save()
 
-        return HttpResponse("The user has been registered successfully")
+        return HttpResponse('The user has been registered successfully')
     except django.db.IntegrityError:
         # резервна перевірка
-        return HttpResponse("Database Integrity error")
+        return HttpResponse('Database Integrity error')
 
     except KeyError as ke:
         print(ke)
-        return JsonResponse({"status": "error", "message": "Invalid data"})
+        return JsonResponse({'status': 'error', 'message': 'Invalid data'})
     except json.JSONDecodeError:
-        print("error decode")
-        return JsonResponse({"status": "error", "message": "Invalid JSON"})
+        print('error decode')
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
 
 
 @csrf_exempt
@@ -148,3 +152,4 @@ def get_user_referrals(request):
         print(referral)
 
     return HttpResponse(referrals)
+
