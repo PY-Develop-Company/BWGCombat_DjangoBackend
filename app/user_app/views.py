@@ -8,6 +8,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
+from django.core.exceptions import ValidationError
+
 
 from .models import User, UserData, Fren
 
@@ -94,37 +96,36 @@ def add_user(request):
             is_admin=is_admin,
             interface_lang_id=interface_lang
         )
+
         if password:
             user.set_password(password)
         else:
             user.set_unusable_password()
         user.save()
 
-        return HttpResponse('The user has been registered successfully')
-    except django.db.IntegrityError:
-        # резервна перевірка
-        return HttpResponse('The user already exists and successfully found')
-
-    except KeyError as ke:
-        print(ke)
-        return JsonResponse({'status': 'error', 'message': 'Invalid data'})
-    except json.JSONDecodeError:
-        print('error decode')
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
+        return JsonResponse({"result": 'The user has been registered successfully'})
+    except:
+        pass
+    # except django.db.IntegrityError:
+    #     return HttpResponse('The user already exists and successfully found')
+    # except KeyError:
+    #     return JsonResponse({'status': 'error', 'message': 'Invalid data'})
+    # except json.JSONDecodeError:
+    #     print('error decode')
+    #     return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
+    
 
 
 @csrf_exempt
 @api_view(["POST"])
 def add_referral(request):
     try:
-        data = json.loads(request.body)
-        fren_tg_id = int(data['fren_tg_id'])
-        inviter_tg_id = int(data['inviter_tg_id'])
+        fren_tg = request.data.get('fren_tg')
+        inviter_tg = request.data.get('inviter_tg')
 
-        inviter_user = User.objects.get(tg_id=inviter_tg_id)
 
         # Додавання реферала до бази даних
-        fren = Fren(fren_tg_id=fren_tg_id, inviter_tg_id=inviter_user)
+        fren = Fren.objects.create(fren_tg_id=fren_tg, inviter_tg_id=inviter_tg)
         fren.save()
 
         return HttpResponse('The user has been registered successfully')

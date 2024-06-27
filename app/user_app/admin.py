@@ -1,6 +1,6 @@
 from .models import User, Language
 from django.contrib import admin
-from .models import UserData, User_tasks
+from .models import UserData, User_tasks, Fren
 
 
 class UserDataAdmin(admin.ModelAdmin):
@@ -11,8 +11,12 @@ class UserDataAdmin(admin.ModelAdmin):
 class UserTasksAdmin(admin.ModelAdmin):
     list_display = ("user", "task")
 
+class FrenAdmin(admin.ModelAdmin):
+    list_display = ("inviter_tg", "fren_tg")
+
 
 admin.site.register(User)
 admin.site.register(Language)
 admin.site.register(UserData, UserDataAdmin)
 admin.site.register(User_tasks, UserTasksAdmin)
+admin.site.register(Fren, FrenAdmin)

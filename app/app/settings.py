@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from datetime import timedelta
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -183,4 +184,9 @@ SIMPLE_JWT = {
 # CORS SETTINGS -> REMOVE ON DEPLOY
 ################################################################
 CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'ngrok-skip-browser-warning',
+]
+
 CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app','https://*']

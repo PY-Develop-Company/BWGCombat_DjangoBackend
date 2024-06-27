@@ -2,6 +2,7 @@ from django.db import models, transaction
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from django.utils.timezone import now
+from django.core.exceptions import ValidationError
 
 from levels_app.models import Rank, Stage, Task
 
@@ -52,7 +53,7 @@ class Language(models.Model):
 
 class User(AbstractBaseUser, PermissionsMixin):
     tg_id = models.BigIntegerField(blank=False, primary_key=True)
-    tg_username = models.CharField(blank=False, unique=True, max_length=255)
+    tg_username = models.CharField(null = True, blank=False, unique=True, max_length=255)
     firstname = models.CharField(blank=True, null=True, default="", max_length=255)
     lastname = models.CharField(blank=True, null=True, default="", max_length=255)
     interface_lang = models.ForeignKey(
@@ -88,12 +89,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return self.is_admin
 
-    def get_full_name(self):
-        return (
-            str(self.firstname) + " " + str(self.lastname)
-            if self.firstname
-            else self.tg_username
-        )
+    def __str__(self) -> str:
+        return f"{self.tg_id}  {self.tg_username or ''}"
 
     # def receive_reward(self, reward_type, amount):
     #     pass
@@ -130,27 +127,30 @@ class UserData(models.Model):
 
     def add_gold_coins(self, coins: int):
         self.gold_balance += int(coins) * self.click_multiplier
-        self.save()
 
     def set_gold_coins(self, coins: int):
         self.gold_balance = int(coins)
-        self.save()
+
 
     def remove_gold_coins(self, coins: int):
         self.gold_balance -= int(coins)
-        self.save()
+
 
     def add_g_token_coins(self, coins: int):
         self.g_token += int(coins)
-        self.save()
+
 
     def set_g_token_coins(self, coins: int):
         self.g_token = int(coins)
-        self.save()
+
 
     def remove_g_token_coins(self, coins: int):
         self.g_token -= int(coins)
-        self.save()
+
+
+    def add_multiplier_coins(self, amount: int):
+        self.click_multiplier += amount
+
 
 
 class User_tasks(models.Model):
@@ -163,7 +163,20 @@ class User_tasks(models.Model):
 
 
 class Fren(models.Model):
-    fren_tg_id = models.BigIntegerField(blank=False, primary_key=True)
-    inviter_tg_id = models.ForeignKey(
-        User, unique=False, on_delete=models.CASCADE, related_name="referrals"
-    )
+    fren_tg = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    inviter_tg = models.ForeignKey(User, on_delete=models.CASCADE, related_name="referrals")
+
+    class Meta:
+        unique_together = ('fren_tg', 'inviter_tg')
+
+    def clean(self):
+        if self.fren_tg == self.inviter_tg:
+            raise ValidationError("You cannot add yourself as a friend.")
+        
+        # Check if the reverse relationship already exists
+        if Fren.objects.filter(inviter_tg=self.fren_tg, fren_tg=self.inviter_tg).exists():
+            raise ValidationError("This friendship already exists in reverse.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super(Fren, self).save(*args, **kwargs)
