@@ -6,11 +6,11 @@ from user_app.models import UserData
 from django.shortcuts import get_object_or_404
 
 
-
 def levels_home(request):
     return HttpResponse("levels home")
 
-def add_reward(user_data:UserData, reward:Reward):
+
+def add_reward(user_data: UserData, reward: Reward):
     reward_type = int(reward.reward_type)
     reward_amount = int(reward.amount)
     match reward_type:
@@ -21,25 +21,30 @@ def add_reward(user_data:UserData, reward:Reward):
         case 3:
             pass
         case _:
-            return 'No such type reward'
-        
+            return "No such type reward"
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def go_to_next_rank(request):
-    user_id = request.data.get('userId')
-    userdata = get_object_or_404(UserData, user_id = user_id)
+    user_id = request.data.get("userId")
+    userdata = get_object_or_404(UserData, user_id=user_id)
     reward = userdata.rank_id.reward_id
 
     userdata.rank_id = userdata.rank_id.next_rank
     userdata.save()
-    return JsonResponse({"result":"ok"})
-
-    
+    return JsonResponse({"result": "ok"})
 
 
-        
-    
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def request_task_submission(request):
+    user_id = request.data.get("userId")
+    task_id = request.data.get("taskId")
+    userdata = get_object_or_404(UserData, user_id=user_id)
+    task = get_object_or_404(Task, task_id=task_id)
+    ### make some logic to check
 
-
+    userdata.rank_id = userdata.rank_id.next_rank
+    userdata.save()
+    return JsonResponse({"result": "ok"})

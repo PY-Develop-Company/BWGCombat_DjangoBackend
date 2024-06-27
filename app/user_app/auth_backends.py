@@ -3,6 +3,7 @@ from django.contrib.auth.backends import ModelBackend
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import get_model
 
+
 class CustomUserModelBackend(ModelBackend):
     def authenticate(self, tg_id=None, password=None):
         try:
@@ -20,8 +21,8 @@ class CustomUserModelBackend(ModelBackend):
 
     @property
     def user_class(self):
-        if not hasattr(self, '_user_class'):
-            self._user_class = get_model(*settings.CUSTOM_USER_MODEL.split('.', 2))
+        if not hasattr(self, "_user_class"):
+            self._user_class = get_model(*settings.CUSTOM_USER_MODEL.split(".", 2))
             if not self._user_class:
-                raise ImproperlyConfigured('Could not get custom user model')
+                raise ImproperlyConfigured("Could not get custom user model")
         return self._user_class

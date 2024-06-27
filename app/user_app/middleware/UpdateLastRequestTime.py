@@ -2,6 +2,7 @@ from django.utils.timezone import now
 from user_app.models import UserData  # Ensure you import the model
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+
 class UpdateLastRequestMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response

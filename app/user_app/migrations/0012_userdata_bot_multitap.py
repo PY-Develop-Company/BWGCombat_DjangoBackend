@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0011_userdata_energy_regeneration'),
+        ("user_app", "0011_userdata_energy_regeneration"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userdata',
-            name='bot_multitap',
-            field=models.BigIntegerField(default=100, help_text='coins per hour'),
+            model_name="userdata",
+            name="bot_multitap",
+            field=models.BigIntegerField(default=100, help_text="coins per hour"),
         ),
     ]

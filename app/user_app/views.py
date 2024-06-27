@@ -1,6 +1,7 @@
 import django.db
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+
 # from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
@@ -30,15 +31,14 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 def user_home(request):
     data = json.loads(request.body)
     if data:
-        fren_id = data['fren_id']
-    return HttpResponse('user home')
-
+        fren_id = data["fren_id"]
+    return HttpResponse("user home")
 
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_user_info(request):
-    user_id = request.query_params.get('userId')
+    user_id = request.query_params.get("userId")
     user_data = get_object_or_404(UserData, user_id=user_id)
     serializer = User_data_Serializer(user_data)
     return Response({"info": serializer.data}, status=status.HTTP_200_OK)
@@ -67,21 +67,19 @@ def remove_coins_from_user(request):
     return Response({"user_info": info.data}, status=status.HTTP_200_OK)
 
 
-
-
 @csrf_exempt
 @api_view(["POST"])
 def add_user(request):
     try:
         data = json.loads(request.body)
-        tg_username = data['tg_username']
-        tg_id = data['tg_id']
-        first_name = data['firstname']
-        last_name = data['lastname']
-        interface_lang = data['interface_lang_id']
-        is_admin = data['is_admin']
+        tg_username = data["tg_username"]
+        tg_id = data["tg_id"]
+        first_name = data["firstname"]
+        last_name = data["lastname"]
+        interface_lang = data["interface_lang_id"]
+        is_admin = data["is_admin"]
         is_staff = is_admin
-        password = data['password'] if 'password' in data else None
+        password = data["password"] if "password" in data else None
         # is_subscribed = data['is_subscribed']
 
         # Додавання користувача до бази даних
@@ -94,7 +92,7 @@ def add_user(request):
             is_active=True,
             is_staff=is_staff,
             is_admin=is_admin,
-            interface_lang_id=interface_lang
+            interface_lang_id=interface_lang,
         )
 
         if password:
@@ -103,7 +101,7 @@ def add_user(request):
             user.set_unusable_password()
         user.save()
 
-        return JsonResponse({"result": 'The user has been registered successfully'})
+        return JsonResponse({"result": "The user has been registered successfully"})
     except:
         pass
     # except django.db.IntegrityError:
@@ -113,32 +111,30 @@ def add_user(request):
     # except json.JSONDecodeError:
     #     print('error decode')
     #     return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
-    
 
 
 @csrf_exempt
 @api_view(["POST"])
 def add_referral(request):
     try:
-        fren_tg = request.data.get('fren_tg')
-        inviter_tg = request.data.get('inviter_tg')
-
+        fren_tg = request.data.get("fren_tg")
+        inviter_tg = request.data.get("inviter_tg")
 
         # Додавання реферала до бази даних
         fren = Fren.objects.create(fren_tg_id=fren_tg, inviter_tg_id=inviter_tg)
         fren.save()
 
-        return HttpResponse('The user has been registered successfully')
+        return HttpResponse("The user has been registered successfully")
     except django.db.IntegrityError:
         # резервна перевірка
-        return HttpResponse('Database Integrity error')
+        return HttpResponse("Database Integrity error")
 
     except KeyError as ke:
         print(ke)
-        return JsonResponse({'status': 'error', 'message': 'Invalid data'})
+        return JsonResponse({"status": "error", "message": "Invalid data"})
     except json.JSONDecodeError:
-        print('error decode')
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
+        print("error decode")
+        return JsonResponse({"status": "error", "message": "Invalid JSON"})
 
 
 @csrf_exempt
@@ -153,4 +149,3 @@ def get_user_referrals(request):
         print(referral)
 
     return HttpResponse(referrals)
-

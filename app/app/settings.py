@@ -148,11 +148,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "user_app.User"
 
 REST_FRAMEWORK = {
-    #"DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    # "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
-        "rest_framework_simplejwt.authentication.JWTAuthentication",    
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
 
@@ -186,7 +186,7 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
-    'ngrok-skip-browser-warning',
+    "ngrok-skip-browser-warning",
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app','https://*']
+CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "https://*"]

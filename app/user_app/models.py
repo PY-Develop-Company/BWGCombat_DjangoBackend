@@ -1,10 +1,15 @@
 from django.db import models, transaction
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import (
+    BaseUserManager,
+    AbstractBaseUser,
+    PermissionsMixin,
+)
 from django.utils import timezone
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
 from levels_app.models import Rank, Stage, Task
+
 
 class CustomUserManager(BaseUserManager):
     def _create_user(self, tg_username, tg_id, password, **extra_fields):
@@ -53,7 +58,7 @@ class Language(models.Model):
 
 class User(AbstractBaseUser, PermissionsMixin):
     tg_id = models.BigIntegerField(blank=False, primary_key=True)
-    tg_username = models.CharField(null = True, blank=False, unique=True, max_length=255)
+    tg_username = models.CharField(null=True, blank=False, unique=True, max_length=255)
     firstname = models.CharField(blank=True, null=True, default="", max_length=255)
     lastname = models.CharField(blank=True, null=True, default="", max_length=255)
     interface_lang = models.ForeignKey(
@@ -121,9 +126,13 @@ class UserData(models.Model):
     click_multiplier = models.IntegerField(null=False, blank=False, default=1)
 
     energy_regeneration = models.IntegerField(null=False, blank=False, default=1)
-    energy = models.BigIntegerField(null=False, blank=False, default=100)  ### ask for default value
+    energy = models.BigIntegerField(
+        null=False, blank=False, default=100
+    )  ### ask for default value
 
-    bot_multitap = models.BigIntegerField(null = False, blank=False, default=100, help_text='coins per hour') ### ask for default value
+    bot_multitap = models.BigIntegerField(
+        null=False, blank=False, default=100, help_text="coins per hour"
+    )  ### ask for default value
 
     def add_gold_coins(self, coins: int):
         self.gold_balance += int(coins) * self.click_multiplier
@@ -131,26 +140,20 @@ class UserData(models.Model):
     def set_gold_coins(self, coins: int):
         self.gold_balance = int(coins)
 
-
     def remove_gold_coins(self, coins: int):
         self.gold_balance -= int(coins)
-
 
     def add_g_token_coins(self, coins: int):
         self.g_token += int(coins)
 
-
     def set_g_token_coins(self, coins: int):
         self.g_token = int(coins)
-
 
     def remove_g_token_coins(self, coins: int):
         self.g_token -= int(coins)
 
-
     def add_multiplier_coins(self, amount: int):
         self.click_multiplier += amount
-
 
 
 class User_tasks(models.Model):
@@ -164,17 +167,21 @@ class User_tasks(models.Model):
 
 class Fren(models.Model):
     fren_tg = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    inviter_tg = models.ForeignKey(User, on_delete=models.CASCADE, related_name="referrals")
+    inviter_tg = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="referrals"
+    )
 
     class Meta:
-        unique_together = ('fren_tg', 'inviter_tg')
+        unique_together = ("fren_tg", "inviter_tg")
 
     def clean(self):
         if self.fren_tg == self.inviter_tg:
             raise ValidationError("You cannot add yourself as a friend.")
-        
+
         # Check if the reverse relationship already exists
-        if Fren.objects.filter(inviter_tg=self.fren_tg, fren_tg=self.inviter_tg).exists():
+        if Fren.objects.filter(
+            inviter_tg=self.fren_tg, fren_tg=self.inviter_tg
+        ).exists():
             raise ValidationError("This friendship already exists in reverse.")
 
     def save(self, *args, **kwargs):

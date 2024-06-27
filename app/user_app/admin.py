@@ -11,6 +11,7 @@ class UserDataAdmin(admin.ModelAdmin):
 class UserTasksAdmin(admin.ModelAdmin):
     list_display = ("user", "task")
 
+
 class FrenAdmin(admin.ModelAdmin):
     list_display = ("inviter_tg", "fren_tg")
 

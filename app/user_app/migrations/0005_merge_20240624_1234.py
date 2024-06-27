@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0003_alter_fren_inviter_tg_id'),
-        ('user_app', '0004_alter_user_interface_lang_userdata'),
+        ("user_app", "0003_alter_fren_inviter_tg_id"),
+        ("user_app", "0004_alter_user_interface_lang_userdata"),
     ]
 
-    operations = [
-    ]
+    operations = []

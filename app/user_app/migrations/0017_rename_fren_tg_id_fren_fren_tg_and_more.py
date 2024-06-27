@@ -4,24 +4,23 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0016_alter_fren_fren_tg_id'),
+        ("user_app", "0016_alter_fren_fren_tg_id"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='fren',
-            old_name='fren_tg_id',
-            new_name='fren_tg',
+            model_name="fren",
+            old_name="fren_tg_id",
+            new_name="fren_tg",
         ),
         migrations.RenameField(
-            model_name='fren',
-            old_name='inviter_tg_id',
-            new_name='inviter_tg',
+            model_name="fren",
+            old_name="inviter_tg_id",
+            new_name="inviter_tg",
         ),
         migrations.AlterUniqueTogether(
-            name='fren',
-            unique_together={('fren_tg', 'inviter_tg')},
+            name="fren",
+            unique_together={("fren_tg", "inviter_tg")},
         ),
     ]

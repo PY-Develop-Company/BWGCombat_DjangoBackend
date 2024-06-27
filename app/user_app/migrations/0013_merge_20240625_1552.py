@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0006_merge_20240625_1013'),
-        ('user_app', '0012_userdata_bot_multitap'),
+        ("user_app", "0006_merge_20240625_1013"),
+        ("user_app", "0012_userdata_bot_multitap"),
     ]
 
-    operations = [
-    ]
+    operations = []

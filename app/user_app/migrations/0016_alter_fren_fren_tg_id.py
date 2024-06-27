@@ -6,15 +6,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0015_alter_fren_fren_tg_id'),
+        ("user_app", "0015_alter_fren_fren_tg_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='fren',
-            name='fren_tg_id',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL),
+            model_name="fren",
+            name="fren_tg_id",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                primary_key=True,
+                serialize=False,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

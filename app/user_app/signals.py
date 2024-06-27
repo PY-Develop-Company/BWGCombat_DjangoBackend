@@ -10,4 +10,3 @@ def add_user_data_record(sender, instance, created, **kwargs):
         user_data = UserData.objects.create(user_id=instance)  ### set nullable to
         user_data.save()
         return user_data
-    
