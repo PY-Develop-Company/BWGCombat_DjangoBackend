@@ -15,11 +15,13 @@ def levels_home(request):
 def check_task_completion(user_id: int, task_id: int):
     task = Task.objects.get(id=task_id)
     userdata = UserData.objects.get(user_id=user_id)
+
+    done = False
     match task.task_type:
         case 1:
             pass
         case 2:
-            userdata.check_referrals_quantity(10)
+            done = userdata.check_referrals_quantity(10)
         case 3:
             pass
         case 4:
@@ -31,12 +33,14 @@ def check_task_completion(user_id: int, task_id: int):
         case 7:
             pass
         case _:
-            print('No such task to check completion')
+            return HttpResponse('No such task to check completion')
     # temporarily only checking frens quantity
-
-    rewards = task.rewards
-    for reward in rewards:
-        userdata.receive_rewards(reward)
+    if done:
+        rewards = task.rewards
+        for reward in rewards:
+            userdata.receive_rewards(reward)
+    else:
+        return HttpResponse('You haven\'t completed the task or no checking for this task exists yet')
 
 
 @api_view(["POST"])
