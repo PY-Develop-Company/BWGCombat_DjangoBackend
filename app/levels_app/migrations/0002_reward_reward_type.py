@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('levels_app', '0001_initial'),
+        ("levels_app", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reward',
-            name='reward_type',
-            field=models.CharField(choices=[('1', 'Gold'), ('2', 'Gold_per_click')], default='1', null=True),
+            model_name="reward",
+            name="reward_type",
+            field=models.CharField(
+                choices=[("1", "Gold"), ("2", "Gold_per_click")], default="1", null=True
+            ),
         ),
     ]

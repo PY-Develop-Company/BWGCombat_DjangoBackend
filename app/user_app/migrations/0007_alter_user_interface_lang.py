@@ -5,15 +5,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0006_userdata_click_multiplier'),
+        ("user_app", "0006_userdata_click_multiplier"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='interface_lang',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_DEFAULT, to='user_app.language', to_field='lang_code'),
+            model_name="user",
+            name="interface_lang",
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.SET_DEFAULT,
+                to="user_app.language",
+                to_field="lang_code",
+            ),
         ),
     ]

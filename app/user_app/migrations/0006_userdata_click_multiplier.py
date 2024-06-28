@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('user_app', '0005_merge_20240624_1124'),
+        ("user_app", "0005_merge_20240624_1124"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userdata',
-            name='click_multiplier',
+            model_name="userdata",
+            name="click_multiplier",
             field=models.IntegerField(default=1),
         ),
     ]
