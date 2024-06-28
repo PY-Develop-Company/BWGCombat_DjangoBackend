@@ -3,7 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Task, Reward
 from user_app.models import UserData
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+# from .models import Link, LinkClick
 
 
 def levels_home(request):
@@ -19,7 +20,7 @@ def check_task_completion(user_id: int, task_id: int):
     done = False
     match task.task_type:
         case 1:
-            pass
+            done = userdata.check_link_click('https://t.me/justforcheckingone')
         case 2:
             done = userdata.check_referrals_quantity(10)
         case 3:
@@ -67,3 +68,5 @@ def request_task_submission(request):
     userdata.rank_id = userdata.rank_id.next_rank
     userdata.save()
     return JsonResponse({"result": "ok"})
+
+

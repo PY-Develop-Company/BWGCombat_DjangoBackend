@@ -2,7 +2,7 @@ import asyncio
 
 
 # from user_app.models import UserData
-# from .models import Reward
+from .models import Reward
 
 
 # async def check_subscription(user_id):

@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 # from django.views.decorators.http import require_POST, require_GET
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -12,7 +12,7 @@ from rest_framework import viewsets
 from django.core.exceptions import ValidationError
 
 
-from .models import User, UserData, Fren
+from .models import User, UserData, Fren, Link, LinkClick
 
 # from aiogram import Bot
 # from aiogram.utils.deep_linking import create_start_link
@@ -149,3 +149,16 @@ def get_user_referrals(request):
         print(referral)
 
     return HttpResponse(referrals)
+
+
+def track_link_click(request, link_id):
+    link = get_object_or_404(Link, id=link_id)
+
+    user_id = request.data.get("userId")
+    # user_id = 585657619  # тимчасово для тесту, поки не було реквестів з фронта
+
+    user = User.objects.get(tg_id=user_id)
+
+    LinkClick.objects.create(user=user, link=link)
+
+    return redirect(link.url)

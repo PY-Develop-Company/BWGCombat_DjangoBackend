@@ -163,6 +163,13 @@ class UserData(models.Model):
         refs_quantity = user.referrals.count()
         return True if refs_quantity >= expected_quantity else False
 
+    def check_channel_subscription(self, link):
+        pass
+
+    def check_link_click(self, link):
+        user = User.objects.get(user_id=self.user_id)
+        return LinkClick.objects.filter(user=user, link=link).exists()
+
     def receive_rewards(self, reward: Reward):
         """
         GOLD = "1", _("Add gold")
@@ -223,3 +230,13 @@ class Fren(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super(Fren, self).save(*args, **kwargs)
+
+
+class Link(models.Model):
+    url = models.URLField(unique=True)
+
+
+class LinkClick(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    link = models.ForeignKey(Link, to_field='url', on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
