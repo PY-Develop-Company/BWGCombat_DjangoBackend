@@ -17,7 +17,7 @@ class StageAdmin(admin.ModelAdmin):
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ("name", "text", "reward_id")
+    list_display = ("name", "text")
 
 
 admin.site.register(Rank, RankAdmin)

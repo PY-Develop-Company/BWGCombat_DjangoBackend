@@ -155,6 +155,9 @@ class UserData(models.Model):
     def add_energy(self, amount: int):
         self.energy += amount
 
+    def add_passive_income(self, amount: int):
+        self.passive_income += amount
+
     def check_referrals_quantity(self, expected_quantity):
         user = User.objects.get(tg_id=self.user_id)
         refs_quantity = user.referrals.count()
@@ -184,7 +187,7 @@ class UserData(models.Model):
             case 5:
                 self.add_energy(reward_amount)
             case 6:
-                pass
+                self.add_passive_income(reward_amount)
             case _:
                 return "No such type reward"
 

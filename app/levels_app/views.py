@@ -10,8 +10,33 @@ def levels_home(request):
     return HttpResponse("levels home")
 
 
-def check_task_completion(user_data: UserData, reward: Reward):
-    pass
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def check_task_completion(user_id: int, task_id: int):
+    task = Task.objects.get(id=task_id)
+    userdata = UserData.objects.get(user_id=user_id)
+    match task.task_type:
+        case 1:
+            pass
+        case 2:
+            userdata.check_referrals_quantity(10)
+        case 3:
+            pass
+        case 4:
+            pass
+        case 5:
+            pass
+        case 6:
+            pass
+        case 7:
+            pass
+        case _:
+            print('No such task to check completion')
+    # temporarily only checking frens quantity
+
+    rewards = task.rewards
+    for reward in rewards:
+        userdata.receive_rewards(reward)
 
 
 @api_view(["POST"])

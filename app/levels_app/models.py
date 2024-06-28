@@ -57,12 +57,11 @@ class Task(models.Model):
 
     name = models.CharField(max_length=255, null=False, blank=False)
     text = models.TextField(null=True, blank=False)
-    amount = models.IntegerField(null = True)
     task_type = models.CharField(
         null=False, choices=TaskType, default=TaskType.buy_energy
     )
-    reward_id = models.ForeignKey(
-        "Reward", null=True, blank=False, on_delete=models.CASCADE
+    rewards = models.ManyToManyField(
+        "Reward", blank=False
     )
 
     def __str__(self) -> str:
