@@ -19,5 +19,5 @@ class FrenAdmin(admin.ModelAdmin):
 admin.site.register(User)
 admin.site.register(Language)
 admin.site.register(UserData, UserDataAdmin)
-admin.site.register(User_tasks, UserTasksAdmin)
+admin.site.register(UsersTasks, UserTasksAdmin)
 admin.site.register(Fren, FrenAdmin)

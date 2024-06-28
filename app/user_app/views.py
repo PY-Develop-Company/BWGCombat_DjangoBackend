@@ -34,7 +34,6 @@ def user_home(request):
         fren_id = data["fren_id"]
     return HttpResponse("user home")
 
-
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_user_info(request):

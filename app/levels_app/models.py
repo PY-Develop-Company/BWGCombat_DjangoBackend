@@ -73,6 +73,7 @@ class Reward(models.Model):
     class RewardType(models.TextChoices):
         GOLD = "1", _("Gold")
         GOLD_PER_CLICK = "2", _("Gold_per_click")
+        G_TOKEN = '3', _("G_Token")
         
         GOLD_AND_PICKAXE = '4', _("add gold per click + pickaxe upgrade")
         ENERGY_BALANCE =  '5', _('energy balance ')

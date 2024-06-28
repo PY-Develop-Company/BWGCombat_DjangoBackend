@@ -97,9 +97,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self) -> str:
         return f"{self.tg_id}  {self.tg_username or ''}"
 
-    # def receive_reward(self, reward_type, amount):
-    #     pass
-
     # def delete(self, args, **kwargs):
     #     # Ensure related UserData is deleted first to avoid integrity errors
     #     with transaction.atomic():
@@ -155,8 +152,16 @@ class UserData(models.Model):
     def add_multiplier_coins(self, amount: int):
         self.click_multiplier += amount
 
+    def referrals_quantity_check(self, expected_quantity):
+        user = User.objects.get(tg_id=self.user_id)
+        refs_quantity = user.referrals.count()
+        return True if refs_quantity >= expected_quantity else False
 
-class User_tasks(models.Model):
+    def receive_reward(self, task: Task):
+        pass
+
+
+class UsersTasks(models.Model):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.DO_NOTHING)
     time = models.DateTimeField(null=False, blank=False, default=now)
