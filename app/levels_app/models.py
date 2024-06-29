@@ -15,6 +15,8 @@ class Rank(models.Model):
         on_delete=models.DO_NOTHING,
     )
 
+    fist_stage = models.ForeignKey('Stage', null = True, on_delete=models.DO_NOTHING, default=None)
+
     def __str__(self) -> str:
         return f"{self.name}"
 
@@ -29,13 +31,6 @@ class Stage(models.Model):
     next_stage = models.ForeignKey(
         "self",
         related_name="next_stage_from_stage",
-        null=True,
-        blank=True,
-        on_delete=models.DO_NOTHING,
-    )
-    next_rank = models.ForeignKey(
-        "Rank",
-        related_name="next_rank_from_stage",
         null=True,
         blank=True,
         on_delete=models.DO_NOTHING,

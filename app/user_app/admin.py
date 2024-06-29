@@ -1,6 +1,6 @@
 from .models import User, Language
 from django.contrib import admin
-from .models import UserData, User_tasks, Fren
+from .models import UserData, UsersTasks, Fren
 
 
 class UserDataAdmin(admin.ModelAdmin):
