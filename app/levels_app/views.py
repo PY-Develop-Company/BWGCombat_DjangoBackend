@@ -3,25 +3,45 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Task, Reward
 from user_app.models import UserData
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+# from .models import Link, LinkClick
 
 
 def levels_home(request):
     return HttpResponse("levels home")
 
 
-def add_reward(user_data: UserData, reward: Reward):
-    reward_type = int(reward.reward_type)
-    reward_amount = int(reward.amount)
-    match reward_type:
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def check_task_completion(user_id: int, task_id: int):
+    task = Task.objects.get(id=task_id)
+    userdata = UserData.objects.get(user_id=user_id)
+
+    done = False
+    match task.task_type:
         case 1:
-            user_data.add_gold_coins(reward_amount)
+            done = userdata.check_link_click('https://t.me/justforcheckingone')
         case 2:
-            user_data.add_multiplier_coins(reward_amount)
+            done = userdata.check_referrals_quantity(10)
         case 3:
             pass
+        case 4:
+            pass
+        case 5:
+            pass
+        case 6:
+            pass
+        case 7:
+            pass
         case _:
-            return "No such type reward"
+            return HttpResponse('No such task to check completion')
+    # temporarily only checking frens quantity
+    if done:
+        rewards = task.rewards
+        for reward in rewards:
+            userdata.receive_rewards(reward)
+    else:
+        return HttpResponse('You haven\'t completed the task or no checking for this task exists yet')
 
 
 @api_view(["POST"])
@@ -48,3 +68,5 @@ def request_task_submission(request):
     userdata.rank_id = userdata.rank_id.next_rank
     userdata.save()
     return JsonResponse({"result": "ok"})
+
+

@@ -13,4 +13,5 @@ urlpatterns = [
     path("rem_coins/", views.remove_coins_from_user, name="rem_coins"),
     path("add_referral/", views.add_referral, name="add_referral"),
     path("get_user_referrals/", views.get_user_referrals, name="get_user_referrals"),
+    path('track/<int:link_id>/', views.track_link_click, name='track_link_click'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

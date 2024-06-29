@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
-from levels_app.models import Rank, Stage, Task
+from levels_app.models import Rank, Stage, Task, Reward
 
 
 class CustomUserManager(BaseUserManager):
@@ -127,7 +127,7 @@ class UserData(models.Model):
         null=False, blank=False, default=100
     )  ### ask for default value
 
-    bot_multitap = models.BigIntegerField(
+    passive_income = models.BigIntegerField(
         null=False, blank=False, default=100, help_text="coins per hour"
     )  ### ask for default value
 
@@ -152,13 +152,51 @@ class UserData(models.Model):
     def add_multiplier_coins(self, amount: int):
         self.click_multiplier += amount
 
-    def referrals_quantity_check(self, expected_quantity):
+    def add_energy(self, amount: int):
+        self.energy += amount
+
+    def add_passive_income(self, amount: int):
+        self.passive_income += amount
+
+    def check_referrals_quantity(self, expected_quantity):
         user = User.objects.get(tg_id=self.user_id)
         refs_quantity = user.referrals.count()
         return True if refs_quantity >= expected_quantity else False
 
-    def receive_reward(self, task: Task):
+    def check_channel_subscription(self, link):
         pass
+
+    def check_link_click(self, link):
+        user = User.objects.get(user_id=self.user_id)
+        return LinkClick.objects.filter(user=user, link=link).exists()
+
+    def receive_rewards(self, reward: Reward):
+        """
+        GOLD = "1", _("Add gold")
+        GOLD_PER_CLICK = "2", _("Increase gold per click multiplier")
+        G_TOKEN = '3', _("Add G token")
+        PICKAXE = '4', _("Pickaxe upgrade")
+        ENERGY_BALANCE = '5', _("Replenish energy")
+        PASSIVE_INCOME = "6", _("Improve passive income")
+        """
+        reward_type = int(reward.reward_type)
+        reward_amount = int(reward.amount)
+
+        match reward_type:
+            case 1:
+                self.add_gold_coins(reward_amount)
+            case 2:
+                self.add_multiplier_coins(reward_amount)
+            case 3:
+                self.add_g_token_coins(reward_amount)
+            case 4:
+                pass
+            case 5:
+                self.add_energy(reward_amount)
+            case 6:
+                self.add_passive_income(reward_amount)
+            case _:
+                return "No such type reward"
 
 
 class UsersTasks(models.Model):
@@ -192,3 +230,13 @@ class Fren(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super(Fren, self).save(*args, **kwargs)
+
+
+class Link(models.Model):
+    url = models.URLField(unique=True)
+
+
+class LinkClick(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    link = models.ForeignKey(Link, to_field='url', on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)

@@ -18,7 +18,7 @@ class UpdateLastRequestMiddleware:
 
                 delta = last_activity.day - now().day
                 if delta >= 1:
-                    user_activity.gold_balance += delta * user_activity.bot_multitap
+                    user_activity.gold_balance += delta * user_activity.passive_income
 
                 user_activity.last_visited = now()
                 user_activity.save()

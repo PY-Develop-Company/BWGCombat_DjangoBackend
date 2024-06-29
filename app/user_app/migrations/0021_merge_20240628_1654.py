@@ -6,8 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('levels_app', '0003_alter_reward_reward_type'),
-        ('levels_app', '0005_task_amount'),
+        ('user_app', '0012_rename_user_tasks_userstasks_alter_user_tg_username'),
+        ('user_app', '0020_alter_user_tg_username'),
     ]
 
     operations = [

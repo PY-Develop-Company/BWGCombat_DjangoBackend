@@ -1,4 +1,5 @@
 from django.db import models
+# from user_app.models import User
 from django.utils.translation import gettext_lazy as _
 
 
@@ -52,12 +53,11 @@ class Task(models.Model):
 
     name = models.CharField(max_length=255, null=False, blank=False)
     text = models.TextField(null=True, blank=False)
-    amount = models.IntegerField(null = True)
     task_type = models.CharField(
         null=False, choices=TaskType, default=TaskType.buy_energy
     )
-    reward_id = models.ForeignKey(
-        "Reward", null=True, blank=False, on_delete=models.CASCADE
+    rewards = models.ManyToManyField(
+        "Reward", blank=False
     )
 
     def __str__(self) -> str:
@@ -66,14 +66,13 @@ class Task(models.Model):
 
 class Reward(models.Model):
     class RewardType(models.TextChoices):
-        GOLD = "1", _("Gold")
-        GOLD_PER_CLICK = "2", _("Gold_per_click")
-        G_TOKEN = '3', _("G_Token")
+        GOLD = "1", _("Add gold")
+        GOLD_PER_CLICK = "2", _("Increase gold per click multiplier")
+        G_TOKEN = '3', _("Add G token")
         
-        GOLD_AND_PICKAXE = '4', _("add gold per click + pickaxe upgrade")
-        ENERGY_BALANCE =  '5', _('energy balance ')
-        ENERGY_AND_GOLD_PER_CLICK  ="6", _("energy balance + add gold per click")
-        ADD_PASSIVE_INCOME = "7", _("add  passive income")
+        PICKAXE = '4', _("Pickaxe upgrade")
+        ENERGY_BALANCE = '5', _("Replenish energy")
+        PASSIVE_INCOME = "6", _("Improve passive income")
 
     name = models.CharField(max_length=200, blank=False, null=False)
     amount = models.BigIntegerField(null=False)

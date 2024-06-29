@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    # "channels",
     "corsheaders",
     "core",
     "user_app",
@@ -81,6 +82,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "app.wsgi.application"
+# ASGI_APPLICATION = "app.routing.application"
 
 
 # Database
