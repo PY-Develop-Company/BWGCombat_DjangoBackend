@@ -113,10 +113,10 @@ class UserData(models.Model):
 
     last_visited = models.DateTimeField(null=False, default=now)
 
-    rank_id = models.OneToOneField(
+    rank_id = models.ForeignKey(
         Rank, null=True, blank=False, on_delete=models.SET_NULL, default=None
     )
-    stage_id = models.OneToOneField(
+    stage_id = models.ForeignKey(
         Stage, null=True, blank=False, on_delete=models.SET_NULL, default=None
     )
 

@@ -69,7 +69,7 @@ class StageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Stage
-        fields = ["name", "next_rank", "tasks"]
+        fields = ["name", "tasks"]
 
 
 class TaskSerializer(serializers.ModelSerializer):
