@@ -1,12 +1,11 @@
 from django.db import models
-# from user_app.models import User
 from django.utils.translation import gettext_lazy as _
 
 
 class Rank(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
     reward_id = models.ForeignKey(
-        "Reward", null=True, blank=False, on_delete=models.CASCADE
+        "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
     )
     next_rank = models.OneToOneField(
         "self",
@@ -16,7 +15,7 @@ class Rank(models.Model):
         on_delete=models.DO_NOTHING,
     )
 
-    fist_stage = models.ForeignKey('Stage', null = True, on_delete=models.DO_NOTHING, default=None)
+    fist_stage = models.ForeignKey('Stage', null=True, on_delete=models.DO_NOTHING, default=None)
 
     def __str__(self) -> str:
         return f"{self.name}"
@@ -26,7 +25,7 @@ class Stage(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
     rank_id = models.ForeignKey(Rank, null=True, blank=False, on_delete=models.CASCADE)
     reward_id = models.ForeignKey(
-        "Reward", null=True, blank=False, on_delete=models.CASCADE
+        "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
     )
     tasks_id = models.ManyToManyField("Task")
     next_stage = models.ForeignKey(

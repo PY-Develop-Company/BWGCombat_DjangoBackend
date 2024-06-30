@@ -18,7 +18,7 @@ from .models import User, UserData, Fren, Link, LinkClick
 # from aiogram.utils.deep_linking import create_start_link
 
 import json
-from .serializer import User_data_Serializer
+from .serializer import UserDataSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from user_app.serializer import CustomTokenObtainPairSerializer
 
@@ -40,7 +40,7 @@ def user_home(request):
 def get_user_info(request):
     user_id = request.query_params.get("userId")
     user_data = get_object_or_404(UserData, user_id=user_id)
-    serializer = User_data_Serializer(user_data)
+    serializer = UserDataSerializer(user_data)
     return Response({"info": serializer.data}, status=status.HTTP_200_OK)
 
 
@@ -52,7 +52,7 @@ def add_coins_to_user(request):
 
     user_data = UserData.objects.get(user_id=user_id)
     user_data.add_gold_coins(coins)
-    info = User_data_Serializer(user_data)
+    info = UserDataSerializer(user_data)
     return Response({"user_info": info.data}, status=status.HTTP_200_OK)
 
 
@@ -63,7 +63,7 @@ def remove_coins_from_user(request):
 
     user_data = UserData.objects.filter(user_id=user_id).first()
     user_data.remove_gold_coins(coins)
-    info = User_data_Serializer(user_data)
+    info = UserDataSerializer(user_data)
     return Response({"user_info": info.data}, status=status.HTTP_200_OK)
 
 
@@ -80,7 +80,6 @@ def add_user(request):
         is_admin = data["is_admin"]
         is_staff = is_admin
         password = data["password"] if "password" in data else None
-        # is_subscribed = data['is_subscribed']
 
         # Додавання користувача до бази даних
         user = User.objects.create(
@@ -88,7 +87,6 @@ def add_user(request):
             tg_id=tg_id,
             firstname=first_name,
             lastname=last_name,
-            # password=password,
             is_active=True,
             is_staff=is_staff,
             is_admin=is_admin,
@@ -104,13 +102,6 @@ def add_user(request):
         return JsonResponse({"result": "The user has been registered successfully"})
     except:
         pass
-    # except django.db.IntegrityError:
-    #     return HttpResponse('The user already exists and successfully found')
-    # except KeyError:
-    #     return JsonResponse({'status': 'error', 'message': 'Invalid data'})
-    # except json.JSONDecodeError:
-    #     print('error decode')
-    #     return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
 
 
 @csrf_exempt
@@ -126,14 +117,11 @@ def add_referral(request):
 
         return HttpResponse("The user has been registered successfully")
     except django.db.IntegrityError:
-        # резервна перевірка
         return HttpResponse("Database Integrity error")
 
     except KeyError as ke:
-        print(ke)
         return JsonResponse({"status": "error", "message": "Invalid data"})
     except json.JSONDecodeError:
-        print("error decode")
         return JsonResponse({"status": "error", "message": "Invalid JSON"})
 
 

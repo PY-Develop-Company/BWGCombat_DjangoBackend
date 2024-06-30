@@ -26,7 +26,7 @@ class RewardSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class User_data_Serializer(serializers.ModelSerializer):
+class UserDataSerializer(serializers.ModelSerializer):
     rank = serializers.SerializerMethodField()
     stage = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
