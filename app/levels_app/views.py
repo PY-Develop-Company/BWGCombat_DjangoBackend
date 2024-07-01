@@ -40,6 +40,9 @@ def check_task_completion(user_id: int, task_id: int):
         rewards = task.rewards
         for reward in rewards:
             userdata.receive_rewards(reward)
+        user_task = get_object_or_404(UsersTasks, user_id=user_id)
+        user_task.status = True
+        user_task.save()
     else:
         return HttpResponse('You haven\'t completed the task or no checking for this task exists yet')
 
@@ -53,7 +56,8 @@ def go_to_next_rank(request):
 
     userdata.rank_id = userdata.rank_id.next_rank
     userdata.save()
-    return JsonResponse({"result": "ok"})
+    # return JsonResponse({"result": "ok"})
+    return HttpResponse('Task has been taken successfully')
 
 
 @api_view(["POST"])
@@ -64,7 +68,9 @@ def request_task_submission(request):
     userdata = get_object_or_404(UserData, user_id=user_id)
     task = get_object_or_404(Task, task_id=task_id)
     ### make some logic to check
+
     user_task = UsersTasks(user_id=user_id, task_id=task_id)
+    user_task.save()
 
     userdata.rank_id = userdata.rank_id.next_rank
     userdata.save()

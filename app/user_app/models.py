@@ -193,9 +193,8 @@ class UserData(models.Model):
         GOLD = "1", _("Add gold")
         GOLD_PER_CLICK = "2", _("Increase gold per click multiplier")
         G_TOKEN = '3', _("Add G token")
-        PICKAXE = '4', _("Pickaxe upgrade")
-        ENERGY_BALANCE = '5', _("Replenish energy")
-        PASSIVE_INCOME = "6", _("Improve passive income")
+        ENERGY_BALANCE = '4', _("Replenish energy")
+        PASSIVE_INCOME = "5", _("Improve passive income")
         """
         reward_type = int(reward.reward_type)
         reward_amount = int(reward.amount)
