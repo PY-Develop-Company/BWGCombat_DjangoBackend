@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import UserData
 from levels_app.models import Rank, Stage, Task, Reward
-from user_app.models import User
+from user_app.models import User, UsersTasks
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -35,7 +35,7 @@ class User_data_Serializer(serializers.ModelSerializer):
         return RankingSerializer(obj.rank_id).data
 
     def get_stage(self, obj: UserData):
-        return StageSerializer(obj.stage_id).data
+        return StageSerializer(obj.stage_id, context = {"user_id": obj.user_id}).data
 
     def get_username(self, obj: UserData):
         return User.objects.get(tg_id=obj.user_id.tg_id).tg_username
@@ -65,19 +65,22 @@ class StageSerializer(serializers.ModelSerializer):
     tasks = serializers.SerializerMethodField()
 
     def get_tasks(self, obj: Stage):
-        return TaskSerializer(obj.tasks_id, many=True).data
+        user = self.context['user_id']
+        completed_tasks_ids = UsersTasks.objects.filter(user_id=user, task__in=obj.tasks_id.all()).values_list('task_id', flat=True)
+        incomplete_tasks = obj.tasks_id.exclude(id__in=completed_tasks_ids)
+        return TaskSerializer(incomplete_tasks, many=True).data
 
     class Meta:
         model = Stage
-        fields = ["name", "next_rank", "tasks"]
+        fields = ["name", "tasks", 'next_stage']
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    reward = serializers.SerializerMethodField()
+    rewards = serializers.SerializerMethodField()
 
-    def get_reward(self, obj: Stage):
-        return RewardSerializer(obj.reward_id).data
+    def get_rewards(self, obj: Stage):
+        return RewardSerializer(obj.rewards, many=True).data
 
     class Meta:
         model = Task
-        fields = ["name", "text", "reward"]
+        fields = ["name", "text", "rewards"]

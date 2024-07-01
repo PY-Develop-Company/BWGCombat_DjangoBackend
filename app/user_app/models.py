@@ -204,6 +204,9 @@ class UsersTasks(models.Model):
     task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.DO_NOTHING)
     time = models.DateTimeField(null=False, blank=False, default=now)
 
+    class Meta:
+        unique_together = ('user', 'task')
+
     def __str__(self) -> str:
         return self.user.tg_username + self.task.name
 

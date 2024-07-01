@@ -16,7 +16,7 @@ class Rank(models.Model):
         on_delete=models.DO_NOTHING,
     )
 
-    fist_stage = models.ForeignKey('Stage', null = True, on_delete=models.DO_NOTHING, default=None)
+    first_stage = models.ForeignKey('Stage', null = True, on_delete=models.DO_NOTHING, default=None)
 
     def __str__(self) -> str:
         return f"{self.name}"
@@ -56,6 +56,7 @@ class Task(models.Model):
     task_type = models.CharField(
         null=False, choices=TaskType, default=TaskType.buy_energy
     )
+    amount = models.IntegerField(null=True, blank=True, default=0)
     rewards = models.ManyToManyField(
         "Reward", blank=False
     )

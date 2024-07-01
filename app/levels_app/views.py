@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Task, Reward
-from user_app.models import UserData
+from user_app.models import UserData, UsersTasks
 from django.shortcuts import get_object_or_404, redirect
 # from .models import Link, LinkClick
 
@@ -62,11 +62,25 @@ def request_task_submission(request):
     user_id = request.data.get("userId")
     task_id = request.data.get("taskId")
     userdata = get_object_or_404(UserData, user_id=user_id)
-    task = get_object_or_404(Task, task_id=task_id)
+    task = get_object_or_404(Task, id=task_id)
     ### make some logic to check
+    
+    task_done = UsersTasks.objects.create(user = userdata.user_id, task = task)
+    task_done.save()
 
-    userdata.rank_id = userdata.rank_id.next_rank
+    current_tasks = userdata.stage_id.tasks_id.all()
+    done_tasks = (UsersTasks.objects.filter(user = userdata.user_id, task__in=current_tasks))
+
+    if len(current_tasks) == len(done_tasks):
+        if userdata.stage_id.next_stage is not None:
+            userdata.stage_id = userdata.stage_id.next_stage
+        else:
+            userdata.rank_id = userdata.rank_id.next_rank
+            userdata.stage_id = userdata.rank_id.first_stage
+    
     userdata.save()
     return JsonResponse({"result": "ok"})
+
+
 
 

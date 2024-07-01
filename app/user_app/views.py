@@ -40,7 +40,7 @@ def user_home(request):
 def get_user_info(request):
     user_id = request.query_params.get("userId")
     user_data = get_object_or_404(UserData, user_id=user_id)
-    serializer = User_data_Serializer(user_data)
+    serializer = User_data_Serializer(user_data, context = {})
     return Response({"info": serializer.data}, status=status.HTTP_200_OK)
 
 
@@ -52,6 +52,7 @@ def add_coins_to_user(request):
 
     user_data = UserData.objects.get(user_id=user_id)
     user_data.add_gold_coins(coins)
+    user_data.save()
     info = User_data_Serializer(user_data)
     return Response({"user_info": info.data}, status=status.HTTP_200_OK)
 
