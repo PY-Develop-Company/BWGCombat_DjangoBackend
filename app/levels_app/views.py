@@ -22,7 +22,7 @@ def check_task_completion(user_id: int, task_id: int):
         case 1:
             done = userdata.check_link_click('https://t.me/justforcheckingone')
         case 2:
-            done = userdata.check_referrals_quantity(10)
+            done = userdata.is_referrals_quantity_exceeds(10)
         case 3:
             pass
         case 4:

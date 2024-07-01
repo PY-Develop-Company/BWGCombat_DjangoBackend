@@ -158,7 +158,7 @@ class UserData(models.Model):
     def add_passive_income(self, amount: int):
         self.passive_income += amount
 
-    def check_referrals_quantity(self, expected_quantity):
+    def is_referrals_quantity_exceeds(self, expected_quantity):
         user = User.objects.get(tg_id=self.user_id)
         refs_quantity = user.referrals.count()
         return True if refs_quantity >= expected_quantity else False
@@ -201,7 +201,7 @@ class UserData(models.Model):
 
 class UsersTasks(models.Model):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.DO_NOTHING)
+    task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.CASCADE)
     time = models.DateTimeField(null=False, blank=False, default=now)
 
     class Meta:
