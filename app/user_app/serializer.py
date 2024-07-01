@@ -3,6 +3,7 @@ from .models import UserData
 from levels_app.models import Rank, Stage, Task, Reward
 from user_app.models import User, UsersTasks
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.shortcuts import get_object_or_404
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -72,7 +73,7 @@ class StageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Stage
-        fields = ["name", "tasks", 'next_stage']
+        fields = ["id", "name", "tasks", 'next_stage']
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -84,3 +85,44 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ["name", "text", "rewards"]
+
+
+class TaskForPreviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Task
+        fields = ('name', 'text')
+
+
+class StageInfo(serializers.ModelSerializer):
+    completed_tasks = serializers.SerializerMethodField()
+    incompleted_tasks = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Stage
+        fields = ('name', 'completed_tasks', 'incompleted_tasks')
+
+    def get_completed_tasks(self, obj):
+        user_id = self.context['user_id']
+        completed_tasks_ids = UsersTasks.objects.filter(user_id=user_id, task__in=obj.tasks_id.all()).values_list('task_id', flat=True)
+        completed_tasks = Task.objects.filter(id__in=completed_tasks_ids)
+        return TaskForPreviewSerializer(completed_tasks, many=True).data
+
+    def get_incompleted_tasks(self, obj):
+        user_id = self.context['user_id']
+        completed_tasks_ids = UsersTasks.objects.filter(user_id=user_id, task__in=obj.tasks_id.all()).values_list('task_id', flat=True)
+        incomplete_tasks = obj.tasks_id.exclude(id__in=completed_tasks_ids)
+        return TaskForPreviewSerializer(incomplete_tasks, many=True).data
+
+
+class RankInfoSerializer(serializers.ModelSerializer):
+    stage = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Rank
+        fields = ('name', 'description', 'stage')
+
+    def get_stage(self, obj):
+        print(self.context.get('stage_id'))
+        stage = get_object_or_404(Stage, id = self.context.get('stage_id'))
+        return StageInfo(stage, context=self.context).data

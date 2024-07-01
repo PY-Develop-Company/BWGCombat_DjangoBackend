@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 class Rank(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
+    description = models.TextField(blank=False, max_length=1023, default='Some text')
+
     reward_id = models.ForeignKey(
         "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
     )
@@ -49,14 +51,13 @@ class Task(models.Model):
         buy_energy = "4", _("buy energy")
         gnome_empl = "5", _("Gnome employment(buying)")
         pick_upg = "6", _("upgrade pickaxe to earn more gold per click")
-        buy_char = "7", _("buy character to improve passive income")
 
     name = models.CharField(max_length=255, null=False, blank=False)
     text = models.TextField(null=True, blank=False)
     task_type = models.CharField(
         null=False, choices=TaskType, default=TaskType.buy_energy
     )
-    amount = models.IntegerField(null=True, blank=True, default=0)
+    amount = models.IntegerField(null=True, blank=True, default=1)
     rewards = models.ManyToManyField(
         "Reward", blank=False
     )
@@ -68,7 +69,6 @@ class Task(models.Model):
 class Reward(models.Model):
     class RewardType(models.TextChoices):
         GOLD = "1", _("Add gold")
-        GOLD_PER_CLICK = "2", _("Increase gold per click multiplier")
         G_TOKEN = '3', _("Add G token")
         
         PICKAXE = '4', _("Pickaxe upgrade")
