@@ -149,14 +149,32 @@ class UserData(models.Model):
     def remove_g_token_coins(self, coins: int):
         self.g_token -= int(coins)
 
-    def add_multiplier_coins(self, amount: int):
+    def add_multiplier(self, amount: int):
         self.click_multiplier += amount
+
+    def set_multiplier(self, amount: int):
+        self.click_multiplier = amount
+
+    def remove_multiplier(self, amount: int):
+        self.click_multiplier -= amount
 
     def add_energy(self, amount: int):
         self.energy += amount
 
+    def set_energy(self, amount: int):
+        self.energy = amount
+
+    def remove_energy(self, amount: int):
+        self.energy -= amount
+
     def add_passive_income(self, amount: int):
         self.passive_income += amount
+
+    def set_passive_income(self, amount: int):
+        self.passive_income = amount
+
+    def remove_passive_income(self, amount: int):
+        self.passive_income = amount
 
     def is_referrals_quantity_exceeds(self, expected_quantity):
         user = User.objects.get(tg_id=self.user_id)
@@ -186,17 +204,15 @@ class UserData(models.Model):
             case 1:
                 self.add_gold_coins(reward_amount)
             case 2:
-                self.add_multiplier_coins(reward_amount)
+                self.add_multiplier(reward_amount)
             case 3:
                 self.add_g_token_coins(reward_amount)
             case 4:
-                pass
-            case 5:
                 self.add_energy(reward_amount)
-            case 6:
+            case 5:
                 self.add_passive_income(reward_amount)
             case _:
-                return "No such type reward"
+                return "No such reward type"
 
 
 class UsersTasks(models.Model):

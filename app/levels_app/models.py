@@ -67,12 +67,10 @@ class Task(models.Model):
 class Reward(models.Model):
     class RewardType(models.TextChoices):
         GOLD = "1", _("Add gold")
-        GOLD_PER_CLICK = "2", _("Increase gold per click multiplier")
+        MULTIPLIER = "2", _("Increase gold multiplier")
         G_TOKEN = '3', _("Add G token")
-        
-        PICKAXE = '4', _("Pickaxe upgrade")
-        ENERGY_BALANCE = '5', _("Replenish energy")
-        PASSIVE_INCOME = "6", _("Improve passive income")
+        ENERGY_BALANCE = '4', _("Replenish energy")
+        PASSIVE_INCOME = "5", _("Improve passive income")
 
     name = models.CharField(max_length=200, blank=False, null=False)
     amount = models.BigIntegerField(null=False)

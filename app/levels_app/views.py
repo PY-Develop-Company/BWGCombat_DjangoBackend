@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Task, Reward
-from user_app.models import UserData
+from user_app.models import UserData, UsersTasks
 from django.shortcuts import get_object_or_404, redirect
 # from .models import Link, LinkClick
 
@@ -22,7 +22,7 @@ def check_task_completion(user_id: int, task_id: int):
         case 1:
             done = userdata.check_link_click('https://t.me/justforcheckingone')
         case 2:
-            done = userdata.is_referrals_quantity_exceeds(10)
+            done = userdata.is_referrals_quantity_exceeds(task.completion_number)
         case 3:
             pass
         case 4:
@@ -64,6 +64,7 @@ def request_task_submission(request):
     userdata = get_object_or_404(UserData, user_id=user_id)
     task = get_object_or_404(Task, task_id=task_id)
     ### make some logic to check
+    user_task = UsersTasks(user_id=user_id, task_id=task_id)
 
     userdata.rank_id = userdata.rank_id.next_rank
     userdata.save()
