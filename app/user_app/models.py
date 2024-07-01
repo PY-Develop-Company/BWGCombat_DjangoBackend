@@ -202,6 +202,7 @@ class UserData(models.Model):
 class UsersTasks(models.Model):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.CASCADE)
+    status = models.BooleanField(null=False, blank=False, default=False)
     time = models.DateTimeField(null=False, blank=False, default=now)
 
     def __str__(self) -> str:

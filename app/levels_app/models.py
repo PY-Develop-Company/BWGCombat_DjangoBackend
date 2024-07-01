@@ -55,6 +55,7 @@ class Task(models.Model):
     task_type = models.CharField(
         null=False, choices=TaskType, default=TaskType.buy_energy
     )
+    completion_number = models.BigIntegerField(null=False, blank=False, default=10)  # default is temporarily
     rewards = models.ManyToManyField(
         "Reward", blank=False
     )
