@@ -72,15 +72,25 @@ class EnergyLevel(models.Model):
     name = models.CharField(max_length=255, blank=False, null=False)
     level = models.IntegerField(null=False, blank=False)
     amount = models.IntegerField(null=False, blank=False)
-    next_level = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
+    next_level = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:
-        return self.name + self.level + self.amount
+        return f'{self.name}  {self.level}  {self.amount}'
 
+class MultiplierLevel(models.Model):
+    name = models.CharField(max_length=255, blank=False, null=False)
+    level = models.IntegerField(null=False, blank=False)
+    amount = models.IntegerField(null=False, blank=False)
+    next_level = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
 
-class MultiplierLevel(EnergyLevel):
-    pass
+    def __str__(self) -> str:
+        return f'{self.name}  {self.level}  {self.amount}'
 
+class PassiveIncomeLevel(models.Model):
+    name = models.CharField(max_length=255, blank=False, null=False)
+    level = models.IntegerField(null=False, blank=False)
+    amount = models.IntegerField(null=False, blank=False)
+    next_level = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
 
-class PassiveIncomeLevel(EnergyLevel):
-    pass
+    def __str__(self) -> str:
+        return f'{self.name}  {self.level}  {self.amount}'
