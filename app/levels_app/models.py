@@ -3,19 +3,17 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Rank(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255, null=False, blank=False)
+    description = models.TextField(blank=False, max_length=1023, default='Some text')
+
     reward_id = models.ForeignKey(
         "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
     )
-    next_rank = models.OneToOneField(
-        "self",
-        related_name="next_rank_from_rank",
-        null=True,
-        blank=True,
-        on_delete=models.DO_NOTHING,
-    )
+    
 
-    fist_stage = models.ForeignKey('Stage', null=True, on_delete=models.DO_NOTHING, default=None)
+    first_stage = models.ForeignKey('Stage', null = True, blank=True, on_delete=models.DO_NOTHING, default=None)
+
 
     def __str__(self) -> str:
         return f"{self.name}"
@@ -28,13 +26,7 @@ class Stage(models.Model):
         "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
     )
     tasks_id = models.ManyToManyField("Task")
-    next_stage = models.ForeignKey(
-        "self",
-        related_name="next_stage_from_stage",
-        null=True,
-        blank=True,
-        on_delete=models.DO_NOTHING,
-    )
+    
 
     def __str__(self) -> str:
         return self.name
@@ -48,7 +40,6 @@ class Task(models.Model):
         buy_energy = "4", _("buy energy")
         gnome_empl = "5", _("Gnome employment(buying)")
         pick_upg = "6", _("upgrade pickaxe to earn more gold per click")
-        buy_char = "7", _("buy character to improve passive income")
 
     name = models.CharField(max_length=255, null=False, blank=False)
     text = models.TextField(null=True, blank=False)
@@ -78,3 +69,23 @@ class Reward(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+    
+
+
+class EnergyLevel(models.Model):
+    name = models.CharField(max_length=255, blank=False, null=False)
+    level = models.IntegerField(null=False, blank=False)
+    amount = models.IntegerField(null=False, blank=False)
+    next_level = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
+
+    def __str__(self) -> str:
+        return self.name + self.level + self.amount
+
+
+class MultitapLevel(EnergyLevel):
+    pass
+
+class PassiveIncomeLevel(EnergyLevel):
+    pass
+
+

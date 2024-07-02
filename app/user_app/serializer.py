@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from .models import UserData
 from levels_app.models import Rank, Stage, Task, Reward
-from user_app.models import User
+from user_app.models import User, UsersTasks
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.shortcuts import get_object_or_404
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -35,7 +36,7 @@ class UserDataSerializer(serializers.ModelSerializer):
         return RankingSerializer(obj.rank_id).data
 
     def get_stage(self, obj: UserData):
-        return StageSerializer(obj.stage_id).data
+        return StageSerializer(obj.stage_id, context = {"user_id": obj.user_id}).data
 
     def get_username(self, obj: UserData):
         return User.objects.get(tg_id=obj.user_id.tg_id).tg_username
@@ -65,19 +66,63 @@ class StageSerializer(serializers.ModelSerializer):
     tasks = serializers.SerializerMethodField()
 
     def get_tasks(self, obj: Stage):
-        return TaskSerializer(obj.tasks_id, many=True).data
+        user = self.context['user_id']
+        completed_tasks_ids = UsersTasks.objects.filter(user_id=user, task__in=obj.tasks_id.all()).values_list('task_id', flat=True)
+        incomplete_tasks = obj.tasks_id.exclude(id__in=completed_tasks_ids)
+        return TaskSerializer(incomplete_tasks, many=True).data
 
     class Meta:
         model = Stage
-        fields = ["name", "tasks"]
+        fields = ["id", "name", "tasks", 'next_stage']
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    reward = serializers.SerializerMethodField()
+    rewards = serializers.SerializerMethodField()
 
-    def get_reward(self, obj: Stage):
-        return RewardSerializer(obj.reward_id).data
+    def get_rewards(self, obj: Stage):
+        return RewardSerializer(obj.rewards, many=True).data
 
     class Meta:
         model = Task
-        fields = ["name", "text", "reward"]
+        fields = ["name", "text", "rewards"]
+
+
+class TaskForPreviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Task
+        fields = ('name', 'text')
+
+
+class StageInfo(serializers.ModelSerializer):
+    completed_tasks = serializers.SerializerMethodField()
+    incompleted_tasks = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Stage
+        fields = ('name', 'completed_tasks', 'incompleted_tasks')
+
+    def get_completed_tasks(self, obj):
+        user_id = self.context['user_id']
+        completed_tasks_ids = UsersTasks.objects.filter(user_id=user_id, task__in=obj.tasks_id.all()).values_list('task_id', flat=True)
+        completed_tasks = Task.objects.filter(id__in=completed_tasks_ids)
+        return TaskForPreviewSerializer(completed_tasks, many=True).data
+
+    def get_incompleted_tasks(self, obj):
+        user_id = self.context['user_id']
+        completed_tasks_ids = UsersTasks.objects.filter(user_id=user_id, task__in=obj.tasks_id.all()).values_list('task_id', flat=True)
+        incomplete_tasks = obj.tasks_id.exclude(id__in=completed_tasks_ids)
+        return TaskForPreviewSerializer(incomplete_tasks, many=True).data
+
+
+class RankInfoSerializer(serializers.ModelSerializer):
+    stage = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Rank
+        fields = ('name', 'description', 'stage')
+
+    def get_stage(self, obj):
+        print(self.context.get('stage_id'))
+        stage = get_object_or_404(Stage, id = self.context.get('stage_id'))
+        return StageInfo(stage, context=self.context).data

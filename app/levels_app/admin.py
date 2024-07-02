@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Rank, Reward, Stage, Task
+from .models import Rank, Reward, Stage, Task, EnergyLevel, MultitapLevel, PassiveIncomeLevel
 
 
 class RankAdmin(admin.ModelAdmin):
@@ -24,3 +24,6 @@ admin.site.register(Rank, RankAdmin)
 admin.site.register(Reward, RewardAdmin)
 admin.site.register(Stage, StageAdmin)
 admin.site.register(Task, TaskAdmin)
+admin.site.register(EnergyLevel)
+admin.site.register(MultitapLevel)
+admin.site.register(PassiveIncomeLevel)

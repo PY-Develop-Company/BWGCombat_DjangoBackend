@@ -66,12 +66,4 @@ def go_to_next_stage(request):
     return JsonResponse({"result": "ok"})
 
 
-#
-# @api_view(["GET"])
-# @permission_classes([AllowAny])
-# def get_task_info(request):
-#     task_id = request.data.get("taskId")
-#     task = get_object_or_404(Task, task_id=task_id)
-#     return HttpResponse({task.text})
-#
 
