@@ -10,8 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='userstasks',
-            name='status',
-        ),
+        # migrations.RemoveField(
+            # model_name='userstasks',
+            # name='status',
+        # ),
     ]
