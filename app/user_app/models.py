@@ -65,7 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         Language,
         to_field="lang_code",
         null=True,
-        default=None,
+        default="en",
         on_delete=models.SET_DEFAULT,
     )
     email = None
@@ -93,6 +93,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return self.is_admin
+
+    def save(self, *args, **kwargs):
+        all_language_codes = Language.objects.values_list('lang_code', flat=True)
+        if 'en' not in all_language_codes:
+            english = Language.objects.create(lang_id=1, lang_code='en', lang_name='English')
+            english.save()
+        print("here")
+        super(User, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.tg_id}  {self.tg_username or ''}"

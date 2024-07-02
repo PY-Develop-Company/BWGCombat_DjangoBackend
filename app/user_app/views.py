@@ -102,8 +102,8 @@ def add_user(request):
         user.save()
 
         return JsonResponse({"result": "The user has been registered successfully"})
-    except:
-        pass
+    except django.db.IntegrityError:
+        return JsonResponse({"result": "The user already exists"})
 
 
 @csrf_exempt
