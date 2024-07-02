@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import UserData
-from levels_app.models import Rank, Stage, Task, Reward
+from levels_app.models import Rank, Stage, Task, Reward, EnergyLevel, MultiplierLevel
 from user_app.models import User, UsersTasks
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.shortcuts import get_object_or_404
@@ -26,11 +26,32 @@ class RewardSerializer(serializers.ModelSerializer):
         model = Reward
         fields = "__all__"
 
+class EnergySerializer(serializers.ModelSerializer):
+
+    class Meta: 
+        model = EnergyLevel
+        fields = ('id', 'amount')
+
+
+class MultiplierSerializer(serializers.ModelSerializer):
+
+    class Meta: 
+        model = EnergyLevel
+        fields = ('id', 'amount')
 
 class UserDataSerializer(serializers.ModelSerializer):
     rank = serializers.SerializerMethodField()
     stage = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
+    click_multiplier = serializers.SerializerMethodField()
+    energy = serializers.SerializerMethodField()
+
+    def get_click_multiplier(self, obj:UserData):
+        return MultiplierSerializer(obj.click_multiplier).data
+    
+
+    def get_energy(self, obj:UserData):
+        return EnergySerializer(obj.energy).data
 
     def get_rank(self, obj: UserData):
         return RankingSerializer(obj.rank_id).data
@@ -53,6 +74,7 @@ class UserDataSerializer(serializers.ModelSerializer):
             "stage",
             "click_multiplier",
             "energy",
+            "energy_regeneration",
         )
 
 
