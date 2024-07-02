@@ -52,7 +52,10 @@ def check_task_completion(user_id: int, task_id: int):
 @permission_classes([AllowAny])
 def go_to_next_rank(request):
     user_id = request.data.get("userId")
-    give_reward_to_inviter(user_id)
+
+    rank_increased = True  # треба перевірка
+    if rank_increased:
+        give_reward_to_inviter(user_id)
 
     return JsonResponse({"result": "ok"})
 
