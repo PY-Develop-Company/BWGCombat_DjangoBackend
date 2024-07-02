@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
-from levels_app.models import Rank, Stage, Task, Reward, MultitapLevel, EnergyLevel, PassiveIncomeLevel
+from levels_app.models import Rank, Stage, Task, Reward, MultiplierLevel, EnergyLevel, PassiveIncomeLevel
 
 
 class CustomUserManager(BaseUserManager):
@@ -120,7 +120,7 @@ class UserData(models.Model):
         Stage, null=True, blank=False, on_delete=models.SET_NULL, default=None
     )
 
-    click_multiplier = models.ForeignKey(MultitapLevel, null = True, blank=True, default=None, on_delete=models.SET_NULL, related_name='Click_level')
+    click_multiplier = models.ForeignKey(MultiplierLevel, null = True, blank=True, default=None, on_delete=models.SET_NULL, related_name='Click_level')
 
     energy_regeneration = models.IntegerField(null=False, blank=False, default=1)
     energy = models.ForeignKey(EnergyLevel,
