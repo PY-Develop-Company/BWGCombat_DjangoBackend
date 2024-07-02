@@ -128,15 +128,15 @@ class UserData(models.Model):
         Stage, null=True, blank=False, on_delete=models.SET_NULL, default=None
     )
 
-    click_multiplier = models.ForeignKey(MultiplierLevel, null = True, blank=True, default=None, on_delete=models.SET_NULL, related_name='Click_level')
+    click_multiplier = models.ForeignKey(MultiplierLevel, null = True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level')
 
     energy_regeneration = models.IntegerField(null=False, blank=False, default=1)
     energy = models.ForeignKey(EnergyLevel,
-        null = True, blank=True, default=None, on_delete=models.SET_NULL
+        null = True, blank=True, default=1, on_delete=models.SET_NULL
     )  ### ask for default value
 
     passive_income = models.ForeignKey(PassiveIncomeLevel,
-        null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='passive_level'
+        null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level'
     )  ### ask for default value
 
     def add_gold_coins(self, coins: int):
