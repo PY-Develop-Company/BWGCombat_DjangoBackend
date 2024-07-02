@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
-from levels_app.models import Rank, Stage, Task, Reward
+from levels_app.models import Rank, Stage, Task, Reward, MultitapLevel, EnergyLevel, PassiveIncomeLevel
 
 
 class CustomUserManager(BaseUserManager):
@@ -120,15 +120,15 @@ class UserData(models.Model):
         Stage, null=True, blank=False, on_delete=models.SET_NULL, default=None
     )
 
-    click_multiplier = models.IntegerField(null=False, blank=False, default=1)
+    click_multiplier = models.ForeignKey(MultitapLevel, null = True, blank=True, default=None, on_delete=models.SET_NULL, related_name='Click_level')
 
     energy_regeneration = models.IntegerField(null=False, blank=False, default=1)
-    energy = models.BigIntegerField(
-        null=False, blank=False, default=100
+    energy = models.ForeignKey(EnergyLevel,
+        null = True, blank=True, default=None, on_delete=models.SET_NULL
     )  ### ask for default value
 
-    passive_income = models.BigIntegerField(
-        null=False, blank=False, default=100, help_text="coins per hour"
+    passive_income = models.ForeignKey(PassiveIncomeLevel,
+        null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='passive_level'
     )  ### ask for default value
 
     def add_gold_coins(self, coins: int):
@@ -259,3 +259,5 @@ class LinkClick(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     link = models.ForeignKey(Link, to_field='url', on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+
