@@ -1,7 +1,8 @@
 import asyncio
 
 
-# from user_app.models import UserData
+from user_app.models import UserData, Fren
+from django.shortcuts import get_object_or_404
 from .models import Reward
 
 
@@ -15,6 +16,15 @@ def check_subscription_sync(user_id):
     asyncio.set_event_loop(loop)
     return loop.run_until_complete(check_subscription(user_id))
 
+
+def give_reward_to_inviter(fren_id):
+    inviter_id = get_object_or_404(Fren, fren_id=fren_id)
+    userdata = get_object_or_404(UserData, user_id=inviter_id)
+
+    reward = get_object_or_404(Reward, name="Referral's rank 1")
+
+    userdata.receive_reward(reward)
+    userdata.save()
 
 # def add_reward(user_data: UserData, reward: Reward):
 """

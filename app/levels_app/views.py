@@ -2,7 +2,8 @@ from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Task, Reward
-from user_app.models import UserData, UsersTasks
+from user_app.models import UserData, UsersTasks, Fren
+from .utils import give_reward_to_inviter
 from django.shortcuts import get_object_or_404, redirect
 # from .models import Link, LinkClick
 
@@ -39,10 +40,10 @@ def check_task_completion(user_id: int, task_id: int):
     if done:
         rewards = task.rewards
         for reward in rewards:
-            userdata.receive_rewards(reward)
-        user_task = get_object_or_404(UsersTasks, user_id=user_id)
-        user_task.status = True
-        user_task.save()
+            userdata.receive_reward(reward)
+        # user_task = get_object_or_404(UsersTasks, user_id=user_id)
+        # user_task.status = True
+        # user_task.save()
     else:
         return HttpResponse('You haven\'t completed the task or no checking for this task exists yet')
 
@@ -51,29 +52,17 @@ def check_task_completion(user_id: int, task_id: int):
 @permission_classes([AllowAny])
 def go_to_next_rank(request):
     user_id = request.data.get("userId")
-    userdata = get_object_or_404(UserData, user_id=user_id)
-    reward = userdata.rank_id.reward_id
+    give_reward_to_inviter(user_id)
 
-    userdata.rank_id = userdata.rank_id.next_rank
-    userdata.save()
-    # return JsonResponse({"result": "ok"})
-    return HttpResponse('Task has been taken successfully')
-
-
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def request_task_submission(request):
-    user_id = request.data.get("userId")
-    task_id = request.data.get("taskId")
-    userdata = get_object_or_404(UserData, user_id=user_id)
-    task = get_object_or_404(Task, task_id=task_id)
-    ### make some logic to check
-
-    user_task = UsersTasks(user_id=user_id, task_id=task_id)
-    user_task.save()
-
-    userdata.rank_id = userdata.rank_id.next_rank
-    userdata.save()
     return JsonResponse({"result": "ok"})
 
+
+#
+# @api_view(["GET"])
+# @permission_classes([AllowAny])
+# def get_task_info(request):
+#     task_id = request.data.get("taskId")
+#     task = get_object_or_404(Task, task_id=task_id)
+#     return HttpResponse({task.text})
+#
 
