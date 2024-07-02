@@ -59,7 +59,7 @@ def go_to_next_rank(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
-def go_to_next_rank(request):
+def go_to_next_stage(request):
     user_id = request.data.get("userId")
     # give_reward_to_inviter(user_id)
 
