@@ -10,10 +10,8 @@ class Rank(models.Model):
     reward_id = models.ForeignKey(
         "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
     )
-    
 
     first_stage = models.ForeignKey('Stage', null = True, blank=True, on_delete=models.DO_NOTHING, default=None)
-
 
     def __str__(self) -> str:
         return f"{self.name}"
@@ -28,6 +26,7 @@ class Stage(models.Model):
     tasks_id = models.ManyToManyField("Task")
     next_stage = models.ForeignKey('self', null = True, blank=True, on_delete=models.SET_NULL)
     
+
 
     def __str__(self) -> str:
         return self.name
@@ -72,7 +71,6 @@ class Reward(models.Model):
         return f"{self.name}"
     
 
-
 class EnergyLevel(models.Model):
     id = models.IntegerField(blank=False, null = False, primary_key=True)
     name = models.CharField(max_length=255, blank=False, null=False)
@@ -82,7 +80,6 @@ class EnergyLevel(models.Model):
 
     def __str__(self) -> str:
         return f'{self.name}  {self.level}  {self.amount}'
-
 
 class MultiplierLevel(models.Model):
     id = models.IntegerField(blank=False, null = False, primary_key=True)
@@ -103,5 +100,3 @@ class PassiveIncomeLevel(models.Model):
 
     def __str__(self) -> str:
         return f'{self.name}  {self.level}  {self.amount}'
-
-
