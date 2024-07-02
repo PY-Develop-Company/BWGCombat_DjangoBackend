@@ -149,14 +149,32 @@ class UserData(models.Model):
     def remove_g_token_coins(self, coins: int):
         self.g_token -= int(coins)
 
-    def add_multiplier_coins(self, amount: int):
+    def add_multiplier(self, amount: int):
         self.click_multiplier += amount
+
+    def set_multiplier(self, amount: int):
+        self.click_multiplier = amount
+
+    def remove_multiplier(self, amount: int):
+        self.click_multiplier -= amount
 
     def add_energy(self, amount: int):
         self.energy += amount
 
+    def set_energy(self, amount: int):
+        self.energy = amount
+
+    def remove_energy(self, amount: int):
+        self.energy -= amount
+
     def add_passive_income(self, amount: int):
         self.passive_income += amount
+
+    def set_passive_income(self, amount: int):
+        self.passive_income = amount
+
+    def remove_passive_income(self, amount: int):
+        self.passive_income = amount
 
     def is_referrals_quantity_exceeds(self, expected_quantity):
         user = User.objects.get(tg_id=self.user_id)
@@ -175,9 +193,8 @@ class UserData(models.Model):
         GOLD = "1", _("Add gold")
         GOLD_PER_CLICK = "2", _("Increase gold per click multiplier")
         G_TOKEN = '3', _("Add G token")
-        PICKAXE = '4', _("Pickaxe upgrade")
-        ENERGY_BALANCE = '5', _("Replenish energy")
-        PASSIVE_INCOME = "6", _("Improve passive income")
+        ENERGY_BALANCE = '4', _("Replenish energy")
+        PASSIVE_INCOME = "5", _("Improve passive income")
         """
         reward_type = int(reward.reward_type)
         reward_amount = int(reward.amount)
@@ -186,22 +203,21 @@ class UserData(models.Model):
             case 1:
                 self.add_gold_coins(reward_amount)
             case 2:
-                self.add_multiplier_coins(reward_amount)
+                self.add_multiplier(reward_amount)
             case 3:
                 self.add_g_token_coins(reward_amount)
             case 4:
-                pass
-            case 5:
                 self.add_energy(reward_amount)
-            case 6:
+            case 5:
                 self.add_passive_income(reward_amount)
             case _:
-                return "No such type reward"
+                return "No such reward type"
 
 
 class UsersTasks(models.Model):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.CASCADE)
+    status = models.BooleanField(null=False, blank=False, default=False)
     time = models.DateTimeField(null=False, blank=False, default=now)
 
     class Meta:

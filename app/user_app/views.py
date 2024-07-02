@@ -145,7 +145,6 @@ def track_link_click(request, link_id):
     link = get_object_or_404(Link, id=link_id)
 
     user_id = request.data.get("userId")
-    # user_id = 585657619  # тимчасово для тесту, поки не було реквестів з фронта
 
     user = User.objects.get(tg_id=user_id)
 

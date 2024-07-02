@@ -22,7 +22,7 @@ def check_task_completion(user_id: int, task_id: int):
         case 1:
             done = userdata.check_link_click('https://t.me/justforcheckingone')
         case 2:
-            done = userdata.is_referrals_quantity_exceeds(10)
+            done = userdata.is_referrals_quantity_exceeds(task.completion_number)
         case 3:
             pass
         case 4:
@@ -40,6 +40,9 @@ def check_task_completion(user_id: int, task_id: int):
         rewards = task.rewards
         for reward in rewards:
             userdata.receive_rewards(reward)
+        user_task = get_object_or_404(UsersTasks, user_id=user_id)
+        user_task.status = True
+        user_task.save()
     else:
         return HttpResponse('You haven\'t completed the task or no checking for this task exists yet')
 
@@ -53,7 +56,8 @@ def go_to_next_rank(request):
 
     userdata.rank_id = userdata.rank_id.next_rank
     userdata.save()
-    return JsonResponse({"result": "ok"})
+    # return JsonResponse({"result": "ok"})
+    return HttpResponse('Task has been taken successfully')
 
 
 @api_view(["POST"])
@@ -68,16 +72,10 @@ def request_task_submission(request):
     task_done = UsersTasks.objects.create(user = userdata.user_id, task = task)
     task_done.save()
 
-    current_tasks = userdata.stage_id.tasks_id.all()
-    done_tasks = (UsersTasks.objects.filter(user = userdata.user_id, task__in=current_tasks))
+    user_task = UsersTasks(user_id=user_id, task_id=task_id)
+    user_task.save()
 
-    if len(current_tasks) == len(done_tasks):
-        if userdata.stage_id.next_stage is not None:
-            userdata.stage_id = userdata.stage_id.next_stage
-        else:
-            userdata.rank_id = userdata.rank_id.next_rank
-            userdata.stage_id = userdata.rank_id.first_stage
-    
+    userdata.rank_id = userdata.rank_id.next_rank
     userdata.save()
     return JsonResponse({"result": "ok"})
 

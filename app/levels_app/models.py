@@ -57,7 +57,7 @@ class Task(models.Model):
     task_type = models.CharField(
         null=False, choices=TaskType, default=TaskType.buy_energy
     )
-    amount = models.IntegerField(null=True, blank=True, default=1)
+    completion_number = models.BigIntegerField(null=True, blank=True)
     rewards = models.ManyToManyField(
         "Reward", blank=False
     )
@@ -69,17 +69,14 @@ class Task(models.Model):
 class Reward(models.Model):
     class RewardType(models.TextChoices):
         GOLD = "1", _("Add gold")
-        G_TOKEN = '3', _("Add G token")
-        
-        PICKAXE = '4', _("Pickaxe upgrade")
-        ENERGY_BALANCE = '5', _("Replenish energy")
-        PASSIVE_INCOME = "6", _("Improve passive income")
+        MULTIPLIER = "2", _("Increase gold multiplier")
+        G_TOKEN = "3", _("Add G token")
+        ENERGY_BALANCE = "4", _("Replenish energy")
+        PASSIVE_INCOME = "5", _("Improve passive income")
 
     name = models.CharField(max_length=200, blank=False, null=False)
     amount = models.BigIntegerField(null=False)
-    reward_type = models.CharField(
-        null=True, choices=RewardType, default=RewardType.GOLD
-    )
+    reward_type = models.CharField(null=True, choices=RewardType, default=RewardType.GOLD)
 
     def __str__(self):
         return f"{self.name}"
