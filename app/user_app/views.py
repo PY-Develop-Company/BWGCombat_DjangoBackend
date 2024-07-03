@@ -54,6 +54,7 @@ def add_coins_to_user(request):
     coins = request.data.get("totalClicks")
     user_id = request.data.get("userId")
     curr_energy = request.data.get("currentEnergy")
+    warning = request.data.get("warning")
 
     user_data = get_object_or_404(UserData, user_id=user_id)
     user_data.add_gold_coins(coins)

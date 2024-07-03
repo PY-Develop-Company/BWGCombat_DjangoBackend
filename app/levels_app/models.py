@@ -12,23 +12,9 @@ class Rank(models.Model):
         "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
     )
 
-    # first_stage = models.ForeignKey('Stage', null = True, blank=True, on_delete=models.DO_NOTHING, default=None)
 
     def __str__(self) -> str:
         return f"{self.name}"
-
-
-# class Stage(models.Model):
-#     name = models.CharField(max_length=255, null=False, blank=False)
-#     rank_id = models.ForeignKey(Rank, null=True, blank=False, on_delete=models.CASCADE)
-#     reward_id = models.ForeignKey(
-#         "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
-#     )
-#     tasks_id = models.ManyToManyField("Task")
-#     next_stage = models.ForeignKey('self', null = True, blank=True, on_delete=models.SET_NULL)
-#
-#     def __str__(self) -> str:
-#         return self.name
 
 
 class Task(models.Model):
@@ -51,6 +37,7 @@ class Task(models.Model):
     rewards = models.ManyToManyField(
         "Reward", blank=False
     )
+    initial = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.name
@@ -65,7 +52,7 @@ class Reward(models.Model):
         PASSIVE_INCOME = "5", _("Improve passive income")
 
     name = models.CharField(max_length=200, blank=False, null=False)
-    amount = models.BigIntegerField(null=False)
+    amount = models.FloatField(null=False)
     reward_type = models.CharField(null=True, choices=RewardType, default=RewardType.GOLD)
 
     def __str__(self):
