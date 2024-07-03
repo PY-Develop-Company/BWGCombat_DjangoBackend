@@ -167,11 +167,10 @@ def get_rank_info(request):
     user_data = get_object_or_404(UserData, user_id=user_id)
     rank_info = get_object_or_404(Rank, id=rank_id)
     if user_data.rank_id == rank_info:
-        serializer = RankInfoSerializer(rank_info, context = {'user_id':user_data.user_id_id, 'stage_id': user_data.stage_id_id})
+        serializer = RankInfoSerializer(rank_info, context={'user_id': user_data.user_id_id, 'stage_id': user_data.stage_id_id})
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
     else:
         return JsonResponse({"rank_id": rank_info.id, "name": rank_info.name, 'description': rank_info.description}, status=status.HTTP_200_OK)
-    
 
 
 @api_view(["POST"])
@@ -182,7 +181,4 @@ def pick_character(request):
     user_data.character_gender = int(choice)
     user_data.save()
     return JsonResponse(UserDataSerializer(user_data).data, status=status.HTTP_200_OK)
-
-
-    
 
