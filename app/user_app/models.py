@@ -120,7 +120,6 @@ class UserData(models.Model):
         MALE = 0, 'Male'
         FEMALE = 1, 'Female'
 
-
     user_id = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     character_gender = models.IntegerField(null = True, blank=True, default=None, choices = Gender.choices)
 
@@ -136,15 +135,17 @@ class UserData(models.Model):
     #     Stage, null=True, blank=False, on_delete=models.SET_NULL, default=None
     # )
 
-    click_multiplier = models.ForeignKey(MultiplierLevel, null = True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level')
+    click_multiplier_level = models.ForeignKey(MultiplierLevel,
+        null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level'
+    )
 
     energy_regeneration = models.IntegerField(null=False, blank=False, default=1)
-    energy = models.ForeignKey(EnergyLevel,
-        null = True, blank=True, default=1, on_delete=models.SET_NULL
+    energy_level = models.ForeignKey(EnergyLevel,
+        null=True, blank=True, default=1, on_delete=models.SET_NULL
     )
-    current_energy = models.IntegerField(null = False, blank=False, default=0)
+    current_energy = models.IntegerField(null=False, blank=False, default=0)
 
-    passive_income = models.ForeignKey(PassiveIncomeLevel,
+    passive_income_level = models.ForeignKey(PassiveIncomeLevel,
         null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level'
     )
 
@@ -166,15 +167,17 @@ class UserData(models.Model):
     def remove_g_token_coins(self, coins: int):
         self.g_token -= int(coins)
 
-    def next_multiplier_level(self, amount: int):
-        self.click_multiplier = self.click_multiplier.next_level
+    def increase_multiplier_level(self, levels_to_increase: int):
+        for __ in range(levels_to_increase):
+            self.click_multiplier = self.click_multiplier_level.next_level
 
-    def next_energy_level(self, amount: int):
-        self.energy = self.energy.next_level
+    def increase_energy_level(self, levels_to_increase: int):
+        for __ in range(levels_to_increase):
+            self.energy = self.energy_level.next_level
 
-    def next_passive_income_level(self, amount: int):
-        self.passive_income = self.passive_income.next_level
-
+    def increase_passive_income_level(self, levels_to_increase: int):
+        for __ in range(levels_to_increase):
+            self.passive_income = self.passive_income_level.next_level
 
     def is_referrals_quantity_exceeds(self, expected_quantity):
         user = User.objects.get(tg_id=self.user_id)
@@ -203,24 +206,25 @@ class UserData(models.Model):
             case 1:
                 self.add_gold_coins(reward_amount)
             case 2:
-                self.add_multiplier(reward_amount)
+                self.increase_multiplier_level(reward_amount)
             case 3:
                 self.add_g_token_coins(reward_amount)
             case 4:
-                self.add_energy(reward_amount)
+                self.increase_energy_level(reward_amount)
             case 5:
-                self.add_passive_income(reward_amount)
+                self.increase_passive_income_level(reward_amount)
             case _:
                 return "No such reward type"
 
     def __str__(self):
         return f'{self.user_id.tg_id} {self.last_visited}'
 
+
 class UsersTasks(models.Model):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.CASCADE)
-    start_time = models.DateTimeField(null=True, blank=True, default=now)  # default "now" might be changed
-    complete_time = models.DateTimeField(null=True, blank=True, default=now)  # default "now" might be changed
+    start_time = models.DateTimeField(null=True, blank=True, default=None)  # default "None" might be changed
+    complete_time = models.DateTimeField(null=True, blank=True, default=None)  # default "None" might be changed
 
     class Status(models.TextChoices):
         UNAVAILABLE = "0", _("Unavailable")

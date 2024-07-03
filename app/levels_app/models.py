@@ -12,7 +12,6 @@ class Rank(models.Model):
         "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
     )
 
-
     def __str__(self) -> str:
         return f"{self.name}"
 

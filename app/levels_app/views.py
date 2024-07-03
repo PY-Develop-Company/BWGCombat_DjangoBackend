@@ -60,13 +60,13 @@ def go_to_next_rank(request):
     return JsonResponse({"result": "ok"})
 
 
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def go_to_next_stage(request):
-    user_id = request.data.get("userId")
-    # give_reward_to_inviter(user_id)
-
-    return JsonResponse({"result": "ok"})
+# @api_view(["POST"])
+# @permission_classes([AllowAny])
+# def go_to_next_stage(request):
+#     user_id = request.data.get("userId")
+#     # give_reward_to_inviter(user_id)
+#
+#     return JsonResponse({"result": "ok"})
 
 
 

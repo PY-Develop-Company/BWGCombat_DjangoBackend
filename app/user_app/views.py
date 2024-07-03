@@ -8,8 +8,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import viewsets
-from django.core.exceptions import ValidationError
+# from rest_framework import viewsets
+# from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 
 
@@ -77,21 +77,44 @@ def remove_coins_from_user(request):
     return Response({"user_info": info.data}, status=status.HTTP_200_OK)
 
 
+@api_view(["POST"])
+def check_user_existence(request):
+    try:
+        data = json.loads(request.body)
+        tg_id = data["tg_id"]
+    except json.JSONDecodeError:
+        return JsonResponse({"result": "Unexpected JSON error"})
+    else:
+        user_exists = User.objects.filter(tg_id=tg_id).exists()
+        if user_exists:
+            return JsonResponse({"result": "1"})
+        else:
+            return JsonResponse({"result": "0"})
+
+
 @csrf_exempt
 @api_view(["POST"])
 def add_user(request):
     try:
         data = json.loads(request.body)
-        tg_username = data["tg_username"]
         tg_id = data["tg_id"]
+        #
+        # user_exists = User.objects.filter(User, tg_id=tg_id).exists()
+        # if user_exists:
+        #     return JsonResponse({"result": "The user already exists"})
+
+        tg_username = data["tg_username"]
         first_name = data["firstname"]
         last_name = data["lastname"]
         interface_lang = data["interface_lang_id"]
         is_admin = data["is_admin"]
-        is_staff = is_admin
+        is_staff = is_admin  # temporarily
         password = data["password"] if "password" in data else None
 
-        # Додавання користувача до бази даних
+    except json.JSONDecodeError:
+        return JsonResponse({"result": "Unexpected JSON error"})
+
+    try:
         user = User.objects.create(
             tg_username=tg_username,
             tg_id=tg_id,
@@ -100,18 +123,19 @@ def add_user(request):
             is_active=True,
             is_staff=is_staff,
             is_admin=is_admin,
-            interface_lang_id=interface_lang,
+            interface_lang_id=interface_lang
         )
-
         if password:
             user.set_password(password)
         else:
             user.set_unusable_password()
         user.save()
 
-        return JsonResponse({"result": "The user has been registered successfully"})
-    except django.db.IntegrityError:
-        return JsonResponse({"result": "The user already exists"})
+    except django.db.Error:
+        return JsonResponse({"result": "Unexpected DB error"})
+
+    # both "tries" without exceptions
+    return JsonResponse({"result": "The user has been registered successfully"})
 
 
 @csrf_exempt
