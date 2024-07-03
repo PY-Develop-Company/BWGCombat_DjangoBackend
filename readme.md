@@ -32,6 +32,17 @@ Then run following commands to configure Docker and install all requirements:
 docker-compose build
 ```
 
+Run following command to migrate models to db
+```
+docker-compose run --rm app sh -c "python3 manage.py migrate"
+```
+
+This command to seed data into database
+```
+docker-compose run --rm app sh -c "python3 manage.py seed_db"
+```
+
+
 To **start the app** use command:
 ```
 docker-compose up
