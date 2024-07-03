@@ -45,10 +45,16 @@ class UserDataSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
     click_multiplier = serializers.SerializerMethodField()
     energy = serializers.SerializerMethodField()
+    passive_income = serializers.SerializerMethodField()
+    is_picked = serializers.SerializerMethodField()
+
+
 
     def get_click_multiplier(self, obj:UserData):
         return MultiplierSerializer(obj.click_multiplier).data
-    
+
+    def get_passive_income(self, obj:UserData):
+        return EnergySerializer(obj.passive_income).data
 
     def get_energy(self, obj:UserData):
         return EnergySerializer(obj.energy).data
@@ -61,11 +67,18 @@ class UserDataSerializer(serializers.ModelSerializer):
 
     def get_username(self, obj: UserData):
         return User.objects.get(tg_id=obj.user_id.tg_id).tg_username
+    
+    def get_is_picked(self, obj:UserData):
+        return obj.character_gender is not None
+    
+
 
     class Meta:
         model = UserData
         fields = (
             "user_id",
+            "is_picked",
+            "character_gender",
             "username",
             "gold_balance",
             "g_token",
@@ -75,6 +88,8 @@ class UserDataSerializer(serializers.ModelSerializer):
             "click_multiplier",
             "energy",
             "energy_regeneration",
+            "current_energy",
+            "passive_income",
         )
 
 
@@ -148,3 +163,33 @@ class RankInfoSerializer(serializers.ModelSerializer):
         print(self.context.get('stage_id'))
         stage = get_object_or_404(Stage, id = self.context.get('stage_id'))
         return StageInfo(stage, context=self.context).data
+    
+
+class ClickSerializer(serializers.ModelSerializer):
+
+    click_multiplier = serializers.SerializerMethodField()
+    energy = serializers.SerializerMethodField()
+    passive_income = serializers.SerializerMethodField()
+
+    def get_click_multiplier(self, obj:UserData):
+        return MultiplierSerializer(obj.click_multiplier).data
+
+    def get_passive_income(self, obj:UserData):
+        return EnergySerializer(obj.passive_income).data
+
+    def get_energy(self, obj:UserData):
+        return EnergySerializer(obj.energy).data
+
+
+    class Meta:
+        model = UserData
+        fields = (
+            "user_id",
+            "gold_balance",
+            "g_token",
+            "click_multiplier",
+            "energy",
+            "energy_regeneration",
+            "current_energy",
+            "passive_income",
+            )

@@ -15,5 +15,6 @@ urlpatterns = [
     path("get_user_referrals/", views.get_user_referrals, name="get_user_referrals"),
     path('track/<int:link_id>/', views.track_link_click, name='track_link_click'),
     path('get_rank_info/', views.get_rank_info, name = 'rank_information'),
+    path('pick_character/', views.pick_character, name = 'pick_character')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

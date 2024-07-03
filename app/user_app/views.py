@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 
 
 from .models import User, UserData, Fren, Link, LinkClick
@@ -19,7 +20,7 @@ from levels_app.models import Rank
 # from aiogram.utils.deep_linking import create_start_link
 
 import json
-from .serializer import UserDataSerializer, RankInfoSerializer
+from .serializer import UserDataSerializer, RankInfoSerializer, ClickSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from user_app.serializer import CustomTokenObtainPairSerializer
 
@@ -41,6 +42,8 @@ def user_home(request):
 def get_user_info(request):
     user_id = request.query_params.get("userId")
     user_data = get_object_or_404(UserData, user_id=user_id)
+    delta = now() - user_data.last_visited
+    user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.energy.amount - user_data.current_energy)
     serializer = UserDataSerializer(user_data)
     return Response({"info": serializer.data}, status=status.HTTP_200_OK)
 
@@ -50,11 +53,15 @@ def get_user_info(request):
 def add_coins_to_user(request):
     coins = request.data.get("totalClicks")
     user_id = request.data.get("userId")
+    curr_energy = request.data.get("currentEnergy")
 
-    user_data = UserData.objects.get(user_id=user_id)
+    user_data = get_object_or_404(UserData, user_id=user_id)
     user_data.add_gold_coins(coins)
+    user_data.current_energy = curr_energy
+    user_data.last_visited = now()
+
     user_data.save()
-    info = UserDataSerializer(user_data)
+    info = ClickSerializer(user_data)
     return Response({"user_info": info.data}, status=status.HTTP_200_OK)
 
 
@@ -63,7 +70,7 @@ def remove_coins_from_user(request):
     coins = request.data.get("coins")
     user_id = request.data.get("user_id")
 
-    user_data = UserData.objects.filter(user_id=user_id).first()
+    user_data = get_object_or_404(UserData, user_id=user_id)
     user_data.remove_gold_coins(coins)
     info = UserDataSerializer(user_data)
     return Response({"user_info": info.data}, status=status.HTTP_200_OK)
@@ -164,6 +171,17 @@ def get_rank_info(request):
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
     else:
         return JsonResponse({"rank_id": rank_info.id, "name": rank_info.name, 'description': rank_info.description}, status=status.HTTP_200_OK)
+    
+
+
+@api_view(["POST"])
+def pick_character(request):
+    user_id = request.data.get('userId')
+    choice = request.data.get('character')
+    user_data = get_object_or_404(UserData, user_id=user_id)
+    user_data.character_gender = int(choice)
+    user_data.save()
+    return JsonResponse(UserDataSerializer(user_data).data, status=status.HTTP_200_OK)
 
 
     
