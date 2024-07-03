@@ -1,4 +1,6 @@
 from django.db import models, transaction
+from django.utils.translation import gettext_lazy as _
+
 from django.contrib.auth.models import (
     BaseUserManager,
     AbstractBaseUser,
@@ -8,7 +10,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
-from levels_app.models import Rank, Stage, Task, Reward, MultiplierLevel, EnergyLevel, PassiveIncomeLevel
+from levels_app.models import Rank, Task, Reward, MultiplierLevel, EnergyLevel, PassiveIncomeLevel
 
 
 class CustomUserManager(BaseUserManager):
@@ -121,12 +123,12 @@ class UserData(models.Model):
 
     last_visited = models.DateTimeField(null=False, default=now)
 
-    rank_id = models.ForeignKey(
+    rank = models.ForeignKey(
         Rank, null=True, blank=False, on_delete=models.SET_NULL, default=None
     )
-    stage_id = models.ForeignKey(
-        Stage, null=True, blank=False, on_delete=models.SET_NULL, default=None
-    )
+    # stage_id = models.ForeignKey(
+    #     Stage, null=True, blank=False, on_delete=models.SET_NULL, default=None
+    # )
 
     click_multiplier = models.ForeignKey(MultiplierLevel, null = True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level')
 
@@ -225,8 +227,15 @@ class UserData(models.Model):
 class UsersTasks(models.Model):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.CASCADE)
-    # status = models.BooleanField(null=False, blank=False, default=False)
-    time = models.DateTimeField(null=False, blank=False, default=now)
+    start_time = models.DateTimeField(null=True, blank=True, default=now)  # default "now" might be changed
+    complete_time = models.DateTimeField(null=True, blank=True, default=now)  # default "now" might be changed
+
+    class Status(models.TextChoices):
+        UNAVAILABLE = "0", _("Unavailable")
+        IN_PROGRESS = "1", _("In progress")
+        COMPLETED = "2", _("Completed")
+        EXPIRED = "3", _("Expired")
+    status = models.CharField(null=False, blank=False, choices=Status, default=Status.UNAVAILABLE)
 
     class Meta:
         unique_together = ('user', 'task')

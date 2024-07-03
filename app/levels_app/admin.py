@@ -1,11 +1,11 @@
 from django.contrib import admin
 
-from .models import Rank, Reward, Stage, Task, EnergyLevel, MultiplierLevel, PassiveIncomeLevel
+from .models import Rank, Reward, Task, EnergyLevel, MultiplierLevel, PassiveIncomeLevel
 
 
 class RankAdmin(admin.ModelAdmin):
-    list_display = ("name", "reward_id")
-    list_select_related = ("reward_id",)
+    list_display = ("name",)
+    # list_select_related = ("rewards",)
 
 
 class RewardAdmin(admin.ModelAdmin):
@@ -22,7 +22,7 @@ class TaskAdmin(admin.ModelAdmin):
 
 admin.site.register(Rank, RankAdmin)
 admin.site.register(Reward, RewardAdmin)
-admin.site.register(Stage, StageAdmin)
+# admin.site.register(Stage, StageAdmin)
 admin.site.register(Task, TaskAdmin)
 admin.site.register(EnergyLevel)
 admin.site.register(MultiplierLevel)
