@@ -116,7 +116,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class UserData(models.Model):
+    class Gender(models.IntegerChoices):
+        MALE = 0, 'Male'
+        FEMALE = 1, 'Female'
+
+
     user_id = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
+    character_gender = models.IntegerField(null = True, blank=True, default=None, choices = Gender.choices)
 
     gold_balance = models.BigIntegerField(null=False, default=0)
     g_token = models.FloatField(null=False, default=0)
@@ -135,14 +141,15 @@ class UserData(models.Model):
     energy_regeneration = models.IntegerField(null=False, blank=False, default=1)
     energy = models.ForeignKey(EnergyLevel,
         null = True, blank=True, default=1, on_delete=models.SET_NULL
-    )  ### ask for default value
+    )
+    current_energy = models.IntegerField(null = False, blank=False, default=0)
 
     passive_income = models.ForeignKey(PassiveIncomeLevel,
         null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level'
-    )  ### ask for default value
+    )
 
     def add_gold_coins(self, coins: int):
-        self.gold_balance += int(coins) * self.click_multiplier
+        self.gold_balance += int(coins) * self.click_multiplier.amount
 
     def set_gold_coins(self, coins: int):
         self.gold_balance = int(coins)
@@ -159,32 +166,15 @@ class UserData(models.Model):
     def remove_g_token_coins(self, coins: int):
         self.g_token -= int(coins)
 
-    def add_multiplier(self, amount: int):
-        self.click_multiplier += amount
+    def next_multiplier_level(self, amount: int):
+        self.click_multiplier = self.click_multiplier.next_level
 
-    def set_multiplier(self, amount: int):
-        self.click_multiplier = amount
+    def next_energy_level(self, amount: int):
+        self.energy = self.energy.next_level
 
-    def remove_multiplier(self, amount: int):
-        self.click_multiplier -= amount
+    def next_passive_income_level(self, amount: int):
+        self.passive_income = self.passive_income.next_level
 
-    def add_energy(self, amount: int):
-        self.energy += amount
-
-    def set_energy(self, amount: int):
-        self.energy = amount
-
-    def remove_energy(self, amount: int):
-        self.energy -= amount
-
-    def add_passive_income(self, amount: int):
-        self.passive_income += amount
-
-    def set_passive_income(self, amount: int):
-        self.passive_income = amount
-
-    def remove_passive_income(self, amount: int):
-        self.passive_income = amount
 
     def is_referrals_quantity_exceeds(self, expected_quantity):
         user = User.objects.get(tg_id=self.user_id)
@@ -223,6 +213,8 @@ class UserData(models.Model):
             case _:
                 return "No such reward type"
 
+    def __str__(self):
+        return f'{self.user_id.tg_id} {self.last_visited}'
 
 class UsersTasks(models.Model):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)

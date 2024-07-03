@@ -6,7 +6,7 @@ class Rank(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255, null=False, blank=False)
     description = models.TextField(blank=False, max_length=1023, default='No description')
-    gold_required = models.BigIntegerField(null=False, blank=False, default=10000)
+    gold_required = models.BigIntegerField(null=True, blank=True, default=10_000)
 
     inviter_reward = models.ForeignKey(
         "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
