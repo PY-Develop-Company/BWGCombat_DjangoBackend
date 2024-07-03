@@ -46,7 +46,8 @@ class UserDataSerializer(serializers.ModelSerializer):
     click_multiplier = serializers.SerializerMethodField()
     energy = serializers.SerializerMethodField()
     passive_income = serializers.SerializerMethodField()
-    is_picked = serializers.SerializerMethodField()
+    is_picked_gender = serializers.SerializerMethodField()
+    gender = serializers.SerializerMethodField()
 
 
 
@@ -68,8 +69,11 @@ class UserDataSerializer(serializers.ModelSerializer):
     def get_username(self, obj: UserData):
         return User.objects.get(tg_id=obj.user_id.tg_id).tg_username
     
-    def get_is_picked(self, obj:UserData):
+    def get_is_picked_gender(self, obj:UserData):
         return obj.character_gender is not None
+    
+    def get_gender(self, obj: UserData):
+        return obj.character_gender
     
 
 
@@ -77,8 +81,8 @@ class UserDataSerializer(serializers.ModelSerializer):
         model = UserData
         fields = (
             "user_id",
-            "is_picked",
-            "character_gender",
+            "is_picked_gender",
+            "gender",
             "username",
             "gold_balance",
             "g_token",
@@ -157,7 +161,7 @@ class RankInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rank
-        fields = ('name', 'description', 'stage')
+        fields = ('name', 'description', 'stage', 'gold_required')
 
     def get_stage(self, obj):
         print(self.context.get('stage_id'))

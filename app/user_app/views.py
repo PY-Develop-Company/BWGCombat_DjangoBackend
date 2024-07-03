@@ -177,7 +177,7 @@ def get_rank_info(request):
 @api_view(["POST"])
 def pick_character(request):
     user_id = request.data.get('userId')
-    choice = request.data.get('character')
+    choice = request.data.get('gender')
     user_data = get_object_or_404(UserData, user_id=user_id)
     user_data.character_gender = int(choice)
     user_data.save()
