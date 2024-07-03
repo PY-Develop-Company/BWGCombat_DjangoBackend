@@ -52,7 +52,7 @@ class Reward(models.Model):
         PASSIVE_INCOME = "5", _("Improve passive income")
 
     name = models.CharField(max_length=200, blank=False, null=False)
-    amount = models.BigIntegerField(null=False)
+    amount = models.FloatField(null=False)
     reward_type = models.CharField(null=True, choices=RewardType, default=RewardType.GOLD)
 
     def __str__(self):

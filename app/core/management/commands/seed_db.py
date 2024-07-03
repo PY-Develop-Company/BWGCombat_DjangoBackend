@@ -16,7 +16,7 @@ class Command(BaseCommand):
         self.seed_multiplier_levels()
         self.seed_passive_income_levels()
         self.seed_users()
-        # self.seed_user_data()
+        self.seed_user_data()
         self.stdout.write('Data seeded successfully.')
 
     def seed_lang(self):
@@ -84,8 +84,17 @@ class Command(BaseCommand):
     def seed_users(self):
         users = [
             {'tg_id': 123568, 'tg_username': 'test_mister', 'firstname': 'mister', 'lastname': 'test', 'interface_lang': Language.objects.get(lang_id=1), 'last_login': now()},
-            {'tg_id': 123456, 'tg_username': 'test_miss', 'firstname': 'misis', 'lastname': 'test', 'interface_lang': Language.objects.get(lang_id=1), 'last_login': now()},
+            {'tg_id': 123456, 'tg_username': 'test_miss', 'firstname': 'miss', 'lastname': 'test', 'interface_lang': Language.objects.get(lang_id=1), 'last_login': now()},
         ]
         for _ in users:
             User.objects.update_or_create(**_)
+
+
+    def seed_user_data(self):
+        user_data = [
+            { 'user_id': User.objects.get(tg_id=123568), 'character_gender': None, 'gold_balance': 0, 'g_token': 0, 'last_visited': now(), 'rank': Rank.objects.get(id=1), 'click_multiplier': MultiplierLevel.objects.get(id=1), 'energy': EnergyLevel.objects.get(id=1), 'current_energy': EnergyLevel.objects.get(id=1).amount, 'passive_income': PassiveIncomeLevel.objects.get(id=1)},
+            { 'user_id': User.objects.get(tg_id=123456), 'character_gender': 0, 'gold_balance': 0, 'g_token': 0, 'last_visited': now(), 'rank': Rank.objects.get(id=1), 'click_multiplier': MultiplierLevel.objects.get(id=1), 'energy': EnergyLevel.objects.get(id=1), 'current_energy': EnergyLevel.objects.get(id=1).amount, 'passive_income': PassiveIncomeLevel.objects.get(id=1)},
+        ]
+        for data in user_data:
+            UserData.objects.update_or_create(user_id=data['user_id'], defaults=data)
 
