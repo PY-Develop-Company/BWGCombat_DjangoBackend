@@ -86,8 +86,8 @@ class Command(BaseCommand):
             {'tg_id': 123568, 'tg_username': 'test_mister', 'firstname': 'mister', 'lastname': 'test', 'interface_lang': Language.objects.get(lang_id=1), 'last_login': now()},
             {'tg_id': 123456, 'tg_username': 'test_miss', 'firstname': 'miss', 'lastname': 'test', 'interface_lang': Language.objects.get(lang_id=1), 'last_login': now()},
         ]
-        for _ in users:
-            User.objects.update_or_create(**_)
+        for data in users:
+            User.objects.update_or_create(tg_id=data['tg_id'], defaults = data)
 
 
     def seed_user_data(self):

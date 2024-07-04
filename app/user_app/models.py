@@ -101,7 +101,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         if 'en' not in all_language_codes:
             english = Language.objects.create(lang_id=1, lang_code='en', lang_name='English')
             english.save()
-        print("here")
         super(User, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -150,7 +149,7 @@ class UserData(models.Model):
     )
 
     def add_gold_coins(self, coins: int):
-        self.gold_balance += int(coins) * self.click_multiplier.amount
+        self.gold_balance += int(coins) * self.click_multiplier_level.amount
 
     def set_gold_coins(self, coins: int):
         self.gold_balance = int(coins)

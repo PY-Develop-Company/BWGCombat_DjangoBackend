@@ -20,7 +20,7 @@ from levels_app.models import Rank
 # from aiogram.utils.deep_linking import create_start_link
 
 import json
-from .serializer import UserDataSerializer, RankInfoSerializer, ClickSerializer
+from .serializer import UserDataSerializer, RankInfoSerializer, ClickSerializer, ReferralsSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from user_app.serializer import CustomTokenObtainPairSerializer
 
@@ -43,7 +43,7 @@ def get_user_info(request):
     user_id = request.query_params.get("userId")
     user_data = get_object_or_404(UserData, user_id=user_id)
     delta = now() - user_data.last_visited
-    user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.energy.amount - user_data.current_energy)
+    user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.energy_level.amount - user_data.current_energy)
     serializer = UserDataSerializer(user_data)
     return Response({"info": serializer.data}, status=status.HTTP_200_OK)
 
@@ -162,15 +162,16 @@ def add_referral(request):
 @csrf_exempt
 @api_view(["GET"])
 def get_user_referrals(request):
-    data = json.loads(request.body)
+    user_id = request.query_params.get("userId")
 
-    user = User.objects.get(tg_id=data["tg_id"])
-    referrals = user.referrals.all()
+    user = get_object_or_404(User, tg_id = user_id)
+    referrals = UserData.objects.filter(
+        user_id__in=Fren.objects.filter(inviter_tg=user).values_list('fren_tg', flat=True)
+    )
+    print(referrals)
+    serializer = ReferralsSerializer(referrals, many=True).data
 
-    for referral in referrals:
-        print(referral)
-
-    return HttpResponse(referrals)
+    return JsonResponse({'referrals':serializer}, status=status.HTTP_200_OK)
 
 
 def track_link_click(request, link_id):
