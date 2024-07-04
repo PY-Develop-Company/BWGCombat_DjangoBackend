@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Task, Reward
 from user_app.models import UserData, UsersTasks, Fren
-from .utils import give_reward_to_inviter
+from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
 # from .models import Link, LinkClick
 
@@ -19,9 +19,15 @@ def check_task_completion(user_id: int, task_id: int):
     userdata = UserData.objects.get(user_id=user_id)
 
     done = False
+
+    link = 'https://t.me/justforcheckingone'  # hardcode will be changed on 05.05.2024 at the office
+
     match task.task_type:
         case 1:
-            done = userdata.check_link_click('https://t.me/justforcheckingone')
+            if check_if_link_is_telegram(link):
+                pass  # there will be subscription checking
+            else:
+                done = userdata.check_link_click()
         case 2:
             done = userdata.is_referrals_quantity_exceeds(task.completion_number)
         case 3:
