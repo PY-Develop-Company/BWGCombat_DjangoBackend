@@ -21,14 +21,13 @@ class CustomUserManager(BaseUserManager):
         if password:
             user.set_password(password)
         else:
-            # print('ми потрапляємо сюди навіть коли пароль додався на попередньому етапі')
             user.set_unusable_password()
         user.save(using=self._db)
         return user
 
     def create_user(self, tg_username=None, tg_id=None, **extra_fields):
         extra_fields.setdefault("is_staff", False)
-        # extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('is_superuser', False)
         extra_fields.setdefault("is_admin", False)
         return self._create_user(tg_username, tg_id, None, **extra_fields)
 
@@ -36,7 +35,7 @@ class CustomUserManager(BaseUserManager):
         self, tg_username=None, tg_id=None, password=None, **extra_fields
     ):
         extra_fields.setdefault("is_staff", True)
-        # extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('is_superuser', False)
         extra_fields.setdefault("is_admin", False)
         return self._create_user(tg_username, tg_id, password, **extra_fields)
 
@@ -44,7 +43,7 @@ class CustomUserManager(BaseUserManager):
         self, tg_username=None, tg_id=None, password=None, **extra_fields
     ):
         extra_fields.setdefault("is_staff", True)
-        # extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault("is_admin", True)
         return self._create_user(tg_username, tg_id, password, **extra_fields)
 
@@ -73,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = None
 
     is_active = models.BooleanField(default=True)
-    is_superuser = None
+    is_superuser = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 
@@ -83,7 +82,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = "tg_username"
-
     REQUIRED_FIELDS = ["tg_id"]
 
     class Meta:
@@ -101,18 +99,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         if 'en' not in all_language_codes:
             english = Language.objects.create(lang_id=1, lang_code='en', lang_name='English')
             english.save()
-        print("here")
         super(User, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.tg_id}  {self.tg_username or ''}"
-
-    # def delete(self, args, **kwargs):
-    #     # Ensure related UserData is deleted first to avoid integrity errors
-    #     with transaction.atomic():
-    #         self.userdata.delete()
-    #         # LogEntry.objects.filter(user_id=instance.userdata.user.id).delete()
-    #         super().delete(args, **kwargs)
 
 
 class UserData(models.Model):
@@ -121,7 +111,7 @@ class UserData(models.Model):
         FEMALE = 1, 'Female'
 
     user_id = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
-    character_gender = models.IntegerField(null = True, blank=True, default=None, choices = Gender.choices)
+    character_gender = models.IntegerField(null=True, blank=True, default=0, choices=Gender.choices)
 
     gold_balance = models.BigIntegerField(null=False, default=0)
     g_token = models.FloatField(null=False, default=0)
@@ -129,11 +119,8 @@ class UserData(models.Model):
     last_visited = models.DateTimeField(null=False, default=now)
 
     rank = models.ForeignKey(
-        Rank, null=True, blank=False, on_delete=models.SET_NULL, default=None
+        Rank, null=True, blank=False, on_delete=models.SET_NULL, default=1
     )
-    # stage_id = models.ForeignKey(
-    #     Stage, null=True, blank=False, on_delete=models.SET_NULL, default=None
-    # )
 
     click_multiplier_level = models.ForeignKey(MultiplierLevel,
         null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level'
@@ -150,7 +137,7 @@ class UserData(models.Model):
     )
 
     def add_gold_coins(self, coins: int):
-        self.gold_balance += int(coins) * self.click_multiplier.amount
+        self.gold_balance += int(coins) * self.click_multiplier_level.amount
 
     def set_gold_coins(self, coins: int):
         self.gold_balance = int(coins)

@@ -52,16 +52,16 @@ class UserDataSerializer(serializers.ModelSerializer):
 
 
     def get_click_multiplier(self, obj:UserData):
-        return MultiplierSerializer(obj.click_multiplier).data
+        return MultiplierSerializer(obj.click_multiplier_level).data
 
     def get_passive_income(self, obj:UserData):
-        return EnergySerializer(obj.passive_income).data
+        return EnergySerializer(obj.passive_income_level).data
 
     def get_energy(self, obj:UserData):
-        return EnergySerializer(obj.energy).data
+        return EnergySerializer(obj.energy_level).data
 
     def get_rank(self, obj: UserData):
-        return RankingSerializer(obj.rank_id).data
+        return RankingSerializer(obj.rank).data
 
     # def get_stage(self, obj: UserData):
     #     return StageSerializer(obj.stage_id, context = {"user_id": obj.user_id}).data
@@ -176,13 +176,13 @@ class ClickSerializer(serializers.ModelSerializer):
     passive_income = serializers.SerializerMethodField()
 
     def get_click_multiplier(self, obj:UserData):
-        return MultiplierSerializer(obj.click_multiplier).data
+        return MultiplierSerializer(obj.click_multiplier_level).data
 
     def get_passive_income(self, obj:UserData):
-        return EnergySerializer(obj.passive_income).data
+        return EnergySerializer(obj.passive_income_level).data
 
     def get_energy(self, obj:UserData):
-        return EnergySerializer(obj.energy).data
+        return EnergySerializer(obj.energy_level).data
 
 
     class Meta:
@@ -197,3 +197,20 @@ class ClickSerializer(serializers.ModelSerializer):
             "current_energy",
             "passive_income",
             )
+
+
+class ReferralsSerializer(serializers.ModelSerializer):
+    tg_username = serializers.SerializerMethodField()
+    passive_income = serializers.SerializerMethodField()
+
+    def get_tg_username(self, obj:UserData):
+        return obj.user_id.tg_username
+    
+    def get_passive_income(self, obj:UserData):
+        return obj.passive_income_level.amount
+    
+    
+
+    class Meta:
+        model = UserData
+        fields = ('tg_username', 'gold_balance', 'rank', 'passive_income')
