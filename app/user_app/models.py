@@ -21,7 +21,6 @@ class CustomUserManager(BaseUserManager):
         if password:
             user.set_password(password)
         else:
-            # print('ми потрапляємо сюди навіть коли пароль додався на попередньому етапі')
             user.set_unusable_password()
         user.save(using=self._db)
         return user
@@ -83,7 +82,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = "tg_username"
-
     REQUIRED_FIELDS = ["tg_id"]
 
     class Meta:
@@ -106,13 +104,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self) -> str:
         return f"{self.tg_id}  {self.tg_username or ''}"
 
-    # def delete(self, args, **kwargs):
-    #     # Ensure related UserData is deleted first to avoid integrity errors
-    #     with transaction.atomic():
-    #         self.userdata.delete()
-    #         # LogEntry.objects.filter(user_id=instance.userdata.user.id).delete()
-    #         super().delete(args, **kwargs)
-
 
 class UserData(models.Model):
     class Gender(models.IntegerChoices):
@@ -120,7 +111,7 @@ class UserData(models.Model):
         FEMALE = 1, 'Female'
 
     user_id = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
-    character_gender = models.IntegerField(null = True, blank=True, default=None, choices = Gender.choices)
+    character_gender = models.IntegerField(null=True, blank=True, default=0, choices=Gender.choices)
 
     gold_balance = models.BigIntegerField(null=False, default=0)
     g_token = models.FloatField(null=False, default=0)
@@ -128,11 +119,8 @@ class UserData(models.Model):
     last_visited = models.DateTimeField(null=False, default=now)
 
     rank = models.ForeignKey(
-        Rank, null=True, blank=False, on_delete=models.SET_NULL, default=None
+        Rank, null=True, blank=False, on_delete=models.SET_NULL, default=1
     )
-    # stage_id = models.ForeignKey(
-    #     Stage, null=True, blank=False, on_delete=models.SET_NULL, default=None
-    # )
 
     click_multiplier_level = models.ForeignKey(MultiplierLevel,
         null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level'
