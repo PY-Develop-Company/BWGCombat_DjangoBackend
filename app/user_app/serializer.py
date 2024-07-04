@@ -58,7 +58,7 @@ class UserDataSerializer(serializers.ModelSerializer):
         return EnergySerializer(obj.passive_income).data
 
     def get_energy(self, obj:UserData):
-        return EnergySerializer(obj.energy).data
+        return EnergySerializer(obj.max_energy).data
 
     def get_rank(self, obj: UserData):
         return RankingSerializer(obj.rank_id).data
@@ -182,7 +182,7 @@ class ClickSerializer(serializers.ModelSerializer):
         return EnergySerializer(obj.passive_income).data
 
     def get_energy(self, obj:UserData):
-        return EnergySerializer(obj.energy).data
+        return EnergySerializer(obj.max_energy).data
 
 
     class Meta:

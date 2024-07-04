@@ -21,7 +21,6 @@ class CustomUserManager(BaseUserManager):
         if password:
             user.set_password(password)
         else:
-            # print('ми потрапляємо сюди навіть коли пароль додався на попередньому етапі')
             user.set_unusable_password()
         user.save(using=self._db)
         return user
@@ -83,7 +82,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = "tg_username"
-
     REQUIRED_FIELDS = ["tg_id"]
 
     class Meta:
@@ -101,18 +99,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         if 'en' not in all_language_codes:
             english = Language.objects.create(lang_id=1, lang_code='en', lang_name='English')
             english.save()
-        print("here")
         super(User, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.tg_id}  {self.tg_username or ''}"
-
-    # def delete(self, args, **kwargs):
-    #     # Ensure related UserData is deleted first to avoid integrity errors
-    #     with transaction.atomic():
-    #         self.userdata.delete()
-    #         # LogEntry.objects.filter(user_id=instance.userdata.user.id).delete()
-    #         super().delete(args, **kwargs)
 
 
 class UserData(models.Model):
@@ -122,7 +112,7 @@ class UserData(models.Model):
 
 
     user_id = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
-    character_gender = models.IntegerField(null = True, blank=True, default=None, choices = Gender.choices)
+    character_gender = models.IntegerField(null=True, blank=True, default=0, choices=Gender.choices)
 
     gold_balance = models.BigIntegerField(null=False, default=0)
     g_token = models.FloatField(null=False, default=0)
@@ -130,19 +120,14 @@ class UserData(models.Model):
     last_visited = models.DateTimeField(null=False, default=now)
 
     rank = models.ForeignKey(
-        Rank, null=True, blank=False, on_delete=models.SET_NULL, default=None
+        Rank, null=True, blank=False, on_delete=models.SET_NULL, default=1
     )
-    # stage_id = models.ForeignKey(
-    #     Stage, null=True, blank=False, on_delete=models.SET_NULL, default=None
-    # )
 
-    click_multiplier = models.ForeignKey(MultiplierLevel, null = True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level')
+    click_multiplier = models.ForeignKey(MultiplierLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level')
 
     energy_regeneration = models.IntegerField(null=False, blank=False, default=1)
-    energy = models.ForeignKey(EnergyLevel,
-        null = True, blank=True, default=1, on_delete=models.SET_NULL
-    )
-    current_energy = models.IntegerField(null = False, blank=False, default=0)
+    max_energy = models.ForeignKey(EnergyLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL)
+    current_energy = models.IntegerField(null=False, blank=False, default=0)
 
     passive_income = models.ForeignKey(PassiveIncomeLevel,
         null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level'
@@ -170,7 +155,7 @@ class UserData(models.Model):
         self.click_multiplier = self.click_multiplier.next_level
 
     def next_energy_level(self, amount: int):
-        self.energy = self.energy.next_level
+        self.max_energy = self.max_energy.next_level
 
     def next_passive_income_level(self, amount: int):
         self.passive_income = self.passive_income.next_level
@@ -215,6 +200,7 @@ class UserData(models.Model):
 
     def __str__(self):
         return f'{self.user_id.tg_id} {self.last_visited}'
+
 
 class UsersTasks(models.Model):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)

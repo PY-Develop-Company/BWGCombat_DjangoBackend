@@ -43,7 +43,7 @@ def get_user_info(request):
     user_id = request.query_params.get("userId")
     user_data = get_object_or_404(UserData, user_id=user_id)
     delta = now() - user_data.last_visited
-    user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.energy.amount - user_data.current_energy)
+    user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.max_energy.amount - user_data.current_energy)
     serializer = UserDataSerializer(user_data)
     return Response({"info": serializer.data}, status=status.HTTP_200_OK)
 
