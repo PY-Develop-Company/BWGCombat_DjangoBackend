@@ -32,6 +32,16 @@ class Command(BaseCommand):
 
     def seed_rewards(self):
         rewards_data = [
+            {"name": "Referral reached Rank 1", "amount": 0.0009765625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"name": "Referral reached Rank 2", "amount": 0.001953125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"name": "Referral reached Rank 3", "amount": 0.00390625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"name": "Referral reached Rank 4", "amount": 0.0078125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"name": "Referral reached Rank 5", "amount": 0.015625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"name": "Referral reached Rank 6", "amount": 0.03125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"name": "Referral reached Rank 7", "amount": 0.0625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"name": "Referral reached Rank 8", "amount": 0.125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"name": "Referral reached Rank 9", "amount": 0.25, "reward_type": Reward.RewardType.G_TOKEN},
+            {"name": "Referral reached Rank 10", "amount": 0.5, "reward_type": Reward.RewardType.G_TOKEN},
             {"name": "Gold Reward", "amount": 1_000, "reward_type": Reward.RewardType.GOLD},
             {"name": "Multiplier Reward", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
             # Add more rewards as needed
@@ -41,8 +51,8 @@ class Command(BaseCommand):
 
     def seed_ranks(self):
         ranks_data = [
-            {"id": 1, "name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10_000},
-            {"id": 2, "name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30_000},
+            {"id": 1, "name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10_000, "inviter_reward": Reward.objects.filter(id=1).first()},
+            {"id": 2, "name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30_000, "inviter_reward": Reward.objects.filter(id=2).first()},
             # Add more ranks as needed
         ]
         for rank_data in ranks_data:

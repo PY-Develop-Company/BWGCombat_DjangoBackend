@@ -21,6 +21,7 @@ def check_task_completion(user_id: int, task_id: int):
     done = False
 
     link = 'https://t.me/justforcheckingone'  # hardcode will be changed on 05.05.2024 at the office
+    # should be Link instance
 
     match task.task_type:
         case 1:

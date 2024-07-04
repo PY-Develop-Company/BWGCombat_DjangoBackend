@@ -21,7 +21,7 @@ def give_reward_to_inviter(fren_id):
     inviter_id = get_object_or_404(Fren, fren_id=fren_id)
     userdata = get_object_or_404(UserData, user_id=inviter_id)
 
-    reward = get_object_or_404(Reward, name="Referral's rank 1")
+    reward = userdata.rank.inviter_reward
 
     userdata.receive_reward(reward)
     userdata.save()
