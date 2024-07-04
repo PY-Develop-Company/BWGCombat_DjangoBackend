@@ -27,7 +27,7 @@ class CustomUserManager(BaseUserManager):
 
     def create_user(self, tg_username=None, tg_id=None, **extra_fields):
         extra_fields.setdefault("is_staff", False)
-        # extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('is_superuser', False)
         extra_fields.setdefault("is_admin", False)
         return self._create_user(tg_username, tg_id, None, **extra_fields)
 
@@ -35,7 +35,7 @@ class CustomUserManager(BaseUserManager):
         self, tg_username=None, tg_id=None, password=None, **extra_fields
     ):
         extra_fields.setdefault("is_staff", True)
-        # extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('is_superuser', False)
         extra_fields.setdefault("is_admin", False)
         return self._create_user(tg_username, tg_id, password, **extra_fields)
 
@@ -43,7 +43,7 @@ class CustomUserManager(BaseUserManager):
         self, tg_username=None, tg_id=None, password=None, **extra_fields
     ):
         extra_fields.setdefault("is_staff", True)
-        # extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault("is_admin", True)
         return self._create_user(tg_username, tg_id, password, **extra_fields)
 
@@ -72,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = None
 
     is_active = models.BooleanField(default=True)
-    is_superuser = None
+    is_superuser = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 

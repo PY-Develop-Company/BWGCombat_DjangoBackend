@@ -10,9 +10,9 @@ services:
             - ./app:/app
         command: >
             sh -c "python manage.py wait_for_db &&
+                   python manage.py makemigrations &&
                    python manage.py migrate &&
                    python manage.py seed_db &&
-                   DJANGO_SUPERUSER_EMAIL=${ADMIN_EMAIL} DJANGO_SUPERUSER_USERNAME=${ADMIN_USERNAME} DJANGO_SUPERUSER_PASSWORD=${ADMIN_PASSWORD} python manage.py createsuperuser --noinput --tg_username ${ADMIN_USERNAME} --tg_id ${ADMIN_TG_ID} &&
                    gunicorn app.wsgi:application --bind 0.0.0.0:8000"
         environment:
             - DB_HOST=${DB_HOST}

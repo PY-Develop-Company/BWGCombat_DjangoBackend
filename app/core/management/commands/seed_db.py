@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 from levels_app.models import Rank, Task, Reward, EnergyLevel, MultiplierLevel, PassiveIncomeLevel
-from user_app.models import User, Language, UserData
+from user_app.models import User, Language, UserData, CustomUserManager
+import os
 
 
 class Command(BaseCommand):
@@ -18,6 +19,7 @@ class Command(BaseCommand):
         self.seed_passive_income_levels()
         self.seed_users()
         self.seed_user_data()
+        self.seed_superuser()
         self.stdout.write('Data seeded successfully.')
 
     def seed_lang(self):
@@ -116,3 +118,11 @@ class Command(BaseCommand):
         ]
         for data in user_data:
             UserData.objects.update_or_create(user_id=data['user_id'], defaults=data)
+
+    def seed_superuser(self):
+        users = [
+            {'tg_id': os.environ.get("ADMIN_TG_ID"), 'tg_username': os.environ.get("ADMIN_USERNAME"),
+             'password': os.environ.get("ADMIN_PASSWORD")},
+        ]
+        for data in users:
+            User.objects.create_superuser(tg_id=data['tg_id'], tg_username=data['tg_username'], password=data['password'])
