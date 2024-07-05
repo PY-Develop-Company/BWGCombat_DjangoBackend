@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "user_app",
     "levels_app",
     "clicker_app",
+    "exchanger_app",
     "django_seed",
 ]
 
