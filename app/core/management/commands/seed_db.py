@@ -29,7 +29,7 @@ class Command(BaseCommand):
             {'lang_id': 2, 'lang_code': 'uk', 'lang_name': 'Ukrainian'},
         ]
         for _ in lang_data:
-            Language.objects.update_or_create(**_)
+            Language.objects.update_or_create(lang_id=_['lang_id'], defaults=_)
 
     def seed_rewards(self):
         rewards_data = [
@@ -48,7 +48,7 @@ class Command(BaseCommand):
             # Add more rewards as needed
         ]
         for reward_data in rewards_data:
-            Reward.objects.update_or_create(**reward_data)
+            Reward.objects.update_or_create(id=reward_data['id'], defaults=reward_data)
 
     def seed_ranks(self):
         ranks_data = [
@@ -57,7 +57,7 @@ class Command(BaseCommand):
             # Add more ranks as needed
         ]
         for rank_data in ranks_data:
-            Rank.objects.update_or_create(**rank_data)
+            Rank.objects.update_or_create(id=rank_data['id'], defaults=rank_data)
 
     def seed_tasks(self):
         tasks_data = [
@@ -77,7 +77,7 @@ class Command(BaseCommand):
             # Add more energy levels as needed
         ]
         for energy_level_data in energy_levels_data:
-            EnergyLevel.objects.update_or_create(**energy_level_data)
+            EnergyLevel.objects.update_or_create(id=energy_level_data['id'], defaults=energy_level_data)
 
     def seed_multiplier_levels(self):
         multiplier_levels_data = [

@@ -13,7 +13,7 @@ from rest_framework import status
 from django.utils.timezone import now
 
 
-from .models import User, UserData, Fren, Link, LinkClick
+from .models import User, UserData, Fren, Link, LinkClick, Language
 
 # from aiogram import Bot
 # from aiogram.utils.deep_linking import create_start_link
@@ -200,6 +200,7 @@ def change_language(request):
     user_id = request.data.get('userId')
     lang_code = request.data.get('languageCode')
     user_data = get_object_or_404(UserData, user_id=user_id)
-    user_data.lang_code = lang_code if lang_code in user_data.LANGUAGE_CHOICE else 'en'
+    lang = get_object_or_404(Language, lang_code=lang_code)
+    user_data.user_id.interface_lang = lang
     user_data.save()
     return JsonResponse(UserDataSerializer(user_data).data, status=status.HTTP_200_OK)
