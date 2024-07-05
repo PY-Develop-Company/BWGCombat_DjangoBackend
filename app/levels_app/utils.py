@@ -18,7 +18,10 @@ def check_subscription_sync(user_id):
 
 
 def give_reward_to_inviter(fren_id):
-    inviter_id = get_object_or_404(Fren, fren_id=fren_id)
+    try:
+        inviter_id = Fren.objects.get(fren_id=fren_id)
+    except Fren.DoesNotExist:
+        return
     userdata = get_object_or_404(UserData, user_id=inviter_id)
 
     reward = userdata.rank.inviter_reward
@@ -27,7 +30,7 @@ def give_reward_to_inviter(fren_id):
     userdata.save()
 
 
-def check_if_link_is_telegram(link: Link):  # will be changed on 05.05.2024
+def check_if_link_is_telegram(link: Link):
     telegram_link_starts = ('t.me/', 'https://t.me/')
     index = link.url.find(telegram_link_starts[1])
     if index == -1:
