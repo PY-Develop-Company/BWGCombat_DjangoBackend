@@ -1,7 +1,7 @@
 import asyncio
 
 
-from user_app.models import UserData, Fren
+from user_app.models import UserData, Fren, Link
 from django.shortcuts import get_object_or_404
 from .models import Reward
 
@@ -18,13 +18,27 @@ def check_subscription_sync(user_id):
 
 
 def give_reward_to_inviter(fren_id):
-    inviter_id = get_object_or_404(Fren, fren_id=fren_id)
+    try:
+        inviter_id = Fren.objects.get(fren_id=fren_id)
+    except Fren.DoesNotExist:
+        return
     userdata = get_object_or_404(UserData, user_id=inviter_id)
 
-    reward = get_object_or_404(Reward, name="Referral's rank 1")
+    reward = userdata.rank.inviter_reward
 
     userdata.receive_reward(reward)
     userdata.save()
+
+
+def check_if_link_is_telegram(link: Link):
+    telegram_link_starts = ('t.me/', 'https://t.me/')
+    index = link.url.find(telegram_link_starts[1])
+    if index == -1:
+        index = link.url.find(telegram_link_starts[0])
+        return False if index == -1 else True
+    else:
+        return True
+
 
 # def add_reward(user_data: UserData, reward: Reward):
 """

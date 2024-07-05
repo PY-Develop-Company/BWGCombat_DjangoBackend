@@ -1,11 +1,11 @@
 from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from .models import Task, Reward
-from user_app.models import UserData, UsersTasks, Fren
-from .utils import give_reward_to_inviter
+from .models import Task, Reward, Rank
+from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick
+from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
-# from .models import Link, LinkClick
+
 
 
 def levels_home(request):
@@ -19,9 +19,14 @@ def check_task_completion(user_id: int, task_id: int):
     userdata = UserData.objects.get(user_id=user_id)
 
     done = False
+
     match task.task_type:
         case 1:
-            done = userdata.check_link_click('https://t.me/justforcheckingone')
+            link = Link.objects.get(task=Task)
+            if check_if_link_is_telegram(link):
+                pass  # there will be subscription checking
+            else:
+                done = userdata.check_link_click()
         case 2:
             done = userdata.is_referrals_quantity_exceeds(task.completion_number)
         case 3:
@@ -52,12 +57,23 @@ def check_task_completion(user_id: int, task_id: int):
 @permission_classes([AllowAny])
 def go_to_next_rank(request):
     user_id = request.data.get("userId")
+    userdata = UserData.objects.get(user_id=user_id)
 
-    rank_increased = True  # треба перевірка
-    if rank_increased:
+    current_rank = userdata.rank
+    try:
+        rank_to_go = Rank.objects.get(id=current_rank.id+1)
+    except Rank.DoesNotExist:
+        return JsonResponse({"result": "no next rank exists"})
+
+    if userdata.gold_balance >= rank_to_go.gold_required:
         give_reward_to_inviter(user_id)
 
-    return JsonResponse({"result": "ok"})
+        userdata.rank = rank_to_go
+        userdata.save()
+
+        return JsonResponse({"result": "ok"})
+    else:
+        return JsonResponse({"result": "using go_to_next_rank() method when user's gold is not enough"})
 
 
 # @api_view(["POST"])

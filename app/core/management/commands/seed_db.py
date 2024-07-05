@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 from levels_app.models import Rank, Task, Reward, EnergyLevel, MultiplierLevel, PassiveIncomeLevel
-from user_app.models import User, Language, UserData, CustomUserManager
+from user_app.models import User, Language, UserData, CustomUserManager, Link
 import os
 
 
@@ -17,6 +17,7 @@ class Command(BaseCommand):
         self.seed_energy_levels()
         self.seed_multiplier_levels()
         self.seed_passive_income_levels()
+        self.seed_links()
         self.seed_users()
         self.seed_user_data()
         self.seed_superuser()
@@ -32,8 +33,18 @@ class Command(BaseCommand):
 
     def seed_rewards(self):
         rewards_data = [
-            {"name": "Gold Reward", "amount": 1_000, "reward_type": Reward.RewardType.GOLD},
-            {"name": "Multiplier Reward", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
+            {"id": 1, "name": "Referral reached Rank 1", "amount": 0.0009765625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id": 2, "name": "Referral reached Rank 2", "amount": 0.001953125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id": 3, "name": "Referral reached Rank 3", "amount": 0.00390625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id": 4, "name": "Referral reached Rank 4", "amount": 0.0078125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id": 5, "name": "Referral reached Rank 5", "amount": 0.015625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id": 6, "name": "Referral reached Rank 6", "amount": 0.03125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id": 7, "name": "Referral reached Rank 7", "amount": 0.0625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id": 8, "name": "Referral reached Rank 8", "amount": 0.125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id": 9, "name": "Referral reached Rank 9", "amount": 0.25, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id": 10, "name": "Referral reached Rank 10", "amount": 0.5, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id": 11, "name": "Gold Reward", "amount": 1_000, "reward_type": Reward.RewardType.GOLD},
+            {"id": 12, "name": "Multiplier Reward", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
             # Add more rewards as needed
         ]
         for reward_data in rewards_data:
@@ -41,8 +52,8 @@ class Command(BaseCommand):
 
     def seed_ranks(self):
         ranks_data = [
-            {"id": 1, "name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10_000},
-            {"id": 2, "name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30_000},
+            {"id": 1, "name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10_000, "inviter_reward": Reward.objects.get(id=1)},
+            {"id": 2, "name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30_000, "inviter_reward": Reward.objects.get(id=2)},
             # Add more ranks as needed
         ]
         for rank_data in ranks_data:
@@ -50,10 +61,10 @@ class Command(BaseCommand):
 
     def seed_tasks(self):
         tasks_data = [
-            {"name": "Subscribe to Channel", "text": "Subscribe to our channel.", "task_type": Task.TaskType.ch_sub,
-             "completion_number": 1, "initial": True},
-            {"name": "Invite 5 friends Friend", "text": "Invite a friend to join.", "task_type": Task.TaskType.inv_fren,
-             "completion_number": 5, "initial": False},
+            {"id": 1, "name": "Subscribe to Channel", "text": "Subscribe to our channel.",
+             "task_type": Task.TaskType.ch_sub, "completion_number": 1, "initial": True},
+            {"id": 2, "name": "Invite 5 friends", "text": "Invite a friend to join.",
+             "task_type": Task.TaskType.inv_fren, "completion_number": 5, "initial": False},
             # Add more tasks as needed
         ]
         for task_data in tasks_data:
@@ -85,6 +96,13 @@ class Command(BaseCommand):
         ]
         for passive_income_level_data in passive_income_levels_data:
             PassiveIncomeLevel.objects.update_or_create(**passive_income_level_data)
+
+    def seed_links(self):
+        links = [
+            {"url": os.environ.get("TG_CHANNEL"), "task": Task.objects.get(id=1)}
+        ]
+        for data in links:
+            Link.objects.update_or_create(url=data['url'], defaults=data)
 
     def seed_users(self):
         users = [
