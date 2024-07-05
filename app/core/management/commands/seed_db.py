@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 from levels_app.models import Rank, Task, Reward, EnergyLevel, MultiplierLevel, PassiveIncomeLevel
 from user_app.models import User, Language, UserData, CustomUserManager, Link
+from exchanger_app.models import Asset, ExchangeRate
 import os
 
 
@@ -144,3 +145,19 @@ class Command(BaseCommand):
         ]
         for data in users:
             User.objects.create_superuser(tg_id=data['tg_id'], tg_username=data['tg_username'], password=data['password'])
+
+    def seed_assets(self):
+        assets = [
+            {"id": 1, "name": "G-Token"},
+            {"id": 2, "name": "Gold"}
+        ]
+        for data in assets:
+            Asset.objects.update_or_create(id=data['id'], defaults=data)
+
+    def seed_exchange_rates(self):
+        rates = [
+            {"id": 1, "asset_1_id": Asset.objects.get(id=1), "asset_2_id": Asset.objects.get(id=2), "rate": 100_500},
+            {"id": 2, "asset_1_id": Asset.objects.get(id=2), "asset_2_id": Asset.objects.get(id=1), "rate": 0.00001}
+        ]
+        for data in rates:
+            Asset.objects.update_or_create(id=data['id'], defaults=data)

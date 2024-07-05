@@ -7,7 +7,6 @@ from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
 
 
-
 def levels_home(request):
     return HttpResponse("levels home")
 
