@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from user_app.models import UserData
+from .models import Swap, Transfer, Asset
+from user_app.models import UserData, User
 from rest_framework import status
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
@@ -46,5 +47,12 @@ def execute_swap(request):
         user_data.add_gold_coins(amount_2)
     else:
         return JsonResponse({"result": "unexpected error while adding and/or removing coins"})
+
+    user = User.objects.get(tg_id=user_id)
+    asset_1 = Asset.objects.get(id=asset_1_id)
+    asset_2 = Asset.objects.get(id=asset_2_id)
+
+    swap = Swap(user=user, asset_1=asset_1, asset_2=asset_2, fee=fee, amount_1=amount_1, amount_2=amount_2)
+    swap.save()
 
     return JsonResponse({"result": "ok"})
