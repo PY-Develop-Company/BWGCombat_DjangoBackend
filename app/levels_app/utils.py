@@ -27,16 +27,11 @@ def give_reward_to_inviter(fren_id):
     userdata.save()
 
 
-def check_if_link_is_telegram(link):  # will be changed on 05.05.2024
-    if isinstance(link, Link):
-        link_str = link.url
-    elif isinstance(link, str):
-        link_str = link
-
+def check_if_link_is_telegram(link: Link):  # will be changed on 05.05.2024
     telegram_link_starts = ('t.me/', 'https://t.me/')
-    index = link_str.find(telegram_link_starts[1])
+    index = link.url.find(telegram_link_starts[1])
     if index == -1:
-        index = link_str.find(telegram_link_starts[0])
+        index = link.url.find(telegram_link_starts[0])
         return False if index == -1 else True
     else:
         return True
