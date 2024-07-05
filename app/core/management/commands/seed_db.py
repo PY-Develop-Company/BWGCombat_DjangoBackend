@@ -65,13 +65,13 @@ class Command(BaseCommand):
     def seed_tasks(self):
         tasks_data = [
             {"id": 1, "name": "Subscribe to Channel", "text": "Subscribe to our channel.",
-             "task_type": Task.TaskType.ch_sub, "completion_number": 1, "initial": True},
+             "task_type": Task.TaskType.ch_sub, "completion_number": 1, "is_initial": True},
             {"id": 2, "name": "Invite 5 friends", "text": "Invite a friend to join.",
-             "task_type": Task.TaskType.inv_fren, "completion_number": 5, "initial": False},
+             "task_type": Task.TaskType.inv_fren, "completion_number": 5, "is_initial": False},
             # Add more tasks as needed
         ]
         for task_data in tasks_data:
-            Task.objects.update_or_create(**task_data)
+            Task.objects.update_or_create(id=task_data["id"], defaults=task_data)
 
     def seed_energy_levels(self):
         energy_levels_data = [
