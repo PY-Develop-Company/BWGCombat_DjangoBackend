@@ -253,11 +253,10 @@ class Fren(models.Model):
 
 class Link(models.Model):
     url = models.URLField(unique=True)
+    task = models.ForeignKey(Task, null=True, blank=False, on_delete=models.SET_NULL, default=None)
 
 
 class LinkClick(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     link = models.ForeignKey(Link, to_field='url', on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
-
-
