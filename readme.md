@@ -28,6 +28,8 @@ NGROK_AUTHTOKEN=__token__
 NGROK_PORT=8000
 
 JWT_SIGNING_KEY=some_key
+
+TG_CHANNEL=https://t.me/justforcheckingone
 ```
 You can get NGROK_AUTHTOKEN via link (https://dashboard.ngrok.com)
 
