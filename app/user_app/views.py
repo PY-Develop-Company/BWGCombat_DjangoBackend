@@ -14,7 +14,6 @@ from django.utils.timezone import now
 
 
 from .models import User, UserData, Fren, Link, LinkClick
-from levels_app.models import Rank
 
 # from aiogram import Bot
 # from aiogram.utils.deep_linking import create_start_link
@@ -185,18 +184,6 @@ def track_link_click(request, link_id):
 
     return redirect(link.url)
 
-
-@api_view(["POST"])
-def get_rank_info(request):
-    user_id = request.data.get('userId')
-    rank_id = request.data.get('rankId')
-    user_data = get_object_or_404(UserData, user_id=user_id)
-    rank_info = get_object_or_404(Rank, id=rank_id)
-    if user_data.rank_id == rank_info:
-        serializer = RankInfoSerializer(rank_info, context={'user_id': user_data.user_id_id, 'stage_id': user_data.stage_id_id})
-        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
-    else:
-        return JsonResponse({"rank_id": rank_info.id, "name": rank_info.name, 'description': rank_info.description}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])

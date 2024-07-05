@@ -68,7 +68,7 @@ class Command(BaseCommand):
             # Add more tasks as needed
         ]
         for task_data in tasks_data:
-            Task.objects.update_or_create(**task_data)
+            Task.objects.update_or_create(id=task_data['id'], defaults=task_data)
 
     def seed_energy_levels(self):
         energy_levels_data = [
@@ -86,7 +86,7 @@ class Command(BaseCommand):
             # Add more multiplier levels as needed
         ]
         for multiplier_level_data in multiplier_levels_data:
-            MultiplierLevel.objects.update_or_create(**multiplier_level_data)
+            MultiplierLevel.objects.update_or_create(id=multiplier_level_data['id'], defaults=multiplier_level_data)
 
     def seed_passive_income_levels(self):
         passive_income_levels_data = [
@@ -95,7 +95,7 @@ class Command(BaseCommand):
             # Add more passive income levels as needed
         ]
         for passive_income_level_data in passive_income_levels_data:
-            PassiveIncomeLevel.objects.update_or_create(**passive_income_level_data)
+            PassiveIncomeLevel.objects.update_or_create(id=passive_income_level_data['id'], defaults=passive_income_level_data)
 
     def seed_links(self):
         links = [

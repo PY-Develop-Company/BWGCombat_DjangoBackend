@@ -157,17 +157,32 @@ class TaskForPreviewSerializer(serializers.ModelSerializer):
 #         return TaskForPreviewSerializer(incomplete_tasks, many=True).data
 
 
+class TaskWithStatus(serializers.ModelSerializer):
+    is_completed = serializers.SerializerMethodField()
+
+    def get_is_completed(self, obj: Task):
+            return UsersTasks.objects.filter(user_id=self.context['user_id'], task=obj).exists()
+    class Meta:
+        model = Task
+        fields = ['id', 'name', 'is_completed']
+
 class RankInfoSerializer(serializers.ModelSerializer):
-    # stage = serializers.SerializerMethodField()
+    tasks = serializers.SerializerMethodField()
 
     class Meta:
         model = Rank
-        fields = ('name', 'description', 'gold_required')
+        fields = ['id', 'name', 'description', 'tasks']
 
-#     def get_stage(self, obj):
-#         print(self.context.get('stage_id'))
-#         stage = get_object_or_404(Stage, id = self.context.get('stage_id'))
-#         return StageInfo(stage, context=self.context).data
+    def get_tasks(self, obj):
+        tasks = []
+        initial_task = Task.objects.filter(rank=obj, initial=True).first()
+        current_task = initial_task
+
+        while current_task:
+            tasks.append(TaskWithStatus(current_task, context=self.context).data)
+            current_task = current_task.next_task
+
+        return tasks
     
 
 class ClickSerializer(serializers.ModelSerializer):

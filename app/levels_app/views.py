@@ -5,6 +5,8 @@ from .models import Task, Reward, Rank
 from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
+from user_app.serializer import RankInfoSerializer
+from rest_framework import status
 
 
 
@@ -83,6 +85,18 @@ def go_to_next_rank(request):
 #     # give_reward_to_inviter(user_id)
 #
 #     return JsonResponse({"result": "ok"})
+
+@api_view(["POST"])
+def get_rank_info(request):
+    user_id = request.data.get('userId')
+    rank_id = request.data.get('rankId')
+    user_data = get_object_or_404(UserData, user_id=user_id)
+    rank_info = get_object_or_404(Rank, id=rank_id)
+    if user_data.rank_id == rank_id:
+        serializer = RankInfoSerializer(rank_info, context={'user_id': user_data.user_id_id})
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({"rank_id": rank_info.id, "name": rank_info.name, 'description': rank_info.description}, status=status.HTTP_200_OK)
 
 
 
