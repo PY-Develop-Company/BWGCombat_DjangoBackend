@@ -38,7 +38,7 @@ class Transfer(models.Model):
                 f"with fee of {self.fee} G-tokens at {self.time}")
 
 
-class ExchangeRate(models.Model):
+class ExchangePair(models.Model):
     asset_1 = models.ForeignKey(Asset, null=False, blank=False, on_delete=models.DO_NOTHING,
                                 related_name='rates_sell')
     asset_2 = models.ForeignKey(Asset, null=False, blank=False, on_delete=models.DO_NOTHING,
