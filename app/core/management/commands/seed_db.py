@@ -22,6 +22,8 @@ class Command(BaseCommand):
         self.seed_users()
         self.seed_user_data()
         self.seed_superuser()
+        self.seed_assets()
+        self.seed_exchange_pairs()
         self.stdout.write('Data seeded successfully.')
 
     def seed_lang(self):
@@ -156,7 +158,7 @@ class Command(BaseCommand):
 
     def seed_exchange_pairs(self):
         pairs = [
-            {"id": 1, "asset_1_id": Asset.objects.get(id=1), "asset_2_id": Asset.objects.get(id=2), "rate": 100_500},
+            {"id": 1, "asset_1_id": Asset.objects.get(id=1), "asset_2_id": Asset.objects.get(id=2), "rate": 100_000},
             {"id": 2, "asset_1_id": Asset.objects.get(id=2), "asset_2_id": Asset.objects.get(id=1), "rate": 0.00001}
         ]
         for data in pairs:
