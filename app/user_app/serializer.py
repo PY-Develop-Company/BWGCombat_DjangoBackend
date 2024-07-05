@@ -83,6 +83,7 @@ class UserDataSerializer(serializers.ModelSerializer):
             "user_id",
             "is_picked_gender",
             "gender",
+            "lang_code",
             "username",
             "gold_balance",
             "g_token",

@@ -208,3 +208,11 @@ def pick_character(request):
     user_data.save()
     return JsonResponse(UserDataSerializer(user_data).data, status=status.HTTP_200_OK)
 
+@api_view(["POST"])
+def change_language(request):
+    user_id = request.data.get('userId')
+    lang_code = request.data.get('languageCode')
+    user_data = get_object_or_404(UserData, user_id=user_id)
+    user_data.lang_code = lang_code if lang_code in user_data.LANGUAGE_CHOICE else 'en'
+    user_data.save()
+    return JsonResponse(UserDataSerializer(user_data).data, status=status.HTTP_200_OK)
