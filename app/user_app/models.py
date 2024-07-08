@@ -128,7 +128,7 @@ class UserData(models.Model):
     passive_income_level = models.ForeignKey(PassiveIncomeLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level')
 
     def add_gold_coins(self, coins: int):
-        self.gold_balance += int(coins) * self.multiclick_level.amount
+        self.gold_balance += int(coins)
 
     def set_gold_coins(self, coins: int):
         self.gold_balance = int(coins)

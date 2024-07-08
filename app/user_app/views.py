@@ -56,13 +56,13 @@ def get_user_info(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def add_coins_to_user(request):
-    coins = request.data.get("totalClicks")
+    total_clicks = request.data.get("totalClicks")
     user_id = request.data.get("userId")
     curr_energy = request.data.get("currentEnergy")
     warning = request.data.get("warning")
 
     user_data = get_object_or_404(UserData, user_id=user_id)
-    user_data.add_gold_coins(coins)
+    user_data.add_gold_coins(total_clicks*user_data.multiclick_level.amount)
     user_data.current_energy = curr_energy
     user_data.last_visited = now()
 
