@@ -110,6 +110,7 @@ class UserData(models.Model):
         MALE = 0, 'Male'
         FEMALE = 1, 'Female'
 
+
     user_id = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     character_gender = models.IntegerField(null=True, blank=True, default=0, choices=Gender.choices)
 

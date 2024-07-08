@@ -48,6 +48,7 @@ class UserDataSerializer(serializers.ModelSerializer):
     passive_income = serializers.SerializerMethodField()
     is_picked_gender = serializers.SerializerMethodField()
     gender = serializers.SerializerMethodField()
+    lang_code = serializers.SerializerMethodField()
 
 
 
@@ -75,6 +76,9 @@ class UserDataSerializer(serializers.ModelSerializer):
     def get_gender(self, obj: UserData):
         return obj.character_gender
     
+    def get_lang_code(self, obj: UserData):
+        return obj.user_id.interface_lang.lang_code
+    
 
 
     class Meta:
@@ -83,6 +87,7 @@ class UserDataSerializer(serializers.ModelSerializer):
             "user_id",
             "is_picked_gender",
             "gender",
+            "lang_code",
             "username",
             "gold_balance",
             "g_token",
@@ -156,18 +161,36 @@ class TaskForPreviewSerializer(serializers.ModelSerializer):
 #         return TaskForPreviewSerializer(incomplete_tasks, many=True).data
 
 
+class TaskWithStatus(serializers.ModelSerializer):
+    is_completed = serializers.SerializerMethodField()
+
+    def get_is_completed(self, obj: Task):
+        return UsersTasks.objects.filter(user_id=self.context['user_id'], task=obj).exists()
+
+    class Meta:
+        model = Task
+        fields = ['id', 'name', 'is_completed']
+
 class RankInfoSerializer(serializers.ModelSerializer):
-    # stage = serializers.SerializerMethodField()
+    tasks = serializers.SerializerMethodField()
 
     class Meta:
         model = Rank
-        fields = ('name', 'description', 'gold_required')
+        fields = ['id', 'name', 'description', 'tasks']
 
-#     def get_stage(self, obj):
-#         print(self.context.get('stage_id'))
-#         stage = get_object_or_404(Stage, id = self.context.get('stage_id'))
-#         return StageInfo(stage, context=self.context).data
-    
+    def get_tasks(self, obj):
+        tasks = []
+        initial_tasks = Task.objects.filter(rank=obj, initial=True).all()
+
+        for i in initial_tasks:
+            current_task = i
+            temp_tasks = []
+            while current_task:
+                temp_tasks.append(TaskWithStatus(current_task, context=self.context).data)
+                current_task = current_task.next_task
+            tasks.append(temp_tasks)
+        return tasks
+
 
 class ClickSerializer(serializers.ModelSerializer):
 
