@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 from levels_app.models import Rank, Task, Reward, EnergyLevel, MultiplierLevel, PassiveIncomeLevel
 from user_app.models import User, Language, UserData, CustomUserManager, Link
+from exchanger_app.models import Asset, ExchangePair
 import os
 
 
@@ -21,6 +22,8 @@ class Command(BaseCommand):
         self.seed_users()
         self.seed_user_data()
         self.seed_superuser()
+        self.seed_assets()
+        self.seed_exchange_pairs()
         self.stdout.write('Data seeded successfully.')
 
     def seed_lang(self):
@@ -62,13 +65,13 @@ class Command(BaseCommand):
     def seed_tasks(self):
         tasks_data = [
             {"id": 1, "name": "Subscribe to Channel", "text": "Subscribe to our channel.",
-             "task_type": Task.TaskType.ch_sub, "completion_number": 1, "initial": True},
+             "task_type": Task.TaskType.ch_sub, "completion_number": 1, "is_initial": True},
             {"id": 2, "name": "Invite 5 friends", "text": "Invite a friend to join.",
-             "task_type": Task.TaskType.inv_fren, "completion_number": 5, "initial": False},
+             "task_type": Task.TaskType.inv_fren, "completion_number": 5, "is_initial": False},
             # Add more tasks as needed
         ]
         for task_data in tasks_data:
-            Task.objects.update_or_create(id=task_data['id'], defaults=task_data)
+            Task.objects.update_or_create(id=task_data["id"], defaults=task_data)
 
     def seed_energy_levels(self):
         energy_levels_data = [
@@ -144,3 +147,19 @@ class Command(BaseCommand):
         ]
         for data in users:
             User.objects.create_superuser(tg_id=data['tg_id'], tg_username=data['tg_username'], password=data['password'])
+
+    def seed_assets(self):
+        assets = [
+            {"id": 1, "name": "G-Token"},
+            {"id": 2, "name": "Gold"}
+        ]
+        for data in assets:
+            Asset.objects.update_or_create(id=data['id'], defaults=data)
+
+    def seed_exchange_pairs(self):
+        pairs = [
+            {"id": 1, "asset_1_id": Asset.objects.get(id=1), "asset_2_id": Asset.objects.get(id=2), "rate": 100_000},
+            {"id": 2, "asset_1_id": Asset.objects.get(id=2), "asset_2_id": Asset.objects.get(id=1), "rate": 0.00001}
+        ]
+        for data in pairs:
+            Asset.objects.update_or_create(id=data['id'], defaults=data)

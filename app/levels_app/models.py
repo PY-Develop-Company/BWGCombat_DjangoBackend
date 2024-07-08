@@ -25,6 +25,7 @@ class Task(models.Model):
         buy_energy = "4", _("buy energy")
         gnome_empl = "5", _("Gnome employment(buying)")
         pick_upg = "6", _("upgrade pickaxe to earn more gold per click")
+        unknown = "7", _("Unknown task")
 
     name = models.CharField(max_length=255, null=False, blank=False)
     text = models.TextField(null=True, blank=False)
@@ -32,12 +33,17 @@ class Task(models.Model):
         null=False, choices=TaskType, default=TaskType.buy_energy
     )
     completion_number = models.BigIntegerField(null=True, blank=True)
-    next_task = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL)
     rank = models.ForeignKey(Rank, null=True, blank=True, on_delete=models.SET_NULL)
+
     rewards = models.ManyToManyField(
         "Reward", blank=False
     )
-    initial = models.BooleanField(default=False)
+    is_initial = models.BooleanField(default=False)
+    is_free = models.BooleanField(default=False)
+    price = models.BigIntegerField(null=False, default=0)
+    coord_x = models.IntegerField(null=False, default=0)
+    coord_y = models.IntegerField(null=False, default=0)
+    block_time = models.IntegerField(null=False, default=0, help_text="time in minutes")
 
     def __str__(self) -> str:
         return self.name

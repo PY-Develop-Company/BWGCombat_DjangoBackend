@@ -10,7 +10,6 @@ from rest_framework import status
 from .serializer import SocialMediaTasksSerializer
 
 
-
 def levels_home(request):
     return HttpResponse("levels home")
 
