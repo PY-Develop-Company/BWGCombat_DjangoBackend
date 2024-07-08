@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.utils.timezone import now
-from levels_app.models import Rank, Task, Reward, EnergyLevel, MultiplierLevel, PassiveIncomeLevel
+from levels_app.models import Rank, Task, Reward, MaxEnergyLevel, MulticlickLevel, PassiveIncomeLevel
 from user_app.models import User, Language, UserData, CustomUserManager, Link
 from exchanger_app.models import Asset, ExchangePair
 import os
@@ -80,7 +80,7 @@ class Command(BaseCommand):
             # Add more energy levels as needed
         ]
         for energy_level_data in energy_levels_data:
-            EnergyLevel.objects.update_or_create(id=energy_level_data['id'], defaults=energy_level_data)
+            MaxEnergyLevel.objects.update_or_create(id=energy_level_data['id'], defaults=energy_level_data)
 
     def seed_multiplier_levels(self):
         multiplier_levels_data = [
@@ -89,7 +89,7 @@ class Command(BaseCommand):
             # Add more multiplier levels as needed
         ]
         for multiplier_level_data in multiplier_levels_data:
-            MultiplierLevel.objects.update_or_create(id=multiplier_level_data['id'], defaults=multiplier_level_data)
+            MulticlickLevel.objects.update_or_create(id=multiplier_level_data['id'], defaults=multiplier_level_data)
 
     def seed_passive_income_levels(self):
         passive_income_levels_data = [
@@ -123,18 +123,18 @@ class Command(BaseCommand):
         user_data = [
             {'user_id': User.objects.get(tg_id=123568), 'character_gender': 0, 'gold_balance': 0, 'g_token': 0,
              'last_visited': now(), 'rank': Rank.objects.get(id=1),
-             'click_multiplier': MultiplierLevel.objects.get(id=1), 'energy': EnergyLevel.objects.get(id=1),
-             'current_energy': EnergyLevel.objects.get(id=1).amount,
+             'click_multiplier': MulticlickLevel.objects.get(id=1), 'energy': MaxEnergyLevel.objects.get(id=1),
+             'current_energy': MaxEnergyLevel.objects.get(id=1).amount,
              'passive_income': PassiveIncomeLevel.objects.get(id=1)},
             {'user_id': User.objects.get(tg_id=123456), 'character_gender': 1, 'gold_balance': 0, 'g_token': 0,
              'last_visited': now(), 'rank': Rank.objects.get(id=1),
-             'click_multiplier': MultiplierLevel.objects.get(id=1), 'energy': EnergyLevel.objects.get(id=1),
-             'current_energy': EnergyLevel.objects.get(id=1).amount,
+             'click_multiplier': MulticlickLevel.objects.get(id=1), 'energy': MaxEnergyLevel.objects.get(id=1),
+             'current_energy': MaxEnergyLevel.objects.get(id=1).amount,
              'passive_income': PassiveIncomeLevel.objects.get(id=1)},
             {'user_id': User.objects.get(tg_id=123457), 'character_gender': None, 'gold_balance': 0, 'g_token': 0,
              'last_visited': now(), 'rank': Rank.objects.get(id=1),
-             'click_multiplier': MultiplierLevel.objects.get(id=1), 'energy': EnergyLevel.objects.get(id=1),
-             'current_energy': EnergyLevel.objects.get(id=1).amount,
+             'click_multiplier': MulticlickLevel.objects.get(id=1), 'energy': MaxEnergyLevel.objects.get(id=1),
+             'current_energy': MaxEnergyLevel.objects.get(id=1).amount,
              'passive_income': PassiveIncomeLevel.objects.get(id=1)},
         ]
         for data in user_data:

@@ -42,14 +42,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
-    # "channels",
     "corsheaders",
+    "django_seed",
+
     "core",
     "user_app",
     "levels_app",
-    "clicker_app",
     "exchanger_app",
-    "django_seed",
 ]
 
 MIDDLEWARE = [
@@ -62,6 +61,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
+
     "user_app.middleware.UpdateLastRequestTime.UpdateLastRequestMiddleware",
 ]
 
@@ -138,11 +138,6 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static'),
-#     "/var/www/static/",
-#     "/var/www/app/staticfiles/"
-# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -163,7 +158,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),  ####
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,

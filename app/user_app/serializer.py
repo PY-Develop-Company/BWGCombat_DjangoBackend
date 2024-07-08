@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import UserData
-from levels_app.models import Rank, Task, Reward, EnergyLevel, MultiplierLevel
+from levels_app.models import Rank, Task, Reward, MaxEnergyLevel, MulticlickLevel
 from user_app.models import User, UsersTasks
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.shortcuts import get_object_or_404
@@ -26,18 +26,20 @@ class RewardSerializer(serializers.ModelSerializer):
         model = Reward
         fields = "__all__"
 
+
 class EnergySerializer(serializers.ModelSerializer):
 
     class Meta: 
-        model = EnergyLevel
+        model = MaxEnergyLevel
         fields = ('id', 'amount')
 
 
 class MultiplierSerializer(serializers.ModelSerializer):
 
     class Meta: 
-        model = EnergyLevel
+        model = MaxEnergyLevel
         fields = ('id', 'amount')
+
 
 class UserDataSerializer(serializers.ModelSerializer):
     rank = serializers.SerializerMethodField()
@@ -53,13 +55,13 @@ class UserDataSerializer(serializers.ModelSerializer):
 
 
     def get_click_multiplier(self, obj:UserData):
-        return MultiplierSerializer(obj.click_multiplier_level).data
+        return MultiplierSerializer(obj.multiclick_level).data
 
     def get_passive_income(self, obj:UserData):
         return EnergySerializer(obj.passive_income_level).data
 
     def get_energy(self, obj:UserData):
-        return EnergySerializer(obj.energy_level).data
+        return EnergySerializer(obj.max_energy_level).data
 
     def get_rank(self, obj: UserData):
         return RankingSerializer(obj.rank).data
@@ -108,20 +110,6 @@ class RankingSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-# class StageSerializer(serializers.ModelSerializer):
-#     tasks = serializers.SerializerMethodField()
-#
-#     def get_tasks(self, obj: Stage):
-#         user = self.context['user_id']
-#         completed_tasks_ids = UsersTasks.objects.filter(user_id=user, task__in=obj.tasks_id.all()).values_list('task_id', flat=True)
-#         incomplete_tasks = obj.tasks_id.exclude(id__in=completed_tasks_ids)
-#         return TaskSerializer(incomplete_tasks, many=True).data
-#
-#     class Meta:
-#         model = Stage
-#         fields = ["id", "name", "tasks", 'next_stage']
-
-
 class TaskSerializer(serializers.ModelSerializer):
     rewards = serializers.SerializerMethodField()
 
@@ -134,31 +122,9 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class TaskForPreviewSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Task
         fields = ('name', 'text')
-
-
-# class StageInfo(serializers.ModelSerializer):
-#     completed_tasks = serializers.SerializerMethodField()
-#     incompleted_tasks = serializers.SerializerMethodField()
-#
-#     class Meta:
-#         model = Stage
-#         fields = ('name', 'completed_tasks', 'incompleted_tasks')
-#
-#     def get_completed_tasks(self, obj):
-#         user_id = self.context['user_id']
-#         completed_tasks_ids = UsersTasks.objects.filter(user_id=user_id, task__in=obj.tasks_id.all()).values_list('task_id', flat=True)
-#         completed_tasks = Task.objects.filter(id__in=completed_tasks_ids)
-#         return TaskForPreviewSerializer(completed_tasks, many=True).data
-#
-#     def get_incompleted_tasks(self, obj):
-#         user_id = self.context['user_id']
-#         completed_tasks_ids = UsersTasks.objects.filter(user_id=user_id, task__in=obj.tasks_id.all()).values_list('task_id', flat=True)
-#         incomplete_tasks = obj.tasks_id.exclude(id__in=completed_tasks_ids)
-#         return TaskForPreviewSerializer(incomplete_tasks, many=True).data
 
 
 class TaskWithStatus(serializers.ModelSerializer):
@@ -170,6 +136,7 @@ class TaskWithStatus(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ['id', 'name', 'is_completed']
+
 
 class RankInfoSerializer(serializers.ModelSerializer):
     tasks = serializers.SerializerMethodField()
@@ -199,13 +166,13 @@ class ClickSerializer(serializers.ModelSerializer):
     passive_income = serializers.SerializerMethodField()
 
     def get_click_multiplier(self, obj:UserData):
-        return MultiplierSerializer(obj.click_multiplier_level).data
+        return MultiplierSerializer(obj.multiclick_level).data
 
     def get_passive_income(self, obj:UserData):
         return EnergySerializer(obj.passive_income_level).data
 
     def get_energy(self, obj:UserData):
-        return EnergySerializer(obj.energy_level).data
+        return EnergySerializer(obj.max_energy_level).data
 
 
     class Meta:

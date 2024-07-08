@@ -4,8 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 class Rank(models.Model):
     id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=255, null=False, blank=False)
-    description = models.TextField(blank=False, max_length=1023, default='No description')
+    name = models.CharField(max_length=255)
+    description = models.TextField(max_length=1023, default='No description')
     gold_required = models.BigIntegerField(null=True, blank=True, default=10_000)
 
     inviter_reward = models.ForeignKey(
@@ -21,28 +21,24 @@ class Task(models.Model):
         ch_sub = "1", _("sub to channel")
         inv_fren = "2", _("invite friend")
         earn_gold = "3", _("earn N amount of gold")
-        buy_energy = "4", _("buy energy")
-        gnome_empl = "5", _("Gnome employment(buying)")
-        pick_upg = "6", _("upgrade pickaxe to earn more gold per click")
+        buy_max_energy = "4", _("buy energy")
+        buy_passive_income = "5", _("Gnome employment(buying)")
+        buy_multiclick = "6", _("upgrade pickaxe to earn more gold per click")
         unknown = "7", _("Unknown task")
 
-    name = models.CharField(max_length=255, null=False, blank=False)
-    text = models.TextField(null=True, blank=False)
-    task_type = models.CharField(
-        null=False, choices=TaskType, default=TaskType.buy_energy
-    )
+    name = models.CharField(max_length=255)
+    text = models.TextField(null=True)
+    task_type = models.CharField(choices=TaskType, default=TaskType.buy_max_energy)
     completion_number = models.BigIntegerField(null=True, blank=True)
     rank = models.ForeignKey(Rank, null=True, blank=True, on_delete=models.SET_NULL)
 
-    rewards = models.ManyToManyField(
-        "Reward", blank=False
-    )
+    rewards = models.ManyToManyField("Reward")
     is_initial = models.BooleanField(default=False)
     is_free = models.BooleanField(default=False)
-    price = models.BigIntegerField(null=False, default=0)
-    coord_x = models.IntegerField(null=False, default=0)
-    coord_y = models.IntegerField(null=False, default=0)
-    block_time = models.IntegerField(null=False, default=0, help_text="time in minutes")
+    price = models.BigIntegerField(default=0)
+    coord_x = models.IntegerField(default=0)
+    coord_y = models.IntegerField(default=0)
+    block_time = models.IntegerField(default=0, help_text="time in minutes")
 
     def __str__(self) -> str:
         return self.name
@@ -56,30 +52,30 @@ class Reward(models.Model):
         ENERGY_BALANCE = "4", _("Replenish energy")
         PASSIVE_INCOME = "5", _("Improve passive income")
 
-    name = models.CharField(max_length=200, blank=False, null=False)
-    amount = models.FloatField(null=False)
+    name = models.CharField(max_length=200)
+    amount = models.FloatField()
     reward_type = models.CharField(null=True, choices=RewardType, default=RewardType.GOLD)
 
     def __str__(self):
         return f"{self.name}"
     
 
-class EnergyLevel(models.Model):
-    id = models.IntegerField(blank=False, null = False, primary_key=True)
-    name = models.CharField(max_length=255, blank=False, null=False)
-    level = models.IntegerField(null=False, blank=False)
-    amount = models.IntegerField(null=False, blank=False)
+class MaxEnergyLevel(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
+    level = models.IntegerField()
+    amount = models.IntegerField()
     next_level = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:
         return f'{self.name}  {self.level}  {self.amount}'
 
 
-class MultiplierLevel(models.Model):
-    id = models.IntegerField(blank=False, null = False, primary_key=True)
-    name = models.CharField(max_length=255, blank=False, null=False)
-    level = models.IntegerField(null=False, blank=False)
-    amount = models.IntegerField(null=False, blank=False)
+class MulticlickLevel(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
+    level = models.IntegerField()
+    amount = models.IntegerField()
     next_level = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:
@@ -87,10 +83,10 @@ class MultiplierLevel(models.Model):
 
 
 class PassiveIncomeLevel(models.Model):
-    id = models.IntegerField(blank=False, null = False, primary_key=True)
-    name = models.CharField(max_length=255, blank=False, null=False)
-    level = models.IntegerField(null=False, blank=False)
-    amount = models.IntegerField(null=False, blank=False)
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
+    level = models.IntegerField()
+    amount = models.IntegerField()
     next_level = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:

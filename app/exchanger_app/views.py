@@ -6,7 +6,7 @@ from user_app.models import UserData, User
 from rest_framework import status
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
-from .utils import check_exchange_pair_existence, check_sufficiency
+from .utils import is_exchange_pair_exists, is_sufficient
 
 
 def exchanger_home(request):
@@ -24,14 +24,14 @@ def execute_swap(request):
 
     checkpoint = transaction.savepoint()
 
-    if not check_exchange_pair_existence(asset_1_id=asset_1_id, asset_2_id=asset_2_id):
+    if not is_exchange_pair_exists(asset_1_id=asset_1_id, asset_2_id=asset_2_id):
         transaction.rollback()
         return JsonResponse({"result": "no such pair"}, status=status.HTTP_400_BAD_REQUEST)
 
     checkpoint = transaction.savepoint()
 
     user_data = UserData.objects.get(user_id=user_id)
-    if not check_sufficiency(userdata=user_data, asset_id=asset_1_id, amount=amount_1, fee=fee):
+    if not is_sufficient(userdata=user_data, asset_id=asset_1_id, amount=amount_1, fee=fee):
         transaction.rollback()
         return JsonResponse({"result": "not enough balance"}, status=status.HTTP_200_OK)
 
