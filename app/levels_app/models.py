@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+
 class Rank(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255, null=False, blank=False)
@@ -89,3 +90,19 @@ class PassiveIncomeLevel(models.Model):
 
     def __str__(self) -> str:
         return f'{self.name}  {self.level}  {self.amount}'
+    
+class SocialMedia(models.Model):
+    name = models.CharField(max_length=64, null = False, blank=False)
+    link = models.CharField(max_length=1024, null=False, blank = False)
+    reward_amount = models.BigIntegerField(null = False, blank = False)
+    # maybe add imageField?
+    is_partner = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return self.name
+
+class CompletedSocialTasks(models.Model):
+    user = models.ForeignKey('user_app.User', null=False, on_delete=models.CASCADE)
+    task = models.ForeignKey(SocialMedia, null=False, on_delete=models.CASCADE)
+
+

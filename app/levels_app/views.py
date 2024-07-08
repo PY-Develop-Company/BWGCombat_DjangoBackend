@@ -1,12 +1,13 @@
 from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from .models import Task, Reward, Rank
+from .models import Task, Reward, Rank, SocialMedia, CompletedSocialTasks
 from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
 from user_app.serializer import RankInfoSerializer
 from rest_framework import status
+from .serializer import SocialMediaTasksSerializer
 
 
 
@@ -98,5 +99,23 @@ def get_rank_info(request):
     else:
         return JsonResponse({"rank_id": rank_info.id, "name": rank_info.name, 'description': rank_info.description}, status=status.HTTP_200_OK)
 
+
+
+@api_view(["GET"])
+def get_social_media_tasks(request):
+    user_id = request.data.get('userId')
+    tasks = SocialMedia.objects.filter(is_partner=False)
+    completed = CompletedSocialTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
+    serializer = SocialMediaTasksSerializer(tasks, context={'completed_tasks': completed}, many=True)
+    return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def get_partner_tasks(request):
+    user_id = request.data.get('userId')
+    tasks = SocialMedia.objects.filter(is_partner=True)
+    completed = CompletedSocialTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
+    serializer = SocialMediaTasksSerializer(tasks, context={'completed_tasks': completed}, many=True)
+    return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
 
 

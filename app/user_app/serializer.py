@@ -231,9 +231,10 @@ class ReferralsSerializer(serializers.ModelSerializer):
     
     def get_passive_income(self, obj:UserData):
         return obj.passive_income_level.amount
+        
     
     
 
     class Meta:
         model = UserData
-        fields = ('tg_username', 'gold_balance', 'rank', 'passive_income')
+        fields = ('tg_username', 'gold_balance', 'rank', 'passive_income', 'character_gender')

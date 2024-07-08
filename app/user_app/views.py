@@ -43,8 +43,14 @@ def get_user_info(request):
     user_data = get_object_or_404(UserData, user_id=user_id)
     delta = now() - user_data.last_visited
     user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.energy_level.amount - user_data.current_energy)
+    print(delta.total_seconds())
+    income = round(user_data.passive_income_level.amount/3600 * delta.total_seconds())
+    user_data.gold_balance += income
+
+    user_data.save()
+
     serializer = UserDataSerializer(user_data)
-    return Response({"info": serializer.data}, status=status.HTTP_200_OK)
+    return Response({"info": serializer.data, 'passive_income': income}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])

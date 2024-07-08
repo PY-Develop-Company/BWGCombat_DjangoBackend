@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Rank, Reward, Task, EnergyLevel, MultiplierLevel, PassiveIncomeLevel
+from .models import Rank, Reward, Task, EnergyLevel, MultiplierLevel, PassiveIncomeLevel, SocialMedia, CompletedSocialTasks
 
 
 class RankAdmin(admin.ModelAdmin):
@@ -27,3 +27,5 @@ admin.site.register(Task, TaskAdmin)
 admin.site.register(EnergyLevel)
 admin.site.register(MultiplierLevel)
 admin.site.register(PassiveIncomeLevel)
+admin.site.register(SocialMedia)
+admin.site.register(CompletedSocialTasks)
