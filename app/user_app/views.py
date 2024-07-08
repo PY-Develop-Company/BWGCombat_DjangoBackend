@@ -164,8 +164,8 @@ def add_referral(request):
         return JsonResponse({"status": "error", "message": "Invalid JSON"})
 
 
-@csrf_exempt
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def get_user_referrals(request):
     user_id = request.query_params.get("userId")
 

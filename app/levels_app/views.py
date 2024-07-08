@@ -10,7 +10,6 @@ from rest_framework import status
 from .serializer import SocialMediaTasksSerializer
 
 
-
 def levels_home(request):
     return HttpResponse("levels home")
 
@@ -44,6 +43,7 @@ def check_task_completion(user_id: int, task_id: int):
             pass
         case _:
             return HttpResponse('No such task to check completion')
+
     # temporarily only checking frens quantity
     if done:
         rewards = task.rewards
@@ -79,18 +79,12 @@ def go_to_next_rank(request):
         return JsonResponse({"result": "using go_to_next_rank() method when user's gold is not enough"})
 
 
-# @api_view(["POST"])
-# @permission_classes([AllowAny])
-# def go_to_next_stage(request):
-#     user_id = request.data.get("userId")
-#     # give_reward_to_inviter(user_id)
-#
-#     return JsonResponse({"result": "ok"})
-
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def get_rank_info(request):
     user_id = request.data.get('userId')
     rank_id = request.data.get('rankId')
+
     user_data = get_object_or_404(UserData, user_id=user_id)
     rank_info = get_object_or_404(Rank, id=rank_id)
     if user_data.rank_id == rank_id:
@@ -98,8 +92,6 @@ def get_rank_info(request):
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
     else:
         return JsonResponse({"rank_id": rank_info.id, "name": rank_info.name, 'description': rank_info.description}, status=status.HTTP_200_OK)
-
-
 
 @api_view(["GET"])
 def get_social_media_tasks(request):
@@ -117,5 +109,3 @@ def get_partner_tasks(request):
     completed = CompletedSocialTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
     serializer = SocialMediaTasksSerializer(tasks, context={'completed_tasks': completed}, many=True)
     return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
-
-
