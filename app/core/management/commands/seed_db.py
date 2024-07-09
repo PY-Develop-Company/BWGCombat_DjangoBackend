@@ -158,8 +158,8 @@ class Command(BaseCommand):
 
     def seed_exchange_pairs(self):
         pairs = [
-            {"id": 1, "asset_1_id": Asset.objects.get(id=1), "asset_2_id": Asset.objects.get(id=2), "rate": 100_000},
-            {"id": 2, "asset_1_id": Asset.objects.get(id=2), "asset_2_id": Asset.objects.get(id=1), "rate": 0.00001}
+            {"id": 1, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=2), "rate": 100_000},
+            {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1), "rate": 0.00001}
         ]
         for data in pairs:
-            Asset.objects.update_or_create(id=data['id'], defaults=data)
+            ExchangePair.objects.update_or_create(id=data['id'], defaults=data)
