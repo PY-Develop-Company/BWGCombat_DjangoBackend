@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
-from levels_app.models import Rank, Task, Reward, MultiplierLevel, EnergyLevel, PassiveIncomeLevel
+from levels_app.models import Rank, Task, Reward, MulticlickLevel, MaxEnergyLevel, PassiveIncomeLevel
 
 
 class CustomUserManager(BaseUserManager):
@@ -49,8 +49,8 @@ class CustomUserManager(BaseUserManager):
 
 
 class Language(models.Model):
-    lang_id = models.IntegerField(blank=False, primary_key=True)
-    lang_code = models.CharField(blank=False, unique=True, max_length=2)
+    lang_id = models.IntegerField(primary_key=True)
+    lang_code = models.CharField(unique=True, max_length=2)
     lang_name = models.CharField(blank=True, unique=False, default="", max_length=100)
 
     def __str__(self) -> str:
@@ -110,35 +110,25 @@ class UserData(models.Model):
         MALE = 0, 'Male'
         FEMALE = 1, 'Female'
 
-
     user_id = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     character_gender = models.IntegerField(null=True, blank=True, default=0, choices=Gender.choices)
 
-    gold_balance = models.BigIntegerField(null=False, default=0)
-    g_token = models.FloatField(null=False, default=0)
+    gold_balance = models.BigIntegerField(default=0)
+    g_token = models.FloatField(default=0)
 
-    last_visited = models.DateTimeField(null=False, default=now)
+    last_visited = models.DateTimeField(default=now)
 
-    rank = models.ForeignKey(
-        Rank, null=True, blank=False, on_delete=models.SET_NULL, default=1
-    )
+    rank = models.ForeignKey(Rank, null=True, on_delete=models.SET_NULL, default=1)
 
-    click_multiplier_level = models.ForeignKey(MultiplierLevel,
-        null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level'
-    )
+    multiclick_level = models.ForeignKey(MulticlickLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level')
+    energy_regeneration = models.IntegerField(default=1)
+    max_energy_level = models.ForeignKey(MaxEnergyLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL)
+    current_energy = models.IntegerField(default=0)
 
-    energy_regeneration = models.IntegerField(null=False, blank=False, default=1)
-    energy_level = models.ForeignKey(EnergyLevel,
-        null=True, blank=True, default=1, on_delete=models.SET_NULL
-    )
-    current_energy = models.IntegerField(null=False, blank=False, default=0)
-
-    passive_income_level = models.ForeignKey(PassiveIncomeLevel,
-        null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level'
-    )
+    passive_income_level = models.ForeignKey(PassiveIncomeLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level')
 
     def add_gold_coins(self, coins: int):
-        self.gold_balance += int(coins) * self.click_multiplier_level.amount
+        self.gold_balance += int(coins)
 
     def set_gold_coins(self, coins: int):
         self.gold_balance = int(coins)
@@ -157,11 +147,11 @@ class UserData(models.Model):
 
     def increase_multiplier_level(self, levels_to_increase: int):
         for __ in range(levels_to_increase):
-            self.click_multiplier = self.click_multiplier_level.next_level
+            self.click_multiplier = self.multiclick_level.next_level
 
     def increase_energy_level(self, levels_to_increase: int):
         for __ in range(levels_to_increase):
-            self.energy = self.energy_level.next_level
+            self.energy = self.max_energy_level.next_level
 
     def increase_passive_income_level(self, levels_to_increase: int):
         for __ in range(levels_to_increase):
@@ -209,10 +199,10 @@ class UserData(models.Model):
 
 
 class UsersTasks(models.Model):
-    user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.CASCADE)
-    start_time = models.DateTimeField(null=True, blank=True, default=None)  # default "None" might be changed
-    complete_time = models.DateTimeField(null=True, blank=True, default=None)  # default "None" might be changed
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    start_time = models.DateTimeField(null=True, blank=True, default=None)
+    complete_time = models.DateTimeField(null=True, blank=True, default=None)
 
     class Status(models.TextChoices):
         UNAVAILABLE = "0", _("Unavailable")
@@ -254,7 +244,7 @@ class Fren(models.Model):
 
 class Link(models.Model):
     url = models.URLField(unique=True)
-    task = models.ForeignKey(Task, null=True, blank=False, on_delete=models.SET_NULL, default=None)
+    task = models.ForeignKey(Task, null=True, on_delete=models.SET_NULL, default=None)
 
 
 class LinkClick(models.Model):

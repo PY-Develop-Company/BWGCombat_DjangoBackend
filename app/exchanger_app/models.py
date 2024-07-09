@@ -4,18 +4,16 @@ from django.utils import timezone
 
 
 class Asset(models.Model):
-    name = models.CharField(max_length=255, null=False, blank=False)
+    name = models.CharField(max_length=255)
 
 
 class Swap(models.Model):
-    user = models.ForeignKey(User, null=False, blank=False, on_delete=models.DO_NOTHING)
-    asset_1 = models.ForeignKey(Asset, null=False, blank=False, on_delete=models.DO_NOTHING,
-                                related_name='swaps_giving')
-    asset_2 = models.ForeignKey(Asset, null=False, blank=False, on_delete=models.DO_NOTHING,
-                                related_name='swaps_receiving')
-    fee = models.FloatField(null=False, blank=False, default=0.0)
-    amount_1 = models.FloatField(null=False, blank=False, default=0.0)
-    amount_2 = models.FloatField(null=False, blank=False, default=0.0)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    asset_1 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='swaps_giving')
+    asset_2 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='swaps_receiving')
+    fee = models.FloatField(default=0.0)
+    amount_1 = models.FloatField(default=0.0)
+    amount_2 = models.FloatField(default=0.0)
     time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -24,13 +22,11 @@ class Swap(models.Model):
 
 
 class Transfer(models.Model):
-    user_1 = models.ForeignKey(User, null=False, blank=False, on_delete=models.DO_NOTHING,
-                               related_name='transfers_giving')
-    user_2 = models.ForeignKey(User, null=False, blank=False, on_delete=models.DO_NOTHING,
-                               related_name='transfers_receiving')
-    asset = models.ForeignKey(Asset, null=False, blank=False, on_delete=models.DO_NOTHING)
-    fee = models.FloatField(null=False, blank=False, default=0.0)
-    amount = models.FloatField(null=False, blank=False, default=0.0)
+    user_1 = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='transfers_giving')
+    user_2 = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='transfers_receiving')
+    asset = models.ForeignKey(Asset, on_delete=models.DO_NOTHING)
+    fee = models.FloatField(default=0.0)
+    amount = models.FloatField(default=0.0)
     time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -39,8 +35,6 @@ class Transfer(models.Model):
 
 
 class ExchangePair(models.Model):
-    asset_1 = models.ForeignKey(Asset, null=False, blank=False, on_delete=models.DO_NOTHING,
-                                related_name='rates_sell')
-    asset_2 = models.ForeignKey(Asset, null=False, blank=False, on_delete=models.DO_NOTHING,
-                                related_name='rates_buy')
-    rate = models.FloatField(null=False, blank=False, default=1.0)
+    asset_1 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='rates_sell')
+    asset_2 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='rates_buy')
+    rate = models.FloatField(default=1.0)
