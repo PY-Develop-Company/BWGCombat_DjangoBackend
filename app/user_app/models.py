@@ -120,9 +120,9 @@ class UserData(models.Model):
 
     rank = models.ForeignKey(Rank, null=True, on_delete=models.SET_NULL, default=1)
 
-    multiclick_level = models.ForeignKey(MulticlickLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='Click_level')
+    multiclick_amount = models.IntegerField(null=True, blank=True, default=2)
     energy_regeneration = models.IntegerField(default=1)
-    max_energy_level = models.ForeignKey(MaxEnergyLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL)
+    max_energy_amount = models.IntegerField(null=True, blank=True, default=100)
     current_energy = models.IntegerField(default=0)
 
     passive_income_level = models.ForeignKey(PassiveIncomeLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level')

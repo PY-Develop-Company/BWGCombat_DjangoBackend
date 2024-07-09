@@ -204,4 +204,4 @@ class ReferralsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserData
-        fields = ('tg_username', 'gold_balance', 'rank', 'passive_income', 'character_gender')
+        fields = ('tg_username', 'g_token', 'rank', 'passive_income', 'character_gender')

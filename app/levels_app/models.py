@@ -12,9 +12,21 @@ class Rank(models.Model):
     inviter_reward = models.ForeignKey(
         "Reward", null=True, blank=False, on_delete=models.DO_NOTHING
     )
+    init_stage = models.ForeignKey('Stage', null=True, on_delete=models.SET_NULL)
+
+    init_energy = models.ForeignKey('MaxEnergyLevel', null = False, on_delete=models.SET_DEFAULT, default=1)
+    init_multiplier = models.ForeignKey('MulticlickLevel', null = False, on_delete=models.SET_DEFAULT, default=1)
+    init_energy_regeneration = models.IntegerField(null=False, default=1)
 
     def __str__(self) -> str:
         return f"{self.name}"
+    
+class Stage(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
+    next_stage = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
+    initial_task = models.ForeignKey('Task', null=True, on_delete=models.SET_NULL)
+    tasks = models.ManyToManyField('Task', related_name='stage_tasks')
 
 
 class Task(models.Model):
@@ -31,7 +43,6 @@ class Task(models.Model):
     text = models.TextField(null=True)
     task_type = models.CharField(choices=TaskType, default=TaskType.buy_max_energy)
     completion_number = models.BigIntegerField(null=True, blank=True)
-    rank = models.ForeignKey(Rank, null=True, blank=True, on_delete=models.SET_NULL)
 
     rewards = models.ManyToManyField("Reward")
     is_initial = models.BooleanField(default=False)

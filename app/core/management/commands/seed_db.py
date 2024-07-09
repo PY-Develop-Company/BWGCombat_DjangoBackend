@@ -11,16 +11,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         self.stdout.write('Seeding data...')
+        self.seed_energy_levels()
+        self.seed_multiplier_levels()
+        self.seed_passive_income_levels()
         self.seed_lang()
         self.seed_rewards()
         self.seed_ranks()
         self.seed_tasks()
-        self.seed_energy_levels()
-        self.seed_multiplier_levels()
-        self.seed_passive_income_levels()
         self.seed_links()
         self.seed_users()
-        self.seed_user_data()
         self.seed_superuser()
         self.seed_assets()
         self.seed_exchange_pairs()
@@ -125,22 +124,61 @@ class Command(BaseCommand):
         user_data = [
             {'user_id': User.objects.get(tg_id=123568), 'character_gender': 0, 'gold_balance': 0, 'g_token': 0,
              'last_visited': now(), 'rank': Rank.objects.get(id=1),
-             'click_multiplier': MulticlickLevel.objects.get(id=1), 'energy': MaxEnergyLevel.objects.get(id=1),
-             'current_energy': MaxEnergyLevel.objects.get(id=1).amount,
-             'passive_income': PassiveIncomeLevel.objects.get(id=1)},
+             'multiclick_amount': MulticlickLevel.objects.get(id=1).amount, 'energy_regeneration': Rank.objects.get(id=1).init_energy_regeneration,
+             'max_energy_amount': MaxEnergyLevel.objects.get(id=1).amount, 'current_energy': MaxEnergyLevel.objects.get(id=1).amount,
+             'passive_income_level': PassiveIncomeLevel.objects.get(id=1)},
             {'user_id': User.objects.get(tg_id=123456), 'character_gender': 1, 'gold_balance': 0, 'g_token': 0,
              'last_visited': now(), 'rank': Rank.objects.get(id=1),
-             'click_multiplier': MulticlickLevel.objects.get(id=1), 'energy': MaxEnergyLevel.objects.get(id=1),
-             'current_energy': MaxEnergyLevel.objects.get(id=1).amount,
-             'passive_income': PassiveIncomeLevel.objects.get(id=1)},
+             'multiclick_amount': MulticlickLevel.objects.get(id=1).amount, 'energy_regeneration': Rank.objects.get(id=1).init_energy_regeneration,
+             'max_energy_amount': MaxEnergyLevel.objects.get(id=1).amount, 'current_energy': MaxEnergyLevel.objects.get(id=1).amount,
+             'passive_income_level': PassiveIncomeLevel.objects.get(id=1)},
             {'user_id': User.objects.get(tg_id=123457), 'character_gender': None, 'gold_balance': 0, 'g_token': 0,
              'last_visited': now(), 'rank': Rank.objects.get(id=1),
-             'click_multiplier': MulticlickLevel.objects.get(id=1), 'energy': MaxEnergyLevel.objects.get(id=1),
-             'current_energy': MaxEnergyLevel.objects.get(id=1).amount,
-             'passive_income': PassiveIncomeLevel.objects.get(id=1)},
+             'multiclick_amount': MulticlickLevel.objects.get(id=1).amount, 'energy_regeneration': Rank.objects.get(id=1).init_energy_regeneration,
+             'max_energy_amount': MaxEnergyLevel.objects.get(id=1).amount, 'current_energy': MaxEnergyLevel.objects.get(id=1).amount,
+             'passive_income_level': PassiveIncomeLevel.objects.get(id=1)},
         ]
         for data in user_data:
             UserData.objects.update_or_create(user_id=data['user_id'], defaults=data)
+
+    def seed_superuser(self):
+        if not User.objects.filter(is_superuser=True).exists():
+            User.objects.create_superuser(tg_id=123321, tg_username='admin', firstname='admin', lastname='admin', password='admin')
+
+    def seed_assets(self):
+        assets_data = [
+            {"name": "Gold", "ticker": "GOLD", "description": "The currency used in the game."},
+            {"name": "GToken", "ticker": "GTOKEN", "description": "The token used for rewards."},
+            # Add more assets as needed
+        ]
+        for asset_data in assets_data:
+            Asset.objects.update_or_create(name=asset_data["name"], defaults=asset_data)
+
+    def seed_exchange_pairs(self):
+        exchange_pairs_data = [
+            {"pair": "GOLD/GTOKEN", "exchange_rate": 1000},
+            # Add more exchange pairs as needed
+        ]
+        for exchange_pair_data in exchange_pairs_data:
+            ExchangePair.objects.update_or_create(pair=exchange_pair_data["pair"], defaults=exchange_pair_data)
+
+    def seed_social_media(self):
+        social_media_data = [
+            {"platform": SocialMedia.Platforms.TELEGRAM, "url": "https://t.me/testchannel"},
+            {"platform": SocialMedia.Platforms.TWITTER, "url": "https://twitter.com/testprofile"},
+            # Add more social media platforms as needed
+        ]
+        for social_media in social_media_data:
+            SocialMedia.objects.update_or_create(platform=social_media['platform'], defaults=social_media)
+
+    def seed_completed_social_tasks(self):
+        completed_social_tasks_data = [
+            {"user_id": User.objects.get(tg_id=123568), "task_id": Task.objects.get(id=1)},
+            # Add more completed social tasks as needed
+        ]
+        for completed_social_task in completed_social_tasks_data:
+            CompletedSocialTasks.objects.update_or_create(user_id=completed_social_task['user_id'],
+                                                          task_id=completed_social_task['task_id'])
 
     def seed_superuser(self):
         users = [

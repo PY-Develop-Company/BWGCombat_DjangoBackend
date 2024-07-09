@@ -72,6 +72,8 @@ def go_to_next_rank(request):
         give_reward_to_inviter(user_id)
 
         userdata.rank = rank_to_go
+        userdata.max_energy_amount = rank_to_go.init_energy.amount
+        userdata.multiclick_amount = rank_to_go.init_multiplier.amount
         userdata.save()
 
         return JsonResponse({"result": "ok"})

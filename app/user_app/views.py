@@ -173,7 +173,6 @@ def get_user_referrals(request):
     referrals = UserData.objects.filter(
         user_id__in=Fren.objects.filter(inviter_tg=user).values_list('fren_tg', flat=True)
     )
-    print(referrals)
     serializer = ReferralsSerializer(referrals, many=True).data
 
     return JsonResponse({'referrals':serializer}, status=status.HTTP_200_OK)
