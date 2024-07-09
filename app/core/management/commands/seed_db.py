@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.utils.timezone import now
-from levels_app.models import Rank, Task, Reward, MaxEnergyLevel, MulticlickLevel, PassiveIncomeLevel
+from levels_app.models import Rank, Task, Reward, MaxEnergyLevel, MulticlickLevel, PassiveIncomeLevel, SocialMedia, CompletedSocialTasks
 from user_app.models import User, Language, UserData, CustomUserManager, Link
 from exchanger_app.models import Asset, ExchangePair
 import os
@@ -24,6 +24,8 @@ class Command(BaseCommand):
         self.seed_superuser()
         self.seed_assets()
         self.seed_exchange_pairs()
+        self.seed_social_media()
+        self.seed_completed_social_tasks()
         self.stdout.write('Data seeded successfully.')
 
     def seed_lang(self):
@@ -163,3 +165,21 @@ class Command(BaseCommand):
         ]
         for data in pairs:
             Asset.objects.update_or_create(id=data['id'], defaults=data)
+
+    def seed_social_media(self):
+        social_medias = [
+            {"id": 1, "name": "Facebook", "link": "https://www.facebook.com", "reward_amount": 5000, "is_partner": True},
+            {"id": 2, "name": "Twitter", "link": "https://www.twitter.com", "reward_amount": 3000, "is_partner": False},
+            {"id": 3, "name": "Instagram", "link": "https://www.instagram.com", "reward_amount": 4000, "is_partner": True}
+        ]
+        for data in social_medias:
+            SocialMedia.objects.update_or_create(id=data['id'], defaults=data)
+
+    def seed_completed_social_tasks(self):
+        tasks = [
+            {"id": 1, "user": User.objects.get(tg_id=123456), "task": SocialMedia.objects.get(id=1)},
+            {"id": 2, "user": User.objects.get(tg_id=123456), "task": SocialMedia.objects.get(id=2)},
+            {"id": 3, "user": User.objects.get(tg_id=123568), "task": SocialMedia.objects.get(id=2)},
+        ]
+        for data in tasks:
+            CompletedSocialTasks.objects.update_or_create(id=data['id'], defaults=data)
