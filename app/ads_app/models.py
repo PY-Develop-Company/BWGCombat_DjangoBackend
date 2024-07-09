@@ -7,4 +7,4 @@ class Advert(models.Model):
     name = models.CharField(null=False, blank=False)
     description = models.TextField(null=True, blank=True)
     link = models.ForeignKey(Link, null=False, blank=False, on_delete=models.CASCADE)
-    img_path = models.FilePathField(path="/ads", recursive=False, max_length=255, allow_folders=False)
+    image = models.ImageField(upload_to="./media/ads", null=True, blank=True, default=None)
