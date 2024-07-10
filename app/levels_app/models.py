@@ -34,26 +34,29 @@ class Task(models.Model):
         ch_sub = "1", _("sub to channel")
         inv_fren = "2", _("invite friend")
         earn_gold = "3", _("earn N amount of gold")
-        buy_max_energy = "4", _("buy energy")
-        buy_passive_income = "5", _("Gnome employment(buying)")
-        buy_multiclick = "6", _("upgrade pickaxe to earn more gold per click")
-        unknown = "7", _("Unknown task")
-
+        buy_energy = "4", _("buy energy")
+        buy_multicklick = "5", _("buy pickaxe")
+        buy_chest = "6", _("buy chest")
+        road = "7", _("buy road")
     name = models.CharField(max_length=255)
     text = models.TextField(null=True)
-    task_type = models.CharField(choices=TaskType, default=TaskType.buy_max_energy)
+    task_type = models.CharField(choices=TaskType, default=TaskType.buy_chest)
     completion_number = models.BigIntegerField(null=True, blank=True)
 
     rewards = models.ManyToManyField("Reward")
     is_initial = models.BooleanField(default=False)
     is_free = models.BooleanField(default=False)
-    price = models.BigIntegerField(default=0)
+    price = models.BigIntegerField(default=0, null=True)
     coord_x = models.IntegerField(default=0)
     coord_y = models.IntegerField(default=0)
     block_time = models.IntegerField(default=0, help_text="time in minutes")
 
     def __str__(self) -> str:
         return self.name
+    
+
+
+    
 
 
 class Reward(models.Model):
