@@ -16,5 +16,5 @@ def get_advert(request):
 
     return JsonResponse({"advert_id": advert.id,
                          "name": advert.name,
-                         "description": advert.description})
-                         # "image": advert.image})
+                         "description": advert.description,
+                         "image": advert.image_path})
