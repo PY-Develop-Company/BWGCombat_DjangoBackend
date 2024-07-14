@@ -136,14 +136,23 @@ class UserData(models.Model):
     def remove_gold_coins(self, coins: int):
         self.gold_balance -= int(coins)
 
-    def add_g_token_coins(self, coins: int):
-        self.g_token += int(coins)
+    def add_g_token_coins(self, coins: float):
+        if not isinstance(coins, float):
+            coins = float(coins)
+        self.g_token += coins
+        self.g_token = round(self.g_token, 12)
 
-    def set_g_token_coins(self, coins: int):
-        self.g_token = int(coins)
+    def set_g_token_coins(self, coins: float):
+        if not isinstance(coins, float):
+            coins = float(coins)
+        self.g_token = coins
+        self.g_token = round(self.g_token, 12)
 
-    def remove_g_token_coins(self, coins: int):
-        self.g_token -= int(coins)
+    def remove_g_token_coins(self, coins: float):
+        if not isinstance(coins, float):
+            coins = float(coins)
+        self.g_token -= coins
+        self.g_token = round(self.g_token, 12)
 
     def increase_multiplier_level(self, levels_to_increase: int):
         for __ in range(levels_to_increase):

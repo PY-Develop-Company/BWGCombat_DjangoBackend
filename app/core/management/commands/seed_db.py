@@ -3,6 +3,7 @@ from django.utils.timezone import now
 from levels_app.models import Rank, Task, Reward, MaxEnergyLevel, MulticlickLevel, PassiveIncomeLevel, SocialMedia, CompletedSocialTasks
 from user_app.models import User, Language, UserData, CustomUserManager, Link
 from exchanger_app.models import Asset, ExchangePair
+from ads_app.models import Advert
 import os
 
 
@@ -25,6 +26,7 @@ class Command(BaseCommand):
         self.seed_exchange_pairs()
         self.seed_social_media()
         self.seed_completed_social_tasks()
+        self.seed_ads()
         self.stdout.write('Data seeded successfully.')
 
     def seed_lang(self):
@@ -138,8 +140,8 @@ class Command(BaseCommand):
 
     def seed_exchange_pairs(self):
         pairs = [
-            {"id": 1, "asset_1_id": Asset.objects.get(id=1), "asset_2_id": Asset.objects.get(id=2), "rate": 100_000},
-            {"id": 2, "asset_1_id": Asset.objects.get(id=2), "asset_2_id": Asset.objects.get(id=1), "rate": 0.00001}
+            {"id": 1, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=2), "rate": 100_000},
+            {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1), "rate": 0.00001}
         ]
         for data in pairs:
             Asset.objects.update_or_create(id=data['id'], defaults=data)
@@ -161,3 +163,12 @@ class Command(BaseCommand):
         ]
         for data in tasks:
             CompletedSocialTasks.objects.update_or_create(id=data['id'], defaults=data)
+            ExchangePair.objects.update_or_create(id=data['id'], defaults=data)
+
+    def seed_ads(self):
+        ads = [
+            {"id": 1, "name": "Azino 777", "description": "Vygravaytie 100000000000000000000 rubley",
+             "link": Link.objects.get(id=1), "image_path": "/azino777.jfif"}
+        ]
+        for data in ads:
+            Advert.objects.update_or_create(id=data['id'], defaults=data)
