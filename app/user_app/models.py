@@ -49,7 +49,6 @@ class CustomUserManager(BaseUserManager):
 
 
 class Language(models.Model):
-    lang_id = models.IntegerField(primary_key=True)
     lang_code = models.CharField(unique=True, max_length=2)
     lang_name = models.CharField(blank=True, unique=False, default="", max_length=100)
 
@@ -95,10 +94,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.is_admin
 
     def save(self, *args, **kwargs):
-        all_language_codes = Language.objects.values_list('lang_code', flat=True)
-        if 'en' not in all_language_codes:
-            english = Language.objects.create(lang_id=1, lang_code='en', lang_name='English')
-            english.save()
         super(User, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -207,7 +202,7 @@ class UserData(models.Model):
         return f'{self.user_id.tg_id} {self.last_visited}'
 
 
-class UsersTasks(models.Model):
+class UsersTask(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     start_time = models.DateTimeField(null=True, blank=True, default=None)

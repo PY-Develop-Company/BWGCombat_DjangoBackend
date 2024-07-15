@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Task, Reward, Rank, SocialMedia, CompletedSocialTasks
-from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick
+from user_app.models import UserData, UsersTask, Fren, Link, LinkClick
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
 from user_app.serializer import RankInfoSerializer
@@ -94,6 +94,7 @@ def get_rank_info(request):
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
     else:
         return JsonResponse({"rank_id": rank_info.id, "name": rank_info.name, 'description': rank_info.description}, status=status.HTTP_200_OK)
+
 
 @api_view(["GET"])
 def get_social_media_tasks(request):

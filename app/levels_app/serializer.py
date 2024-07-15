@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Rank, Task, Reward, SocialMedia
-from user_app.models import User, UsersTasks
+from user_app.models import User, UsersTask
+
 
 class SocialMediaTasksSerializer(serializers.ModelSerializer):
 
@@ -17,6 +18,7 @@ class SocialMediaTasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = SocialMedia
         fields = ('name', 'link', 'amount', 'is_completed')
+
 
 class RewardSerializer(serializers.ModelSerializer):
     reward_type = serializers.SerializerMethodField()

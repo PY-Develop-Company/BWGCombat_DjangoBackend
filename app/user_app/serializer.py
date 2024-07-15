@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import UserData
 from levels_app.models import Rank, Task, Reward, MaxEnergyLevel, MulticlickLevel
 from levels_app.serializer import RankInfoSerializer, RankingSerializer, RewardSerializer, TaskSerializer
-from user_app.models import User, UsersTasks
+from user_app.models import User, UsersTask
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.shortcuts import get_object_or_404
 

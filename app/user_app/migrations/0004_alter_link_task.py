@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('levels_app', '0001_initial'),
         ('user_app', '0003_link_task'),

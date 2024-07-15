@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-
 class Rank(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -14,13 +13,14 @@ class Rank(models.Model):
     )
     init_stage = models.ForeignKey('Stage', null=True, on_delete=models.SET_NULL)
 
-    init_energy = models.ForeignKey('MaxEnergyLevel', null = False, on_delete=models.SET_DEFAULT, default=1)
-    init_multiplier = models.ForeignKey('MulticlickLevel', null = False, on_delete=models.SET_DEFAULT, default=1)
+    init_energy = models.ForeignKey('MaxEnergyLevel', null=False, on_delete=models.SET_DEFAULT, default=1)
+    init_multiplier = models.ForeignKey('MulticlickLevel', null=False, on_delete=models.SET_DEFAULT, default=1)
     init_energy_regeneration = models.IntegerField(null=False, default=1)
 
     def __str__(self) -> str:
         return f"{self.name}"
-    
+
+
 class Stage(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -38,6 +38,7 @@ class Task(models.Model):
         buy_multicklick = "5", _("buy pickaxe")
         buy_chest = "6", _("buy chest")
         road = "7", _("buy road")
+
     name = models.CharField(max_length=255)
     text = models.TextField(null=True)
     task_type = models.CharField(choices=TaskType, default=TaskType.buy_chest)
@@ -53,10 +54,6 @@ class Task(models.Model):
 
     def __str__(self) -> str:
         return self.name
-    
-
-
-    
 
 
 class Reward(models.Model):
@@ -73,10 +70,9 @@ class Reward(models.Model):
 
     def __str__(self):
         return f"{self.name}"
-    
+
 
 class MaxEnergyLevel(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     level = models.IntegerField()
     amount = models.IntegerField()
@@ -87,7 +83,6 @@ class MaxEnergyLevel(models.Model):
 
 
 class MulticlickLevel(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     level = models.IntegerField()
     amount = models.IntegerField()
@@ -98,7 +93,6 @@ class MulticlickLevel(models.Model):
 
 
 class PassiveIncomeLevel(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     level = models.IntegerField()
     amount = models.IntegerField()
@@ -106,19 +100,19 @@ class PassiveIncomeLevel(models.Model):
 
     def __str__(self) -> str:
         return f'{self.name}  {self.level}  {self.amount}'
-    
+
+
 class SocialMedia(models.Model):
-    name = models.CharField(max_length=64, null = False, blank=False)
-    link = models.CharField(max_length=1024, null=False, blank = False)
-    reward_amount = models.BigIntegerField(null = False, blank = False)
+    name = models.CharField(max_length=64, null=False, blank=False)
+    link = models.CharField(max_length=1024, null=False, blank=False)
+    reward_amount = models.BigIntegerField(null=False, blank=False)
     # maybe add imageField?
     is_partner = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.name
 
+
 class CompletedSocialTasks(models.Model):
     user = models.ForeignKey('user_app.User', null=False, on_delete=models.CASCADE)
     task = models.ForeignKey(SocialMedia, null=False, on_delete=models.CASCADE)
-
-

@@ -30,9 +30,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 
 def user_home(request):
-    data = json.loads(request.body)
-    if data:
-        fren_id = data["fren_id"]
     return HttpResponse("user home")
 
 

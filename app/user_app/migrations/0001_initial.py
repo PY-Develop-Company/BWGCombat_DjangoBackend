@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Language',
             fields=[
-                ('lang_id', models.IntegerField(primary_key=True, serialize=False)),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('lang_code', models.CharField(max_length=2, unique=True)),
                 ('lang_name', models.CharField(blank=True, default='', max_length=100)),
             ],

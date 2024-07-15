@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='EnergyLevel',
             fields=[
-                ('id', models.IntegerField(primary_key=True, serialize=False)),
+                ('id', models.IntegerField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
                 ('level', models.IntegerField()),
                 ('amount', models.IntegerField()),
@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MultiplierLevel',
             fields=[
-                ('id', models.IntegerField(primary_key=True, serialize=False)),
+                ('id', models.IntegerField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
                 ('level', models.IntegerField()),
                 ('amount', models.IntegerField()),
@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PassiveIncomeLevel',
             fields=[
-                ('id', models.IntegerField(primary_key=True, serialize=False)),
+                ('id', models.IntegerField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
                 ('level', models.IntegerField()),
                 ('amount', models.IntegerField()),
