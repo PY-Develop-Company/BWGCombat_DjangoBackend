@@ -1,11 +1,11 @@
 from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from .models import Task, Reward, Rank, SocialMedia, CompletedSocialTasks
-from user_app.models import UserData, UsersTask, Fren, Link, LinkClick
+from .models import Reward, Rank, SocialMedia, CompletedSocialTasks
+from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
-from user_app.serializer import RankInfoSerializer
+from levels_app.serializer import RankInfoSerializer, ClosedRankSerializer
 from rest_framework import status
 from .serializer import SocialMediaTasksSerializer
 
@@ -14,46 +14,46 @@ def levels_home(request):
     return HttpResponse("levels home")
 
 
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def check_task_completion(user_id: int, task_id: int):
-    task = Task.objects.get(id=task_id)
-    userdata = UserData.objects.get(user_id=user_id)
+# @api_view(["POST"])
+# @permission_classes([AllowAny])
+# def check_task_completion(user_id: int, task_id: int):
+#     task = Task.objects.get(id=task_id)
+#     userdata = UserData.objects.get(user_id=user_id)
 
-    done = False
+#     done = False
 
-    match task.task_type:
-        case 1:
-            link = Link.objects.get(task=Task)
-            if check_if_link_is_telegram(link):
-                pass  # there will be subscription checking
-            else:
-                done = userdata.check_link_click()
-        case 2:
-            done = userdata.is_referrals_quantity_exceeds(task.completion_number)
-        case 3:
-            pass
-        case 4:
-            pass
-        case 5:
-            pass
-        case 6:
-            pass
-        case 7:
-            pass
-        case _:
-            return HttpResponse('No such task to check completion')
+#     match task.task_type:
+#         case 1:
+#             link = Link.objects.get(task=Task)
+#             if check_if_link_is_telegram(link):
+#                 pass  # there will be subscription checking
+#             else:
+#                 done = userdata.check_link_click()
+#         case 2:
+#             done = userdata.is_referrals_quantity_exceeds(task.completion_number)
+#         case 3:
+#             pass
+#         case 4:
+#             pass
+#         case 5:
+#             pass
+#         case 6:
+#             pass
+#         case 7:
+#             pass
+#         case _:
+#             return HttpResponse('No such task to check completion')
 
-    # temporarily only checking frens quantity
-    if done:
-        rewards = task.rewards
-        for reward in rewards:
-            userdata.receive_reward(reward)
-        # user_task = get_object_or_404(UsersTasks, user_id=user_id)
-        # user_task.status = True
-        # user_task.save()
-    else:
-        return HttpResponse('You haven\'t completed the task or no checking for this task exists yet')
+#     # temporarily only checking frens quantity
+#     if done:
+#         rewards = task.rewards
+#         for reward in rewards:
+#             userdata.receive_reward(reward)
+#         # user_task = get_object_or_404(UsersTasks, user_id=user_id)
+#         # user_task.status = True
+#         # user_task.save()
+#     else:
+#         return HttpResponse('You haven\'t completed the task or no checking for this task exists yet')
 
 
 @api_view(["POST"])
@@ -93,10 +93,9 @@ def get_rank_info(request):
         serializer = RankInfoSerializer(rank_info, context={'user_id': user_data.user_id_id})
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
     else:
-        return JsonResponse({"rank_id": rank_info.id, "name": rank_info.name, 'description': rank_info.description}, status=status.HTTP_200_OK)
+        return JsonResponse(ClosedRankSerializer(rank_info).data, status=status.HTTP_200_OK)
 
-
-@api_view(["GET"])
+@api_view(["POST"])
 def get_social_media_tasks(request):
     user_id = request.data.get('userId')
     tasks = SocialMedia.objects.filter(is_partner=False)
@@ -105,7 +104,7 @@ def get_social_media_tasks(request):
     return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def get_partner_tasks(request):
     user_id = request.data.get('userId')
     tasks = SocialMedia.objects.filter(is_partner=True)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import Rank, Task, Reward, SocialMedia
-from user_app.models import User, UsersTask
+from .models import Rank, TaskTemplate, TaskRoutes, Reward, SocialMedia
+from user_app.models import User, UsersTasks
 
 
 class SocialMediaTasksSerializer(serializers.ModelSerializer):
@@ -44,25 +44,31 @@ class TaskSerializer(serializers.ModelSerializer):
         return RewardSerializer(self.rewards, many=True).data
 
     class Meta:
-        model = Task
+        model = TaskTemplate
         fields = ["name", "text", "rewards"]
 
 
 class TaskForPreviewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Task
+        model = TaskTemplate
         fields = ('name', 'text')
 
 
 class TaskWithStatus(serializers.ModelSerializer):
     is_completed = serializers.SerializerMethodField()
 
-    def get_is_completed(self, obj: Task):
+    def get_is_completed(self, obj: TaskTemplate):
         return UsersTasks.objects.filter(user_id=self.context['user_id'], task=obj).exists()
 
     class Meta:
-        model = Task
+        model = TaskTemplate
         fields = ['id', 'name', 'is_completed']
+
+
+class ClosedRankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rank
+        fields = ('id', 'name', 'description', 'gold_required')
 
 
 class RankInfoSerializer(serializers.ModelSerializer):
@@ -74,7 +80,7 @@ class RankInfoSerializer(serializers.ModelSerializer):
 
     def get_tasks(self, obj):
         tasks = []
-        initial_tasks = Task.objects.filter(rank=obj, initial=True).all()
+        initial_tasks = TaskTemplate.objects.filter(rank=obj, initial=True).all()
 
         for i in initial_tasks:
             current_task = i

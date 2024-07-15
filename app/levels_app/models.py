@@ -19,17 +19,34 @@ class Rank(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name}"
+    
+    class Meta:
+        verbose_name_plural = ('1_Rank model')
+
+
+class StageTemplate(models.Model):
+    task_with_keys = models.ManyToManyField('TaskRoutes')
+    keys_amount = models.IntegerField(default=1)
+
+    class Meta:
+        verbose_name_plural = ('2.1_StageTemplate models')
 
 
 class Stage(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
-    next_stage = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
-    initial_task = models.ForeignKey('Task', null=True, on_delete=models.SET_NULL)
-    tasks = models.ManyToManyField('Task', related_name='stage_tasks')
+    next_stage = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
+    initial_task = models.ForeignKey('TaskRoutes', null=True, on_delete=models.SET_NULL, related_name='ini_task')
+    tasks = models.ManyToManyField('TaskRoutes', related_name='stage')
+
+    def __str__(self) -> str:
+        return f'{self.name} -> {self.next_stage}'
+
+    class Meta:
+        verbose_name_plural = ('2.2_Stage model')
 
 
-class Task(models.Model):
+
+class TaskTemplate(models.Model):
     class TaskType(models.TextChoices):
         ch_sub = "1", _("sub to channel")
         inv_fren = "2", _("invite friend")
@@ -45,15 +62,27 @@ class Task(models.Model):
     completion_number = models.BigIntegerField(null=True, blank=True)
 
     rewards = models.ManyToManyField("Reward")
-    is_initial = models.BooleanField(default=False)
-    is_free = models.BooleanField(default=False)
     price = models.BigIntegerField(default=0, null=True)
-    coord_x = models.IntegerField(default=0)
-    coord_y = models.IntegerField(default=0)
-    block_time = models.IntegerField(default=0, help_text="time in minutes")
 
     def __str__(self) -> str:
         return self.name
+    
+    class Meta:
+        verbose_name_plural = ('3_TaskTemplate model')
+
+class TaskRoutes(models.Model):
+    coord_x = models.IntegerField(default=0, null=False)
+    coord_y = models.IntegerField(default=0, null=False)
+    template = models.ForeignKey(TaskTemplate, blank=False, on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', blank=True, on_delete=models.SET_NULL, null=True)
+    initial = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return f'{self.template.name} + ({self.coord_x},{self.coord_y})'
+
+
+    class Meta:
+        verbose_name_plural = ('4_TaskRoutes model')
 
 
 class Reward(models.Model):
@@ -70,6 +99,9 @@ class Reward(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+    
+    class Meta:
+        verbose_name_plural = ('5_Reward model')
 
 
 class MaxEnergyLevel(models.Model):
@@ -80,6 +112,9 @@ class MaxEnergyLevel(models.Model):
 
     def __str__(self) -> str:
         return f'{self.name}  {self.level}  {self.amount}'
+    
+    class Meta:
+        verbose_name_plural = ('6_Energy model')
 
 
 class MulticlickLevel(models.Model):
@@ -90,6 +125,9 @@ class MulticlickLevel(models.Model):
 
     def __str__(self) -> str:
         return f'{self.name}  {self.level}  {self.amount}'
+    
+    class Meta:
+        verbose_name_plural = ('7_Multiplier model')
 
 
 class PassiveIncomeLevel(models.Model):
@@ -100,7 +138,10 @@ class PassiveIncomeLevel(models.Model):
 
     def __str__(self) -> str:
         return f'{self.name}  {self.level}  {self.amount}'
-
+    
+    class Meta:
+        verbose_name_plural = ('8_PassiveIncome model')
+    
 
 class SocialMedia(models.Model):
     name = models.CharField(max_length=64, null=False, blank=False)
@@ -111,8 +152,15 @@ class SocialMedia(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+    class Meta:
+        verbose_name_plural = ('9.1_Out_Rank_Tasks model')
 
 
 class CompletedSocialTasks(models.Model):
     user = models.ForeignKey('user_app.User', null=False, on_delete=models.CASCADE)
     task = models.ForeignKey(SocialMedia, null=False, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = ('9.2_Completed_Out_Rank_Tasks model')
+

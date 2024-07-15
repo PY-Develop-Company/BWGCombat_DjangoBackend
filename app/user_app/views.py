@@ -1,22 +1,14 @@
 import django.db
 from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 
-# from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404, redirect
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-# from rest_framework import viewsets
-# from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 
-
 from .models import User, UserData, Fren, Link, LinkClick, Language
-
-# from aiogram import Bot
-# from aiogram.utils.deep_linking import create_start_link
 
 import json
 from .serializer import UserDataSerializer, RankInfoSerializer, ClickSerializer, ReferralsSerializer
@@ -39,7 +31,7 @@ def get_user_info(request):
     user_id = request.query_params.get("userId")
     user_data = get_object_or_404(UserData, user_id=user_id)
     delta = now() - user_data.last_visited
-    user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.energy_level.amount - user_data.current_energy)
+    user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.max_energy_amount - user_data.current_energy)
     print(delta.total_seconds())
     income = round(user_data.passive_income_level.amount/3600 * delta.total_seconds())
     user_data.gold_balance += income
@@ -59,7 +51,7 @@ def add_coins_to_user(request):
     warning = request.data.get("warning")
 
     user_data = get_object_or_404(UserData, user_id=user_id)
-    user_data.add_gold_coins(total_clicks*user_data.multiclick_level.amount)
+    user_data.add_gold_coins(total_clicks*user_data.multiclick_amount)
     user_data.current_energy = curr_energy
     user_data.last_visited = now()
 
@@ -69,6 +61,7 @@ def add_coins_to_user(request):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def remove_coins_from_user(request):
     coins = request.data.get("coins")
     user_id = request.data.get("user_id")
@@ -80,6 +73,7 @@ def remove_coins_from_user(request):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def check_user_existence(request):
     try:
         data = json.loads(request.body)
@@ -94,7 +88,7 @@ def check_user_existence(request):
             return JsonResponse({"result": "0"})
 
 
-@csrf_exempt
+@permission_classes([AllowAny])
 @api_view(["POST"])
 def add_user(request):
     try:
@@ -140,7 +134,7 @@ def add_user(request):
     return JsonResponse({"result": "The user has been registered successfully"})
 
 
-@csrf_exempt
+@permission_classes([AllowAny])
 @api_view(["POST"])
 def add_referral(request):
     try:
@@ -187,7 +181,7 @@ def track_link_click(request, link_id):
     return redirect(link.url)
 
 
-
+@permission_classes([AllowAny])
 @api_view(["POST"])
 def pick_character(request):
     user_id = request.data.get('userId')
@@ -197,6 +191,8 @@ def pick_character(request):
     user_data.save()
     return JsonResponse(UserDataSerializer(user_data).data, status=status.HTTP_200_OK)
 
+
+@permission_classes([AllowAny])
 @api_view(["POST"])
 def change_language(request):
     user_id = request.data.get('userId')

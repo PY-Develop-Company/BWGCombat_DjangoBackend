@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
-from levels_app.models import Rank, Task, Reward, MulticlickLevel, MaxEnergyLevel, PassiveIncomeLevel
+from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MulticlickLevel, MaxEnergyLevel, PassiveIncomeLevel, Stage
 
 
 class CustomUserManager(BaseUserManager):
@@ -122,6 +122,8 @@ class UserData(models.Model):
 
     passive_income_level = models.ForeignKey(PassiveIncomeLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level')
 
+    has_key = models.BooleanField(default=False)
+
     def add_gold_coins(self, coins: int):
         self.gold_balance += int(coins)
 
@@ -149,13 +151,20 @@ class UserData(models.Model):
         self.g_token -= coins
         self.g_token = round(self.g_token, 12)
 
-    def increase_multiplier_level(self, levels_to_increase: int):
-        for __ in range(levels_to_increase):
-            self.click_multiplier = self.multiclick_level.next_level
+    def set_multiplier(self, multiplier: int):
+        self.multiclick_amount = multiplier
 
-    def increase_energy_level(self, levels_to_increase: int):
-        for __ in range(levels_to_increase):
-            self.energy = self.max_energy_level.next_level
+
+    def add_multiplier(self, multiplier: int):
+        self.multiclick_amount += multiplier
+
+    def add_energy(self, energy: int):
+        self.max_energy_amount += energy
+
+    def set_energy(self, energy: int):
+        self.max_energy_amount = energy
+
+        
 
     def increase_passive_income_level(self, levels_to_increase: int):
         for __ in range(levels_to_increase):
@@ -176,9 +185,9 @@ class UserData(models.Model):
     def receive_reward(self, reward: Reward):
         """
         GOLD = "1", _("Add gold")
-        GOLD_PER_CLICK = "2", _("Increase gold per click multiplier")
-        G_TOKEN = '3', _("Add G token")
-        ENERGY_BALANCE = '4', _("Replenish energy")
+        MULTIPLIER = "2", _("Increase gold multiplier")
+        G_TOKEN = "3", _("Add G token")
+        ENERGY_BALANCE = "4", _("Replenish energy")
         PASSIVE_INCOME = "5", _("Improve passive income")
         """
         reward_type = int(reward.reward_type)
@@ -188,11 +197,11 @@ class UserData(models.Model):
             case 1:
                 self.add_gold_coins(reward_amount)
             case 2:
-                self.increase_multiplier_level(reward_amount)
+                self.add_multiplier(reward_amount)
             case 3:
                 self.add_g_token_coins(reward_amount)
             case 4:
-                self.increase_energy_level(reward_amount)
+                self.add_energy(reward_amount)
             case 5:
                 self.increase_passive_income_level(reward_amount)
             case _:
@@ -202,17 +211,19 @@ class UserData(models.Model):
         return f'{self.user_id.tg_id} {self.last_visited}'
 
 
-class UsersTask(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    start_time = models.DateTimeField(null=True, blank=True, default=None)
-    complete_time = models.DateTimeField(null=True, blank=True, default=None)
-
+class UsersTasks(models.Model): 
     class Status(models.TextChoices):
         UNAVAILABLE = "0", _("Unavailable")
         IN_PROGRESS = "1", _("In progress")
         COMPLETED = "2", _("Completed")
         EXPIRED = "3", _("Expired")
+
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    task = models.ForeignKey(TaskRoutes, on_delete=models.CASCADE)
+    reward = models.ForeignKey(Reward, on_delete=models.CASCADE)
+    completion_time = models.DateTimeField(null=True, blank=True, default=None)
+
     status = models.CharField(null=False, blank=False, choices=Status, default=Status.UNAVAILABLE)
 
     class Meta:
@@ -248,7 +259,7 @@ class Fren(models.Model):
 
 class Link(models.Model):
     url = models.URLField(unique=True)
-    task = models.ForeignKey(Task, null=True, on_delete=models.SET_NULL, default=None)
+    task = models.ForeignKey(TaskTemplate, null=True, on_delete=models.SET_NULL, default=None)
 
 
 class LinkClick(models.Model):
