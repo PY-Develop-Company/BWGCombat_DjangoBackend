@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import UserData
-from levels_app.models import Rank, Task, Reward, MaxEnergyLevel, MulticlickLevel
+from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel
 from levels_app.serializer import RankInfoSerializer, RankingSerializer, RewardSerializer, TaskSerializer
 from user_app.models import User, UsersTasks
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -45,13 +45,13 @@ class UserDataSerializer(serializers.ModelSerializer):
 
 
     def get_click_multiplier(self, obj:UserData):
-        return MultiplierSerializer(obj.multiclick_level).data
+        return obj.multiclick_amount
 
     def get_passive_income(self, obj:UserData):
         return EnergySerializer(obj.passive_income_level).data
 
     def get_energy(self, obj:UserData):
-        return EnergySerializer(obj.max_energy_level).data
+        return obj.max_energy_amount
 
     def get_rank(self, obj: UserData):
         return RankingSerializer(obj.rank).data
@@ -97,13 +97,13 @@ class ClickSerializer(serializers.ModelSerializer):
     passive_income = serializers.SerializerMethodField()
 
     def get_click_multiplier(self, obj:UserData):
-        return MultiplierSerializer(obj.multiclick_level).data
+        return obj.multiclick_amount
 
     def get_passive_income(self, obj:UserData):
         return EnergySerializer(obj.passive_income_level).data
 
     def get_energy(self, obj:UserData):
-        return EnergySerializer(obj.max_energy_level).data
+        return obj.max_energy_amount
 
 
     class Meta:

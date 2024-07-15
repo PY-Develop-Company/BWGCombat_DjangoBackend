@@ -37,3 +37,7 @@ def check_if_link_is_telegram(link: Link):
         return index != -1
 
     return True
+
+
+def set_rewards_for_user_tasks(user_id: int, stage: int):
+    pass

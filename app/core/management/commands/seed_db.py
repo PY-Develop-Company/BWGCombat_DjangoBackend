@@ -1,9 +1,10 @@
 from django.core.management.base import BaseCommand
 from django.utils.timezone import now
-from levels_app.models import Rank, Task, Reward, MaxEnergyLevel, MulticlickLevel, PassiveIncomeLevel, SocialMedia, CompletedSocialTasks
+from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, PassiveIncomeLevel, SocialMedia, CompletedSocialTasks, StageTemplate
 from user_app.models import User, Language, UserData, CustomUserManager, Link
 from exchanger_app.models import Asset, ExchangePair
 import os
+from django.db import transaction
 
 
 class Command(BaseCommand):
@@ -17,7 +18,8 @@ class Command(BaseCommand):
         self.seed_lang()
         self.seed_rewards()
         self.seed_ranks()
-        self.seed_tasks()
+        self.seed_task_templates()
+        #self.seed_task_routes()
         self.seed_links()
         self.seed_users()
         self.seed_superuser()
@@ -47,8 +49,11 @@ class Command(BaseCommand):
             {"name": "Referral reached Rank 8", "amount": 0.125, "reward_type": Reward.RewardType.G_TOKEN},
             {"name": "Referral reached Rank 9", "amount": 0.25, "reward_type": Reward.RewardType.G_TOKEN},
             {"name": "Referral reached Rank 10", "amount": 0.5, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "Gold Reward", "amount": 1000, "reward_type": Reward.RewardType.GOLD},
-            {"name": "Multiplier Reward", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
+            {"name": "gold +1000", "amount": 1000, "reward_type": Reward.RewardType.GOLD},
+            {"name": "gold -1000", "amount": -1000, "reward_type": Reward.RewardType.GOLD},
+            {"name": "energy +50", "amount": 50, "reward_type": Reward.RewardType.ENERGY_BALANCE},
+            {"name": "multiclick +2", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
+            {"name": "multiclick +10", "amount": 10, "reward_type": Reward.RewardType.MULTIPLIER},
             # Add more rewards as needed
         ]
         for reward_data in rewards_data:
@@ -56,21 +61,95 @@ class Command(BaseCommand):
 
     def seed_ranks(self):
         ranks_data = [
-            {"name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10000, "inviter_reward": Reward.objects.get(name="Referral reached Rank 1")},
-            {"name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30000, "inviter_reward": Reward.objects.get(name="Referral reached Rank 2")},
+            {"id":1,"name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10000, "inviter_reward": Reward.objects.get(name="Referral reached Rank 1")},
+            {"id":2,"name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30000, "inviter_reward": Reward.objects.get(name="Referral reached Rank 2")},
             # Add more ranks as needed
         ]
         for rank_data in ranks_data:
             Rank.objects.update_or_create(name=rank_data['name'], defaults=rank_data)
 
-    def seed_tasks(self):
-        tasks_data = [
-            {"name": "Subscribe to Channel", "text": "Subscribe to our channel.", "task_type": Task.TaskType.ch_sub, "completion_number": 1, "is_initial": True},
-            {"name": "Invite 5 friends", "text": "Invite a friend to join.", "task_type": Task.TaskType.inv_fren, "completion_number": 5, "is_initial": False},
-            # Add more tasks as needed
+    @transaction.atomic
+    def seed_task_templates(self):
+        task_templates_data = [
+            {
+                "name": "Subscribe to Channel",
+                "text": "Subscribe to our channel.",
+                "task_type": TaskTemplate.TaskType.ch_sub,
+                "completion_number": 1,
+                "price": 0,
+                "rewards": [
+                    Reward.objects.get(name='energy +50', amount=50),
+                    Reward.objects.get(name='multiclick +2', amount=2)
+                ]
+            },
+            {
+                "name": "Invite 1 friends",
+                "text": "Invite a friend to join.",
+                "task_type": TaskTemplate.TaskType.inv_fren,
+                "completion_number": 1,
+                "price": 0,
+                "rewards": [
+                    Reward.objects.get(name='energy +50', amount=50),
+                    Reward.objects.get(name='multiclick +10', amount=10)
+                ]
+            },
+            {
+                "name": "chest_1000",
+                "text": "Buy chest and get chance to get extra gnome",
+                "task_type": TaskTemplate.TaskType.buy_chest,
+                "completion_number": 1,
+                "price": 1000,
+                "rewards": [
+                    Reward.objects.get(name='gold +1000', amount=1000),
+                    Reward.objects.get(name='gold -1000', amount=-1000)
+                ],  # Add reward instances if needed
+            },
+            # Add more task templates as needed
         ]
-        for task_data in tasks_data:
-            Task.objects.update_or_create(name=task_data['name'], defaults=task_data)
+
+        for task_template_data in task_templates_data:
+            rewards = task_template_data.pop("rewards", [])
+            task_template, created = TaskTemplate.objects.update_or_create(
+                name=task_template_data['name'],
+                defaults=task_template_data
+            )
+            if created or task_template.rewards.count() != len(rewards):
+                task_template.rewards.set(rewards)
+            task_template.save()
+
+    @transaction.atomic
+    def seed_task_routes(self):
+        task_routes_data = [
+            {
+                "coord_x": 0,
+                "coord_y": 0,
+                "template": "Subscribe to Channel",  # Reference to TaskTemplate name
+                "subtasks": [],  # Add references to other TaskRoutes if needed
+                "initial": True,
+            },
+            {
+                "coord_x": -1,
+                "coord_y": 0,
+                "template": "Invite 1 friends",  # Reference to TaskTemplate name
+                "subtasks": [],  # Add references to other TaskRoutes if needed
+                "initial": False,
+            },
+            # Add more task routes as needed
+        ]
+
+        for task_route_data in task_routes_data:
+            template_name = task_route_data.pop("template")
+            subtasks = task_route_data.pop("subtasks", [])
+            template = TaskTemplate.objects.filter(name=template_name).first()
+
+            task_route, created = TaskRoutes.objects.update_or_create(
+                coord_x=task_route_data['coord_x'],
+                coord_y=task_route_data['coord_y'],
+                defaults={"template": template, "initial": task_route_data['initial']}
+            )
+            if created or task_route.subtasks.count() != len(subtasks):
+                task_route.subtasks.set(subtasks)
+            task_route.save()
 
     def seed_energy_levels(self):
         energy_levels_data = [
@@ -101,7 +180,7 @@ class Command(BaseCommand):
 
     def seed_links(self):
         links = [
-            {"url": os.environ.get("TG_CHANNEL"), "task": Task.objects.get(name="Subscribe to Channel")}
+            {"url": os.environ.get("TG_CHANNEL"), "task": TaskTemplate.objects.get(name="Subscribe to Channel")}
         ]
         for data in links:
             Link.objects.update_or_create(url=data['url'], defaults=data)

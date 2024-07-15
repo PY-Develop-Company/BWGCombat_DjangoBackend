@@ -42,7 +42,7 @@ def get_user_info(request):
     user_id = request.query_params.get("userId")
     user_data = get_object_or_404(UserData, user_id=user_id)
     delta = now() - user_data.last_visited
-    user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.energy_level.amount - user_data.current_energy)
+    user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.max_energy_amount - user_data.current_energy)
     print(delta.total_seconds())
     income = round(user_data.passive_income_level.amount/3600 * delta.total_seconds())
     user_data.gold_balance += income
@@ -62,7 +62,7 @@ def add_coins_to_user(request):
     warning = request.data.get("warning")
 
     user_data = get_object_or_404(UserData, user_id=user_id)
-    user_data.add_gold_coins(total_clicks*user_data.multiclick_level.amount)
+    user_data.add_gold_coins(total_clicks*user_data.multiclick_amount)
     user_data.current_energy = curr_energy
     user_data.last_visited = now()
 
