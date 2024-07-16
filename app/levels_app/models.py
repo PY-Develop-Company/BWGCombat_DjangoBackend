@@ -14,8 +14,8 @@ class Rank(models.Model):
     )
     init_stage = models.ForeignKey('Stage', null=True, on_delete=models.SET_NULL)
 
-    init_energy = models.ForeignKey('MaxEnergyLevel', null = False, on_delete=models.SET_DEFAULT, default=1)
-    init_multiplier = models.ForeignKey('MulticlickLevel', null = False, on_delete=models.SET_DEFAULT, default=1)
+    init_energy = models.ForeignKey('MaxEnergyLevel', null=False, on_delete=models.SET_DEFAULT, default=1)
+    init_multiplier = models.ForeignKey('MulticlickLevel', null=False, on_delete=models.SET_DEFAULT, default=1)
     init_energy_regeneration = models.IntegerField(null=False, default=1)
 
     next_rank = models.ForeignKey('self', null = True, blank=True, on_delete=models.SET_NULL)
@@ -67,7 +67,7 @@ class Rank(models.Model):
     class Meta:
         verbose_name_plural = ('1_Rank model')
 
-# 
+
 class StageTemplate(models.Model):
     name = models.CharField(max_length=255, default='none')
     task_with_keys = models.ManyToManyField('TaskRoutes', blank=True)
@@ -79,7 +79,6 @@ class StageTemplate(models.Model):
 
     class Meta:
         verbose_name_plural = ('2.1_StageTemplate models')
-
 
 
 class Stage(models.Model):
@@ -106,6 +105,7 @@ class TaskTemplate(models.Model):
         buy_multicklick = "5", _("buy pickaxe")
         buy_chest = "6", _("buy chest")
         road = "7", _("buy road")
+
     name = models.CharField(max_length=255)
     text = models.TextField(null=True)
     task_type = models.CharField(choices=TaskType, default=TaskType.buy_chest)
@@ -135,9 +135,6 @@ class TaskRoutes(models.Model):
         verbose_name_plural = ('4_TaskRoutes model')
 
 
-    
-
-
 class Reward(models.Model):
     class RewardType(models.TextChoices):
         GOLD = "1", _("Add gold")
@@ -156,7 +153,7 @@ class Reward(models.Model):
     
     class Meta:
         verbose_name_plural = ('5_Reward model')
-    
+
 
 class MaxEnergyLevel(models.Model):
     name = models.CharField(max_length=255)
@@ -196,10 +193,11 @@ class PassiveIncomeLevel(models.Model):
     class Meta:
         verbose_name_plural = ('8_PassiveIncome model')
     
+
 class SocialMedia(models.Model):
-    name = models.CharField(max_length=64, null = False, blank=False)
-    link = models.CharField(max_length=1024, null=False, blank = False)
-    reward_amount = models.BigIntegerField(null = False, blank = False)
+    name = models.CharField(max_length=64, null=False, blank=False)
+    link = models.CharField(max_length=1024, null=False, blank=False)
+    reward_amount = models.BigIntegerField(null=False, blank=False)
     # maybe add imageField?
     is_partner = models.BooleanField(default=False)
 
@@ -209,11 +207,11 @@ class SocialMedia(models.Model):
     class Meta:
         verbose_name_plural = ('9.1_Out_Rank_Tasks model')
 
+
 class CompletedSocialTasks(models.Model):
     user = models.ForeignKey('user_app.User', null=False, on_delete=models.CASCADE)
     task = models.ForeignKey(SocialMedia, null=False, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = ('9.2_Completed_Out_Rank_Tasks model')
-
 

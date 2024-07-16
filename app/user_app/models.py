@@ -94,10 +94,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.is_admin
 
     def save(self, *args, **kwargs):
-        all_language_codes = Language.objects.values_list('lang_code', flat=True)
-        if 'en' not in all_language_codes:
-            english = Language.objects.create(lang_id=1, lang_code='en', lang_name='English')
-            english.save()
         super(User, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -131,14 +127,29 @@ class UserData(models.Model):
     def add_gold_coins(self, coins: int):
         self.gold_balance += int(coins)
 
-    def add_g_token_coins(self, coins: int):
-        self.g_token += int(coins)
+    def set_gold_coins(self, coins: int):
+        self.gold_balance = int(coins)
 
-    def set_g_token_coins(self, coins: int):
-        self.g_token = int(coins)
+    def remove_gold_coins(self, coins: int):
+        self.gold_balance -= int(coins)
 
-    def remove_g_token_coins(self, coins: int):
-        self.g_token -= int(coins)
+    def add_g_token_coins(self, coins: float):
+        if not isinstance(coins, float):
+            coins = float(coins)
+        self.g_token += coins
+        self.g_token = round(self.g_token, 12)
+
+    def set_g_token_coins(self, coins: float):
+        if not isinstance(coins, float):
+            coins = float(coins)
+        self.g_token = coins
+        self.g_token = round(self.g_token, 12)
+
+    def remove_g_token_coins(self, coins: float):
+        if not isinstance(coins, float):
+            coins = float(coins)
+        self.g_token -= coins
+        self.g_token = round(self.g_token, 12)
 
     def set_multiplier(self, multiplier: int):
         self.multiclick_amount = multiplier

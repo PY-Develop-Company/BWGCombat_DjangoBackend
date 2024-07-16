@@ -1,7 +1,10 @@
+import os
+
+from ads_app.models import Advert
 from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, PassiveIncomeLevel, SocialMedia, CompletedSocialTasks, StageTemplate
-from user_app.models import User, Language, UserData, CustomUserManager, Link
+from user_app.models import User, Language, UserData, CustomUserManager, Link, Fren
 from exchanger_app.models import Asset, ExchangePair
 import os
 from django.db import transaction
@@ -15,18 +18,27 @@ class Command(BaseCommand):
         self.seed_energy_levels()
         self.seed_multiplier_levels()
         self.seed_passive_income_levels()
+
         self.seed_lang()
+
         self.seed_rewards()
         self.seed_ranks()
         self.seed_task_templates()
         #self.seed_task_routes()
         self.seed_links()
+
         self.seed_users()
-        self.seed_superuser()
-        self.seed_assets()
-        self.seed_exchange_pairs()
+        self.seed_frens()
+
         self.seed_social_media()
         self.seed_completed_social_tasks()
+
+        self.seed_superuser()
+
+        self.seed_assets()
+        self.seed_exchange_pairs()
+        self.seed_ads()
+
         self.stdout.write('Data seeded successfully.')
 
     def seed_lang(self):
@@ -61,8 +73,26 @@ class Command(BaseCommand):
 
     def seed_ranks(self):
         ranks_data = [
-            {"id":1,"name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10000, "inviter_reward": Reward.objects.get(name="Referral reached Rank 1")},
-            {"id":2,"name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30000, "inviter_reward": Reward.objects.get(name="Referral reached Rank 2")},
+            {"id": 1, "name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 1")},
+            {"id": 2, "name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 2")},
+            {"id": 3, "name": "Rank 3", "description": "Intermediate rank", "gold_required": 60000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 3")},
+            {"id": 4, "name": "Rank 4", "description": "Intermediate rank", "gold_required": 90000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 4")},
+            {"id": 5, "name": "Rank 5", "description": "Intermediate rank", "gold_required": 120000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 5")},
+            {"id": 6, "name": "Rank 6", "description": "Intermediate rank", "gold_required": 150000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 6")},
+            {"id": 7, "name": "Rank 7", "description": "Intermediate rank", "gold_required": 180000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 7")},
+            {"id": 8, "name": "Rank 8", "description": "Intermediate rank", "gold_required": 210000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 8")},
+            {"id": 9, "name": "Rank 9", "description": "Intermediate rank", "gold_required": 240000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 9")},
+            {"id": 10, "name": "Rank 10", "description": "Last rank", "gold_required": 300000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 10")},
             # Add more ranks as needed
         ]
         for rank_data in ranks_data:
@@ -176,7 +206,8 @@ class Command(BaseCommand):
             # Add more passive income levels as needed
         ]
         for passive_income_level_data in passive_income_levels_data:
-            PassiveIncomeLevel.objects.update_or_create(name=passive_income_level_data['name'], defaults=passive_income_level_data)
+            PassiveIncomeLevel.objects.update_or_create(name=passive_income_level_data['name'],
+                                                        defaults=passive_income_level_data)
 
     def seed_links(self):
         links = [
@@ -187,25 +218,56 @@ class Command(BaseCommand):
 
     def seed_users(self):
         users = [
-            {'tg_id': 123568, 'tg_username': 'test_mister', 'firstname': 'mister', 'lastname': 'test', 'interface_lang': Language.objects.get(lang_code='en'), 'last_login': now()},
-            {'tg_id': 123456, 'tg_username': 'test_miss', 'firstname': 'miss', 'lastname': 'test', 'interface_lang': Language.objects.get(lang_code='en'), 'last_login': now()},
-            {'tg_id': 123457, 'tg_username': 'test_none', 'firstname': 'miss', 'lastname': 'test', 'interface_lang': Language.objects.get(lang_code='en'), 'last_login': now()},
+            {'tg_id': 123568, 'tg_username': 'test_mister', 'firstname': 'mister', 'lastname': 'test',
+             'interface_lang': Language.objects.get(lang_code='en'), 'last_login': now()},
+            {'tg_id': 123456, 'tg_username': 'test_miss', 'firstname': 'miss', 'lastname': 'test',
+             'interface_lang': Language.objects.get(lang_code='en'), 'last_login': now()},
+            {'tg_id': 123457, 'tg_username': 'test_none', 'firstname': 'miss', 'lastname': 'test',
+             'interface_lang': Language.objects.get(lang_code='en'), 'last_login': now()},
         ]
         for data in users:
             User.objects.update_or_create(tg_id=data['tg_id'], defaults=data)
 
+    def seed_frens(self):
+        frens = [
+            {'fren_tg': User.objects.get(tg_id=123456), 'inviter_tg': User.objects.get(tg_id=123568)},
+            {'fren_tg': User.objects.get(tg_id=123456), 'inviter_tg': User.objects.get(tg_id=123568)}
+        ]
+        for data in frens:
+            Fren.objects.update_or_create(defaults=data)
+
     def seed_user_data(self):
         user_data = [
-            {'user': User.objects.get(tg_id=123568), 'character_gender': 0, 'gold_balance': 0, 'g_token': 0, 'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"), 'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount, 'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration, 'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount, 'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount, 'passive_income_level': PassiveIncomeLevel.objects.get(name="Passive Income Level 1")},
-            {'user': User.objects.get(tg_id=123456), 'character_gender': 1, 'gold_balance': 0, 'g_token': 0, 'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"), 'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount, 'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration, 'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount, 'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount, 'passive_income_level': PassiveIncomeLevel.objects.get(name="Passive Income Level 1")},
-            {'user': User.objects.get(tg_id=123457), 'character_gender': None, 'gold_balance': 0, 'g_token': 0, 'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"), 'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount, 'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration, 'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount, 'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount, 'passive_income_level': PassiveIncomeLevel.objects.get(name="Passive Income Level 1")},
+            {'user': User.objects.get(tg_id=123568), 'character_gender': 0, 'gold_balance': 0, 'g_token': 0,
+             'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
+             'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
+             'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
+             'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'passive_income_level': PassiveIncomeLevel.objects.get(name="Passive Income Level 1")},
+            {'user': User.objects.get(tg_id=123456), 'character_gender': 1, 'gold_balance': 0, 'g_token': 0,
+             'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
+             'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
+             'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
+             'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'passive_income_level': PassiveIncomeLevel.objects.get(name="Passive Income Level 1")},
+            {'user': User.objects.get(tg_id=123457), 'character_gender': None, 'gold_balance': 0, 'g_token': 0,
+             'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
+             'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
+             'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
+             'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'passive_income_level': PassiveIncomeLevel.objects.get(name="Passive Income Level 1")},
         ]
         for data in user_data:
             UserData.objects.update_or_create(user=data['user'], defaults=data)
 
     def seed_superuser(self):
         if not User.objects.filter(is_superuser=True).exists():
-            User.objects.create_superuser(tg_id=os.environ.get("ADMIN_TG_ID"), tg_username=os.environ.get("ADMIN_USERNAME"), firstname='admin', lastname='admin', password=os.environ.get("ADMIN_PASSWORD"))
+            User.objects.create_superuser(tg_id=os.environ.get("ADMIN_TG_ID"),
+                                          tg_username=os.environ.get("ADMIN_USERNAME"), firstname='admin',
+                                          lastname='admin', password=os.environ.get("ADMIN_PASSWORD"))
 
     def seed_assets(self):
         assets = [
@@ -217,17 +279,19 @@ class Command(BaseCommand):
 
     def seed_exchange_pairs(self):
         pairs = [
-            {"id": 1, "asset_1_id": Asset.objects.get(id=1), "asset_2_id": Asset.objects.get(id=2), "rate": 100_000},
-            {"id": 2, "asset_1_id": Asset.objects.get(id=2), "asset_2_id": Asset.objects.get(id=1), "rate": 0.00001}
+            {"id": 1, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=2), "rate": 100_000},
+            {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1), "rate": 0.00001}
         ]
         for data in pairs:
-            Asset.objects.update_or_create(id=data['id'], defaults=data)
+            ExchangePair.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_social_media(self):
         social_medias = [
-            {"id": 1, "name": "Facebook", "link": "https://www.facebook.com", "reward_amount": 5000, "is_partner": True},
+            {"id": 1, "name": "Facebook", "link": "https://www.facebook.com", "reward_amount": 5000,
+             "is_partner": True},
             {"id": 2, "name": "Twitter", "link": "https://www.twitter.com", "reward_amount": 3000, "is_partner": False},
-            {"id": 3, "name": "Instagram", "link": "https://www.instagram.com", "reward_amount": 4000, "is_partner": True}
+            {"id": 3, "name": "Instagram", "link": "https://www.instagram.com", "reward_amount": 4000,
+             "is_partner": True}
         ]
         for data in social_medias:
             SocialMedia.objects.update_or_create(id=data['id'], defaults=data)
@@ -240,3 +304,11 @@ class Command(BaseCommand):
         ]
         for data in tasks:
             CompletedSocialTasks.objects.update_or_create(id=data['id'], defaults=data)
+
+    def seed_ads(self):
+        ads = [
+            {"id": 1, "name": "Azino 777", "description": "Vygravaytie 100000000000000000000 rubley",
+             "link": Link.objects.get(id=1), "image_path": "/azino777.jfif"}
+        ]
+        for data in ads:
+            Advert.objects.update_or_create(id=data['id'], defaults=data)

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Rank, TaskTemplate, TaskRoutes, Reward, SocialMedia
 from user_app.models import User, UsersTasks
 
+
 class SocialMediaTasksSerializer(serializers.ModelSerializer):
 
     amount = serializers.SerializerMethodField()
@@ -17,6 +18,7 @@ class SocialMediaTasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = SocialMedia
         fields = ('name', 'link', 'amount', 'is_completed')
+
 
 class RewardSerializer(serializers.ModelSerializer):
     reward_type = serializers.SerializerMethodField()
@@ -62,9 +64,8 @@ class TaskWithStatus(serializers.ModelSerializer):
         model = TaskTemplate
         fields = ['id', 'name', 'is_completed']
 
+
 class ClosedRankSerializer(serializers.ModelSerializer):
-
-
     class Meta:
         model = Rank
         fields = ('id', 'name', 'description', 'gold_required')
@@ -79,7 +80,7 @@ class RankInfoSerializer(serializers.ModelSerializer):
 
     def get_tasks(self, obj):
         tasks = []
-        initial_tasks = Task.objects.filter(rank=obj, initial=True).all()
+        initial_tasks = TaskTemplate.objects.filter(rank=obj, initial=True).all()
 
         for i in initial_tasks:
             current_task = i
