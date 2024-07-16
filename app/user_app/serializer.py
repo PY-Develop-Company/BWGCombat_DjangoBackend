@@ -36,7 +36,6 @@ class UserDataSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
     click_multiplier = serializers.SerializerMethodField()
     energy = serializers.SerializerMethodField()
-    passive_income = serializers.SerializerMethodField()
     is_picked_gender = serializers.SerializerMethodField()
     gender = serializers.SerializerMethodField()
     lang_code = serializers.SerializerMethodField()
@@ -46,9 +45,6 @@ class UserDataSerializer(serializers.ModelSerializer):
     def get_click_multiplier(self, obj:UserData):
         return obj.multiclick_amount
 
-    def get_passive_income(self, obj:UserData):
-        return EnergySerializer(obj.passive_income_level).data
-
     def get_energy(self, obj:UserData):
         return obj.max_energy_amount
 
@@ -56,7 +52,7 @@ class UserDataSerializer(serializers.ModelSerializer):
         return RankingSerializer(obj.rank).data
 
     def get_username(self, obj: UserData):
-        return User.objects.get(tg_id=obj.user_id.tg_id).tg_username
+        return User.objects.get(tg_id=obj.user.tg_id).tg_username
     
     def get_is_picked_gender(self, obj:UserData):
         return obj.character_gender is not None
@@ -65,7 +61,7 @@ class UserDataSerializer(serializers.ModelSerializer):
         return obj.character_gender
     
     def get_lang_code(self, obj: UserData):
-        return obj.user_id.interface_lang.lang_code
+        return obj.user.interface_lang.lang_code
     
 
 
@@ -86,7 +82,7 @@ class UserDataSerializer(serializers.ModelSerializer):
             "energy",
             "energy_regeneration",
             "current_energy",
-            "passive_income",
+            "gnome_amount",
         )
 
 class ClickSerializer(serializers.ModelSerializer):
@@ -99,8 +95,8 @@ class ClickSerializer(serializers.ModelSerializer):
         return obj.multiclick_amount
 
     def get_passive_income(self, obj:UserData):
-        return EnergySerializer(obj.passive_income_level).data
-
+        return obj.gnome_amount
+    
     def get_energy(self, obj:UserData):
         return obj.max_energy_amount
 

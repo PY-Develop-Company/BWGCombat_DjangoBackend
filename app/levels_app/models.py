@@ -143,6 +143,7 @@ class Reward(models.Model):
         ENERGY_BALANCE = "4", _("Replenish energy")
         PASSIVE_INCOME = "5", _("Improve passive income")
         KEY = '6', _('Key')
+        GNOME = '7', _('Gnome')
 
     name = models.CharField(max_length=200, unique=True)
     amount = models.FloatField()

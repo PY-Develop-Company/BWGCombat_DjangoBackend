@@ -36,9 +36,9 @@ def get_user_info(request):
     delta = now() - user_data.last_visited
     user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.max_energy_amount - user_data.current_energy)
     print(delta.total_seconds())
-    income = round(user_data.passive_income_level.amount/3600 * delta.total_seconds())
+    income = round(user_data.gnome_amount*100/3600 * delta.total_seconds())
     user_data.gold_balance += income
-    print(user_data.rank.get_all_tasks())
+    print(user_data.rank.get_all_tasks(user_data))
     user_data.save()
 
 

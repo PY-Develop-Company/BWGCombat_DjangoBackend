@@ -120,9 +120,10 @@ class UserData(models.Model):
     max_energy_amount = models.IntegerField(null=True, blank=True, default=100)
     current_energy = models.IntegerField(default=0)
 
-    passive_income_level = models.ForeignKey(PassiveIncomeLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level')
+    gnome_amount = models.IntegerField(default=0, null=True, blank=True)
 
     has_key = models.BooleanField(default=False)
+    blocked_until = models.DateTimeField(default=None, null=True, blank=True)
 
     def add_gold_coins(self, coins: int):
         self.gold_balance += int(coins)
@@ -208,7 +209,7 @@ class UserData(models.Model):
                 return "No such reward type"
 
     def __str__(self):
-        return f'{self.user_id.tg_id} {self.last_visited}'
+        return f'{self.user_id} {self.last_visited}'
 
 
 class UsersTasks(models.Model): 

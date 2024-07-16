@@ -62,11 +62,11 @@ def levels_home(request):
 @permission_classes([AllowAny])
 def go_to_next_rank(request):
     user_id = request.data.get("userId")
-    userdata = get_object_or_404(UserData, tg_id = user_id)
+    userdata = get_object_or_404(UserData, user_id = user_id)
 
     current_rank = userdata.rank
     try:
-        rank_to_go = Rank.objects.get(id=current_rank.id+1)
+        rank_to_go = current_rank.next_rank
     except Rank.DoesNotExist:
         return JsonResponse({"result": "no next rank exists"})
 
@@ -78,9 +78,9 @@ def go_to_next_rank(request):
         userdata.energy_regeneration = rank_to_go.init_energy_regeneration
         userdata.save()
 
-        return JsonResponse({"result": "ok"})
+        return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
     else:
-        return JsonResponse({"result": "using go_to_next_rank() method when user's gold is not enough"})
+        return JsonResponse({"result": "You don't have enough money to move on the next rank"}, status=status.HTTP_403_FORBIDDEN)
 
 
 @api_view(["POST"])
