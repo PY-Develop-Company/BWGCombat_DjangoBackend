@@ -41,8 +41,6 @@ def get_user_info(request):
     print(user_data.rank.get_all_tasks(user_data))
     user_data.save()
 
-
-
     serializer = UserDataSerializer(user_data)
     return Response({"info": serializer.data, 'passive_income': income}, status=status.HTTP_200_OK)
 

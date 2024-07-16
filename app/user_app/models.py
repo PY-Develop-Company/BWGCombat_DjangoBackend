@@ -171,7 +171,7 @@ class UserData(models.Model):
 
     def increase_passive_income_level(self, levels_to_increase: int):
         for __ in range(levels_to_increase):
-            self.passive_income = self.passive_income_level.next_level
+            self.passive_income = self.passive_income.next_level
 
     def is_referrals_quantity_exceeds(self, expected_quantity):
         user = User.objects.get(tg_id=self.user_id)
