@@ -4,7 +4,7 @@ from .models import UserData, UsersTasks, Fren
 
 
 class UserDataAdmin(admin.ModelAdmin):
-    list_display = ("user_id", "gold_balance", "g_token", "rank")
+    list_display = ("user", "gold_balance", "g_token", "rank")
     list_select_related = ("rank",)
 
 

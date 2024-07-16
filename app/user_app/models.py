@@ -109,7 +109,7 @@ class UserData(models.Model):
         MALE = 0, 'Male'
         FEMALE = 1, 'Female'
 
-    user_id = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     character_gender = models.IntegerField(null=True, blank=True, default=0, choices=Gender.choices)
 
     gold_balance = models.BigIntegerField(default=0)
@@ -210,7 +210,7 @@ class UsersTasks(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(TaskRoutes, on_delete=models.CASCADE)
-    reward = models.ForeignKey(Reward, on_delete=models.CASCADE)
+    rewards = models.ManyToManyField(Reward, blank=True)
     completion_time = models.DateTimeField(null=True, blank=True, default=None)
 
     status = models.CharField(null=False, blank=False, choices=Status, default=Status.UNAVAILABLE)
@@ -219,7 +219,7 @@ class UsersTasks(models.Model):
         unique_together = ('user', 'task')
 
     def __str__(self) -> str:
-        return self.user.tg_username + self.task.name
+        return self.user.tg_username + self.task.template.name
 
 
 class Fren(models.Model):
