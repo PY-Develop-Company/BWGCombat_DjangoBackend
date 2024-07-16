@@ -8,6 +8,8 @@ from django.shortcuts import get_object_or_404, redirect
 from levels_app.serializer import RankInfoSerializer, ClosedRankSerializer
 from rest_framework import status
 from .serializer import SocialMediaTasksSerializer
+from django.shortcuts import get_object_or_404
+from .utils import place_items
 
 
 def levels_home(request):
@@ -60,25 +62,25 @@ def levels_home(request):
 @permission_classes([AllowAny])
 def go_to_next_rank(request):
     user_id = request.data.get("userId")
-    userdata = UserData.objects.get(user_id=user_id)
+    userdata = get_object_or_404(UserData, user_id = user_id)
 
     current_rank = userdata.rank
     try:
-        rank_to_go = Rank.objects.get(id=current_rank.id+1)
+        rank_to_go = current_rank.next_rank
     except Rank.DoesNotExist:
         return JsonResponse({"result": "no next rank exists"})
 
     if userdata.gold_balance >= rank_to_go.gold_required:
-        give_reward_to_inviter(user_id)
-
+        place_items(userdata, rank_to_go)
         userdata.rank = rank_to_go
-        userdata.max_energy_amount = rank_to_go.init_energy.amount
-        userdata.multiclick_amount = rank_to_go.init_multiplier.amount
+        userdata.max_energy_amount = rank_to_go.init_energy
+        userdata.multiclick_amount = rank_to_go.init_multiplier
+        userdata.energy_regeneration = rank_to_go.init_energy_regeneration
         userdata.save()
 
-        return JsonResponse({"result": "ok"})
+        return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
     else:
-        return JsonResponse({"result": "using go_to_next_rank() method when user's gold is not enough"})
+        return JsonResponse({"result": "You don't have enough money to move on the next rank"}, status=status.HTTP_403_FORBIDDEN)
 
 
 @api_view(["POST"])

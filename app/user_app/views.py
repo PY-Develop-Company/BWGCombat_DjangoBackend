@@ -10,6 +10,9 @@ from django.utils.timezone import now
 
 from .models import User, UserData, Fren, Link, LinkClick, Language
 
+# from aiogram import Bot
+# from aiogram.utils.deep_linking import create_start_link
+from levels_app.models import Rank
 import json
 from .serializer import UserDataSerializer, RankInfoSerializer, ClickSerializer, ReferralsSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -33,10 +36,12 @@ def get_user_info(request):
     delta = now() - user_data.last_visited
     user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.max_energy_amount - user_data.current_energy)
     print(delta.total_seconds())
-    income = round(user_data.passive_income_level.amount/3600 * delta.total_seconds())
+    income = round(user_data.gnome_amount*100/3600 * delta.total_seconds())
     user_data.gold_balance += income
-
+    print(user_data.rank.get_all_tasks(user_data))
     user_data.save()
+
+
 
     serializer = UserDataSerializer(user_data)
     return Response({"info": serializer.data, 'passive_income': income}, status=status.HTTP_200_OK)

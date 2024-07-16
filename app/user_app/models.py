@@ -105,7 +105,7 @@ class UserData(models.Model):
         MALE = 0, 'Male'
         FEMALE = 1, 'Female'
 
-    user_id = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     character_gender = models.IntegerField(null=True, blank=True, default=0, choices=Gender.choices)
 
     gold_balance = models.BigIntegerField(default=0)
@@ -120,9 +120,10 @@ class UserData(models.Model):
     max_energy_amount = models.IntegerField(null=True, blank=True, default=100)
     current_energy = models.IntegerField(default=0)
 
-    passive_income_level = models.ForeignKey(PassiveIncomeLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level')
+    gnome_amount = models.IntegerField(default=0, null=True, blank=True)
 
     has_key = models.BooleanField(default=False)
+    blocked_until = models.DateTimeField(default=None, null=True, blank=True)
 
     def add_gold_coins(self, coins: int):
         self.gold_balance += int(coins)
@@ -208,7 +209,7 @@ class UserData(models.Model):
                 return "No such reward type"
 
     def __str__(self):
-        return f'{self.user_id.tg_id} {self.last_visited}'
+        return f'{self.user_id} {self.last_visited}'
 
 
 class UsersTasks(models.Model): 
@@ -221,7 +222,7 @@ class UsersTasks(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(TaskRoutes, on_delete=models.CASCADE)
-    reward = models.ForeignKey(Reward, on_delete=models.CASCADE)
+    rewards = models.ManyToManyField(Reward, blank=True)
     completion_time = models.DateTimeField(null=True, blank=True, default=None)
 
     status = models.CharField(null=False, blank=False, choices=Status, default=Status.UNAVAILABLE)
@@ -230,7 +231,7 @@ class UsersTasks(models.Model):
         unique_together = ('user', 'task')
 
     def __str__(self) -> str:
-        return self.user.tg_username + self.task.name
+        return self.user.tg_username + self.task.template.name
 
 
 class Fren(models.Model):

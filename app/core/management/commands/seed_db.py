@@ -66,6 +66,9 @@ class Command(BaseCommand):
             {"name": "energy +50", "amount": 50, "reward_type": Reward.RewardType.ENERGY_BALANCE},
             {"name": "multiclick +2", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
             {"name": "multiclick +10", "amount": 10, "reward_type": Reward.RewardType.MULTIPLIER},
+            {"name": "KEY", "amount": 1, "reward_type": Reward.RewardType.KEY},
+            {"name": "Gnome", "amount": 1, "reward_type": Reward.RewardType.GNOME},
+            
             # Add more rewards as needed
         ]
         for reward_data in rewards_data:

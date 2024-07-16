@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Rank(models.Model):
+
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=1023, default='No description')
@@ -17,16 +18,64 @@ class Rank(models.Model):
     init_multiplier = models.ForeignKey('MulticlickLevel', null=False, on_delete=models.SET_DEFAULT, default=1)
     init_energy_regeneration = models.IntegerField(null=False, default=1)
 
+    next_rank = models.ForeignKey('self', null = True, blank=True, on_delete=models.SET_NULL)
+
     def __str__(self) -> str:
         return f"{self.name}"
     
+    def get_all_tasks(self, user_data:int):
+        from user_app.models import UsersTasks
+
+        stages = self.get_all_stages()
+        tasks = TaskRoutes.objects.filter(stage__in=stages)\
+        .exclude(id__in=UsersTasks.objects.filter(user=user_data.user).values_list('task_id', flat=True)).distinct()
+
+        return tasks
+    
+
+    def get_all_chests(self, user_data):
+        from user_app.models import UsersTasks
+
+        stages = self.get_all_stages()
+        tasks = TaskRoutes.objects.filter(stage__in=stages, template=TaskTemplate.objects.get(task_type=TaskTemplate.TaskType.buy_chest))\
+        .exclude(id__in=UsersTasks.objects.filter(user=user_data.user).values_list('task_id', flat=True)).distinct()
+
+        return tasks
+    
+    def get_not_chest_tasks(self, user_data):
+        from user_app.models import UsersTasks
+
+
+        stages = self.get_all_stages()
+        tasks = TaskRoutes.objects.filter(stage__in=stages).exclude(template__task_type=TaskTemplate.TaskType.buy_chest)\
+        .exclude(id__in=UsersTasks.objects.filter(user=user_data.user).values_list('task_id', flat=True)).distinct()
+
+        return tasks
+
+
+
+    def get_all_stages(self):
+        stages = []
+        curr_stage = self.init_stage
+
+        while curr_stage:
+            stages.append(curr_stage)   
+            curr_stage = curr_stage.next_stage
+        return stages
+    
+
     class Meta:
         verbose_name_plural = ('1_Rank model')
 
 
 class StageTemplate(models.Model):
-    task_with_keys = models.ManyToManyField('TaskRoutes')
+    name = models.CharField(max_length=255, default='none')
+    task_with_keys = models.ManyToManyField('TaskRoutes', blank=True)
     keys_amount = models.IntegerField(default=1)
+
+
+    def __str__(self) -> str:
+        return self.name
 
     class Meta:
         verbose_name_plural = ('2.1_StageTemplate models')
@@ -37,6 +86,7 @@ class Stage(models.Model):
     next_stage = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
     initial_task = models.ForeignKey('TaskRoutes', null=True, on_delete=models.SET_NULL, related_name='ini_task')
     tasks = models.ManyToManyField('TaskRoutes', related_name='stage')
+    stage_template = models.ForeignKey('StageTemplate', null=True, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:
         return f'{self.name} -> {self.next_stage}'
@@ -78,7 +128,7 @@ class TaskRoutes(models.Model):
     initial = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return f'{self.template.name} + ({self.coord_x},{self.coord_y})'
+        return f'{self.template} + ({self.coord_x},{self.coord_y})'
 
 
     class Meta:
@@ -92,8 +142,10 @@ class Reward(models.Model):
         G_TOKEN = "3", _("Add G token")
         ENERGY_BALANCE = "4", _("Replenish energy")
         PASSIVE_INCOME = "5", _("Improve passive income")
+        KEY = '6', _('Key')
+        GNOME = '7', _('Gnome')
 
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     amount = models.FloatField()
     reward_type = models.CharField(null=True, choices=RewardType, default=RewardType.GOLD)
 
