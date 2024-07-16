@@ -1,11 +1,15 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from rest_framework import status
+
+from .serilizer import SwapSerializer, TransferSerializer
+from .utils import is_exchange_pair_exists, is_asset_exists, is_sufficient
+
 from .models import Swap, Transfer, Asset
 from user_app.models import UserData, User
-from rest_framework import status
+
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
-from .utils import is_exchange_pair_exists, is_asset_exists, is_sufficient
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -113,3 +117,23 @@ def execute_transfer(request):
     receiver_data.save()
 
     return JsonResponse({"result": "ok"})
+
+
+@api_view(["GET"])
+def get_all_transactions(request):
+    user_id = request.data.get('userId')
+    if not user_id:
+        return JsonResponse({"error": "user_id is required"}, status=400)
+
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User does not exist"}, status=404)
+
+    swaps = Swap.objects.filter(user=user)
+    swap_data = SwapSerializer(swaps, many=True).data
+
+    transfers = Transfer.objects.filter(user_1=user) | Transfer.objects.filter(user_2=user)
+    transfer_data = TransferSerializer(transfers, many=True).data
+
+    return JsonResponse({"swaps": swap_data, 'transfers': transfer_data})
