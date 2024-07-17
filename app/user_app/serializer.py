@@ -42,7 +42,7 @@ class UserDataSerializer(serializers.ModelSerializer):
 
 
 
-    def get_click_multiplier(self, obj:UserData):
+    def get_click_multiplier(self, obj: UserData):
         return obj.multiclick_amount
 
     def get_energy(self, obj:UserData):
@@ -53,17 +53,15 @@ class UserDataSerializer(serializers.ModelSerializer):
 
     def get_username(self, obj: UserData):
         return User.objects.get(tg_id=obj.user.tg_id).tg_username
-    
+
     def get_is_picked_gender(self, obj:UserData):
         return obj.character_gender is not None
-    
+
     def get_gender(self, obj: UserData):
         return obj.character_gender
-    
+
     def get_lang_code(self, obj: UserData):
         return obj.user.interface_lang.lang_code
-    
-
 
     class Meta:
         model = UserData
@@ -71,7 +69,6 @@ class UserDataSerializer(serializers.ModelSerializer):
             "user_id",
             "is_picked_gender",
             "gender",
-            "lang_code",
             "username",
             "gold_balance",
             "g_token",
@@ -83,7 +80,13 @@ class UserDataSerializer(serializers.ModelSerializer):
             "energy_regeneration",
             "current_energy",
             "gnome_amount",
+            "lang_code",
+            "visual_effects",
+            "general_volume",
+            "effects_volume",
+            "music_volume"
         )
+
 
 class ClickSerializer(serializers.ModelSerializer):
 
@@ -123,7 +126,7 @@ class ReferralsSerializer(serializers.ModelSerializer):
         return obj.user_id.tg_username
     
     def get_passive_income(self, obj:UserData):
-        return obj.passive_income_level.amount
+        return obj.passive_income.amount
         
     
     class Meta:

@@ -120,8 +120,13 @@ class UserData(models.Model):
     energy_regeneration = models.IntegerField(default=1)
     max_energy_amount = models.IntegerField(null=True, blank=True, default=100)
     current_energy = models.IntegerField(default=0)
-
     gnome_amount = models.IntegerField(default=0, null=True, blank=True)
+
+    # language = models.ForeignKey(Language, to_field='lang_code', null=True, on_delete=models.SET_DEFAULT, default='en')
+    visual_effects = models.BooleanField(default=True)
+    general_volume = models.PositiveSmallIntegerField(default=50)
+    effects_volume = models.PositiveSmallIntegerField(default=50)
+    music_volume = models.PositiveSmallIntegerField(default=50)
 
     has_key = models.BooleanField(default=False)
     blocked_until = models.DateTimeField(default=None, null=True, blank=True)
@@ -156,7 +161,6 @@ class UserData(models.Model):
     def set_multiplier(self, multiplier: int):
         self.multiclick_amount = multiplier
 
-
     def add_multiplier(self, multiplier: int):
         self.multiclick_amount += multiplier
 
@@ -182,6 +186,7 @@ class UserData(models.Model):
         return True if refs_quantity >= expected_quantity else False
 
     def check_channel_subscription(self, link):
+        # покамість
         pass
 
     def check_link_click(self, link):
@@ -232,7 +237,6 @@ class UsersTasks(models.Model):
         IN_PROGRESS = "1", _("In progress")
         COMPLETED = "2", _("Completed")
         EXPIRED = "3", _("Expired")
-
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(TaskRoutes, on_delete=models.CASCADE)
