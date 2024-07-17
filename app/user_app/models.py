@@ -115,6 +115,7 @@ class UserData(models.Model):
     last_visited = models.DateTimeField(default=now)
 
     rank = models.ForeignKey(Rank, null=True, on_delete=models.SET_NULL, default=1)
+    current_stage = models.ForeignKey(Stage, null = True, default=1, on_delete=models.SET_NULL)
 
     multiclick_amount = models.IntegerField(null=True, blank=True, default=2)
     energy_regeneration = models.IntegerField(default=1)
@@ -129,7 +130,7 @@ class UserData(models.Model):
     music_volume = models.PositiveSmallIntegerField(default=50)
 
     has_key = models.BooleanField(default=False)
-    blocked_until = models.DateTimeField(default=None, null=True, blank=True)
+    blocked_until = models.DateTimeField(default = now)
 
     def add_gold_coins(self, coins: int):
         self.gold_balance += int(coins)

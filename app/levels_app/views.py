@@ -5,11 +5,12 @@ from .models import Reward, Rank, SocialMedia, CompletedSocialTasks
 from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoutes
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
-from levels_app.serializer import RankInfoSerializer, ClosedRankSerializer
+from levels_app.serializer import RankInfoSerializer, StageSerializer
 from rest_framework import status
 from .serializer import SocialMediaTasksSerializer
 from django.shortcuts import get_object_or_404
 from .utils import place_items
+from django.utils.timezone import now
 
 
 def levels_home(request):
@@ -23,12 +24,19 @@ def check_task_completion(request):
     task = UsersTasks.objects.get(id=task_id)
     userdata = UserData.objects.get(user_id=task.user.tg_id)
 
+    if task.status != UsersTasks.Status.IN_PROGRESS:
+        return JsonResponse({"message":"Can't complete these task"}, status=status.HTTP_403_FORBIDDEN)
+
+    if task.status == UsersTasks.Status.COMPLETED:
+        return JsonResponse({"message":"Task already done"}, status=status.HTTP_200_OK)
+
+    if userdata.blocked_until>now():
+        return JsonResponse({"message":"You can't buy tasks while prisoning"}, status=status.HTTP_403_FORBIDDEN)
 
     if task.task.template.price > userdata.gold_balance:
-        return JsonResponse({'message':'You don\'t have enough money'}, status=status.HTTP_403_FORBIDDEN)
+        return JsonResponse({"message":"You don't have enough money"}, status=status.HTTP_403_FORBIDDEN)
 
     done = False
-    print(userdata)
 
     match task.task.template.task_type:
         case 1:
@@ -48,13 +56,11 @@ def check_task_completion(request):
         rewards = task.rewards.all()
         for reward in rewards:
             userdata.receive_reward(reward)
-            print(reward.__repr__())
-            print(reward.reward_type)
         userdata.save()
         task.save()
-        return JsonResponse({'message':'success'})
+        return JsonResponse({"message":"success"})
     else:
-        return JsonResponse({"message":'You haven\'t completed the task or no checking for this task exists yet'})
+        return JsonResponse({"message":"You haven't completed the task or no checking for this task exists yet"})
 
 
 @api_view(["POST"])
@@ -91,8 +97,8 @@ def get_rank_info(request):
     user_data = get_object_or_404(UserData, user_id=user_id)
     rank_info = get_object_or_404(Rank, id=rank_id)
     if user_data.rank_id == rank_id:
-        serializer = RankInfoSerializer(rank_info, context={'user_id': user_data.user_id_id})
-        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+        serializer = RankInfoSerializer(rank_info, context={'user_data': user_data}).data
+        return JsonResponse(serializer, status=status.HTTP_200_OK)
     else:
         return JsonResponse(ClosedRankSerializer(rank_info).data, status=status.HTTP_200_OK)
     
@@ -100,10 +106,12 @@ def get_rank_info(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
-def buy_task(request):
+def get_stage_tasks_with_routes(request):
     user_id = request.data.get('userId')
-    task_id = request.data.get('taskId')
-
+    
+    user_data = get_object_or_404(UserData, user_id=user_id)
+    serializer = StageSerializer(user_data.current_stage, context={'user_data': user_data}).data
+    return JsonResponse(serializer, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])

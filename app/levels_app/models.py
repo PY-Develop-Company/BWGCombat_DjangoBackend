@@ -98,6 +98,15 @@ class Stage(models.Model):
         empty_chests = chest_tasks.exclude(id__in=UsersTasks.objects.filter(user=user_data.user).values_list('task_id', flat=True))
         
         return empty_chests
+    
+    def get_not_chest_tasks(self, user_data):
+        from user_app.models import UsersTasks
+        
+        not_chest = self.tasks.exclude(template__task_type=TaskTemplate.TaskType.buy_chest)
+        empty_chests = not_chest.exclude(id__in=UsersTasks.objects.filter(user=user_data.user).values_list('task_id', flat=True))
+
+        return empty_chests
+        
 
     class Meta:
         verbose_name_plural = ('2.2_Stage model')
@@ -132,8 +141,12 @@ class TaskRoutes(models.Model):
     coord_x = models.IntegerField(default=0, null=False)
     coord_y = models.IntegerField(default=0, null=False)
     template = models.ForeignKey(TaskTemplate, blank=False, on_delete=models.CASCADE)
-    parent = models.ForeignKey('self', blank=True, on_delete=models.SET_NULL, null=True)
+    parent = models.ForeignKey('self', blank=True, on_delete=models.SET_NULL, null=True, related_name='subtasks')
     initial = models.BooleanField(default=False)
+
+    def get_subtasks(self):
+        subtasks = TaskRoutes.objects.filter(parent=self)
+        return subtasks
 
     def __str__(self) -> str:
         return f'{self.template} + ({self.coord_x},{self.coord_y})'

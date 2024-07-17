@@ -3,7 +3,7 @@ import os
 from ads_app.models import Advert
 from django.core.management.base import BaseCommand
 from django.utils.timezone import now
-from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, PassiveIncomeLevel, SocialMedia, CompletedSocialTasks, StageTemplate
+from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, PassiveIncomeLevel, SocialMedia, CompletedSocialTasks, StageTemplate, Stage
 from user_app.models import User, Language, UserData, CustomUserManager, Link, Fren
 from exchanger_app.models import Asset, ExchangePair
 import os
@@ -12,6 +12,8 @@ from django.db import transaction
 
 class Command(BaseCommand):
     help = 'Seed database with initial data'
+    
+    tasks_1_stage = []
 
     def handle(self, *args, **kwargs):
         self.stdout.write('Seeding data...')
@@ -21,11 +23,19 @@ class Command(BaseCommand):
 
         self.seed_lang()
 
+
         self.seed_rewards()
-        self.seed_ranks()
+
+
         self.seed_task_templates()
-        #self.seed_task_routes()
+        self.seed_task_routes()
         self.seed_links()
+
+        self.seed_stage_templates()
+        self.seed_stage()
+
+
+        self.seed_ranks()
 
         self.seed_users()
         self.seed_frens()
@@ -38,6 +48,7 @@ class Command(BaseCommand):
         self.seed_assets()
         self.seed_exchange_pairs()
         self.seed_ads()
+
 
         self.stdout.write('Data seeded successfully.')
 
@@ -78,7 +89,7 @@ class Command(BaseCommand):
     def seed_ranks(self):
         ranks_data = [
             {"id": 1, "name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10000,
-             "inviter_reward": Reward.objects.get(name="Referral reached Rank 1")},
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 1"), 'init_stage_id':1},
             {"id": 2, "name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30000,
              "inviter_reward": Reward.objects.get(name="Referral reached Rank 2")},
             {"id": 3, "name": "Rank 3", "description": "Intermediate rank", "gold_required": 60000,
@@ -101,6 +112,25 @@ class Command(BaseCommand):
         ]
         for rank_data in ranks_data:
             Rank.objects.update_or_create(name=rank_data['name'], defaults=rank_data)
+
+    def seed_stage_templates(self):
+        stage_temp_data = [
+            {"id": 1, "name": "1_stage_1_rank_tmp", "keys_amount": 0, "jail_amount":0},
+        ]
+        for rank_data in stage_temp_data:
+            StageTemplate.objects.update_or_create(id=rank_data['id'], defaults=rank_data)
+
+    def seed_stage(self):
+        stage_data = [
+            {"id": 1, "name": "1_stage_1_rank", "initial_task_id":1, "tasks":[1,2], "stage_template_id":1},
+        ]
+        for stage_data in stage_data:
+            st,_ = Stage.objects.update_or_create(id=stage_data['id'], defaults={"name":stage_data['name'], "initial_task_id":stage_data['initial_task_id'], "stage_template_id":stage_data['stage_template_id']})
+            st.tasks.add(*stage_data['tasks'])
+            st.save()
+
+
+
 
     @transaction.atomic
     def seed_task_templates(self):
@@ -167,6 +197,8 @@ class Command(BaseCommand):
         ]
 
         for task_template_data in task_templates_data:
+            if task_template_data["id"] in [1,2]:
+                self.tasks_1_stage.append(task_template_data)
             rewards = task_template_data.pop("rewards", [])
             task_template, created = TaskTemplate.objects.update_or_create(
                 name=task_template_data['name'],
@@ -176,6 +208,7 @@ class Command(BaseCommand):
                 task_template.rewards.set(rewards)
             task_template.save()
 
+
     @transaction.atomic
     def seed_task_routes(self):
         task_routes_data = [
@@ -183,28 +216,26 @@ class Command(BaseCommand):
                 "id":1,
                 "coord_x": 0,
                 "coord_y": 0,
-                "template": TaskTemplate.objects.get(id = 1),  # Reference to TaskTemplate name
+                "template_id": 1,
+                "parent":None,
                 "initial": True,
             },
             {
                 "id":2,
                 "coord_x": 0,
                 "coord_y": -1,
-                "template": TaskTemplate.objects.get(name='Subscribe to Channel'),  # Reference to TaskTemplate name
-                "parent": None, # Reference to TaskTemplate
+                "template_id": 2,  
+                "parent_id": 1,
                 "initial": False,
             },
-            # Add more task routes as needed
         ]
     
         for task_route_data in task_routes_data:
             task_route, created = TaskRoutes.objects.update_or_create(
                 id = task_route_data['id'],
-                parent = TaskRoutes.objects.get(id=1),
                 defaults=task_route_data
             )
             task_route.save()
-        pass
 
     def seed_energy_levels(self):
         energy_levels_data = [
