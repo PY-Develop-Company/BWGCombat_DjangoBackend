@@ -14,5 +14,5 @@ def add_user_data_record(sender, instance, created, **kwargs):
                                             max_energy_amount=initial_rank.init_energy.amount,
                                             multiclick_amount=initial_rank.init_multiplier.amount)
         user_data.save()
-        place_items(user_data, user_data.rank)
+        # place_items(user_data, user_data.rank)
         return user_data

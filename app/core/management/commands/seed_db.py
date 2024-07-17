@@ -68,6 +68,7 @@ class Command(BaseCommand):
             {"name": "multiclick +10", "amount": 10, "reward_type": Reward.RewardType.MULTIPLIER},
             {"name": "KEY", "amount": 1, "reward_type": Reward.RewardType.KEY},
             {"name": "Gnome", "amount": 1, "reward_type": Reward.RewardType.GNOME},
+            {"name": "Jail", "amount": 12, "reward_type": Reward.RewardType.GNOME},
             
             # Add more rewards as needed
         ]
@@ -105,6 +106,7 @@ class Command(BaseCommand):
     def seed_task_templates(self):
         task_templates_data = [
             {
+                "id":1,
                 "name": "Subscribe to Channel",
                 "text": "Subscribe to our channel.",
                 "task_type": TaskTemplate.TaskType.ch_sub,
@@ -116,6 +118,7 @@ class Command(BaseCommand):
                 ]
             },
             {
+                "id":2,
                 "name": "Invite 1 friends",
                 "text": "Invite a friend to join.",
                 "task_type": TaskTemplate.TaskType.inv_fren,
@@ -127,6 +130,7 @@ class Command(BaseCommand):
                 ]
             },
             {
+                "id":3,
                 "name": "chest_1000",
                 "text": "Buy chest and get chance to get extra gnome",
                 "task_type": TaskTemplate.TaskType.buy_chest,
@@ -135,6 +139,28 @@ class Command(BaseCommand):
                 "rewards": [
                     Reward.objects.get(name='gold +1000', amount=1000),
                     Reward.objects.get(name='gold -1000', amount=-1000)
+                ],  # Add reward instances if needed
+            },
+            {
+                "id":4,
+                "name": "Upgrade pickaxe",
+                "text": "Earn more gold with 1 click",
+                "task_type": TaskTemplate.TaskType.buy_multicklick,
+                "completion_number": 0,
+                "price": 2000,
+                "rewards": [
+                    Reward.objects.get(name='multiclick +2', amount=2)
+                ],  # Add reward instances if needed
+            },
+            {
+                "id":5,
+                "name": "Upgrade energy",
+                "text": "Buy more energy",
+                "task_type": TaskTemplate.TaskType.buy_energy,
+                "completion_number": 0,
+                "price": 2000,
+                "rewards": [
+                    Reward.objects.get(name='energy +50', amount=50),
                 ],  # Add reward instances if needed
             },
             # Add more task templates as needed
@@ -154,35 +180,31 @@ class Command(BaseCommand):
     def seed_task_routes(self):
         task_routes_data = [
             {
+                "id":1,
                 "coord_x": 0,
                 "coord_y": 0,
-                "template": "Subscribe to Channel",  # Reference to TaskTemplate name
-                "subtasks": [],  # Add references to other TaskRoutes if needed
+                "template": TaskTemplate.objects.get(id = 1),  # Reference to TaskTemplate name
                 "initial": True,
             },
             {
-                "coord_x": -1,
-                "coord_y": 0,
-                "template": "Invite 1 friends",  # Reference to TaskTemplate name
-                "subtasks": [],  # Add references to other TaskRoutes if needed
+                "id":2,
+                "coord_x": 0,
+                "coord_y": -1,
+                "template": TaskTemplate.objects.get(name='Subscribe to Channel'),  # Reference to TaskTemplate name
+                "parent": None, # Reference to TaskTemplate
                 "initial": False,
             },
             # Add more task routes as needed
         ]
-
+    
         for task_route_data in task_routes_data:
-            template_name = task_route_data.pop("template")
-            subtasks = task_route_data.pop("subtasks", [])
-            template = TaskTemplate.objects.filter(name=template_name).first()
-
             task_route, created = TaskRoutes.objects.update_or_create(
-                coord_x=task_route_data['coord_x'],
-                coord_y=task_route_data['coord_y'],
-                defaults={"template": template, "initial": task_route_data['initial']}
+                id = task_route_data['id'],
+                parent = TaskRoutes.objects.get(id=1),
+                defaults=task_route_data
             )
-            if created or task_route.subtasks.count() != len(subtasks):
-                task_route.subtasks.set(subtasks)
             task_route.save()
+        pass
 
     def seed_energy_levels(self):
         energy_levels_data = [

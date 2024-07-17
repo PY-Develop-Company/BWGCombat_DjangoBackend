@@ -8,4 +8,5 @@ urlpatterns = [
     path('get_rank_info/', views.get_rank_info, name='rank_information'),
     path('social_tasks/', views.get_social_media_tasks, name='get_social_media_tasks'),
     path('partner_tasks/', views.get_partner_tasks, name='get_social_media_tasks'),
+    path('check_task/', views.check_task_completion, name='check_task_state'),
 ]
