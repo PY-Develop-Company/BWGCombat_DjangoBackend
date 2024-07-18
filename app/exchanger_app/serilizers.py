@@ -8,6 +8,7 @@ class SwapSerializer(serializers.ModelSerializer):
         model = Swap
         fields = "__all__"
 
+
 class TransferSerializer(serializers.ModelSerializer):
 
     class Meta:
