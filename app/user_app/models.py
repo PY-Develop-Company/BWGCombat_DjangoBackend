@@ -251,6 +251,10 @@ class UsersTasks(models.Model):
 
     def __str__(self) -> str:
         return f"{self.id} {self.user.tg_username} {self.task.template.name}"
+    
+    def get_user_subtasks(self, user):
+        sub = self.task.subtasks.values_list('id', flat=True)
+        return UsersTasks.objects.filter(task__in=sub, user=user)
 
 
 class Fren(models.Model):

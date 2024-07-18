@@ -53,7 +53,6 @@ def place_key(user_data: UserData, stage: Stage):
 
 
 
-
 def place_rewards_for_chests(user_data, chests:list[TaskRoutes]):
     for chest in chests:
         available_rewards = list(chest.template.rewards.exclude(Q(name='Key') | Q(name='Jail')))
@@ -84,8 +83,10 @@ def place_items(user_data: UserData, rank:Rank):
     for stage in stages:
         place_key(user_data, stage)
         place_jail(user_data, stage)
-
     place_rewards_for_chests(user_data, rank.get_empty_chests(user_data))
     place_another_tasks(user_data, rank.get_not_chest_tasks(user_data))
+    ts = UsersTasks.objects.get(user=user_data.user, task=rank.init_stage.initial_task)
+    ts.status = UsersTasks.Status.IN_PROGRESS
+    ts.save()
     
     

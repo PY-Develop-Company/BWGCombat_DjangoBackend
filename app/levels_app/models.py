@@ -145,8 +145,7 @@ class TaskRoutes(models.Model):
     initial = models.BooleanField(default=False)
 
     def get_subtasks(self):
-        subtasks = TaskRoutes.objects.filter(parent=self)
-        return subtasks
+        return self.subtasks.all()
 
     def __str__(self) -> str:
         return f'{self.template} + ({self.coord_x},{self.coord_y})'

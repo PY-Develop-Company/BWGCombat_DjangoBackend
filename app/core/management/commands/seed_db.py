@@ -62,25 +62,24 @@ class Command(BaseCommand):
 
     def seed_rewards(self):
         rewards_data = [
-            {"name": "Referral reached Rank 1", "amount": 0.0009765625, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "Referral reached Rank 2", "amount": 0.001953125, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "Referral reached Rank 3", "amount": 0.00390625, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "Referral reached Rank 4", "amount": 0.0078125, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "Referral reached Rank 5", "amount": 0.015625, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "Referral reached Rank 6", "amount": 0.03125, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "Referral reached Rank 7", "amount": 0.0625, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "Referral reached Rank 8", "amount": 0.125, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "Referral reached Rank 9", "amount": 0.25, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "Referral reached Rank 10", "amount": 0.5, "reward_type": Reward.RewardType.G_TOKEN},
-            {"name": "gold +1000", "amount": 1000, "reward_type": Reward.RewardType.GOLD},
-            {"name": "gold -1000", "amount": -1000, "reward_type": Reward.RewardType.GOLD},
-            {"name": "energy +50", "amount": 50, "reward_type": Reward.RewardType.ENERGY_BALANCE},
-            {"name": "multiclick +2", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
-            {"name": "multiclick +10", "amount": 10, "reward_type": Reward.RewardType.MULTIPLIER},
-            {"name": "KEY", "amount": 1, "reward_type": Reward.RewardType.KEY},
-            {"name": "Gnome", "amount": 1, "reward_type": Reward.RewardType.GNOME},
-            {"name": "Jail", "amount": 12, "reward_type": Reward.RewardType.GNOME},
-            
+            {"id":1, "name": "KEY", "amount": 1, "reward_type": Reward.RewardType.KEY},
+            {"id":2, "name": "Gnome", "amount": 1, "reward_type": Reward.RewardType.GNOME},
+            {"id":3, "name": "Jail", "amount": 12, "reward_type": Reward.RewardType.GNOME},
+            {"id":4, "name": "Referral reached Rank 1", "amount": 0.0009765625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id":5, "name": "Referral reached Rank 2", "amount": 0.001953125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id":6, "name": "Referral reached Rank 3", "amount": 0.00390625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id":7, "name": "Referral reached Rank 4", "amount": 0.0078125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id":8, "name": "Referral reached Rank 5", "amount": 0.015625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id":9, "name": "Referral reached Rank 6", "amount": 0.03125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id":10, "name": "Referral reached Rank 7", "amount": 0.0625, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id":11, "name": "Referral reached Rank 8", "amount": 0.125, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id":12, "name": "Referral reached Rank 9", "amount": 0.25, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id":13, "name": "Referral reached Rank 10", "amount": 0.5, "reward_type": Reward.RewardType.G_TOKEN},
+            {"id":14, "name": "gold +1000", "amount": 1000, "reward_type": Reward.RewardType.GOLD},
+            {"id":15, "name": "gold -1000", "amount": -1000, "reward_type": Reward.RewardType.GOLD},
+            {"id":16, "name": "energy +50", "amount": 50, "reward_type": Reward.RewardType.ENERGY_BALANCE},
+            {"id":17, "name": "multiclick +2", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
+            {"id":18, "name": "multiclick +10", "amount": 10, "reward_type": Reward.RewardType.MULTIPLIER},
             # Add more rewards as needed
         ]
         for reward_data in rewards_data:
@@ -89,9 +88,9 @@ class Command(BaseCommand):
     def seed_ranks(self):
         ranks_data = [
             {"id": 1, "name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10000,
-             "inviter_reward": Reward.objects.get(name="Referral reached Rank 1"), 'init_stage_id':1},
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 1"), 'init_stage_id':1, 'next_rank_id':2},
             {"id": 2, "name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30000,
-             "inviter_reward": Reward.objects.get(name="Referral reached Rank 2")},
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 2"),  'init_stage_id':2, 'next_rank_id':3},
             {"id": 3, "name": "Rank 3", "description": "Intermediate rank", "gold_required": 60000,
              "inviter_reward": Reward.objects.get(name="Referral reached Rank 3")},
             {"id": 4, "name": "Rank 4", "description": "Intermediate rank", "gold_required": 90000,
@@ -111,11 +110,16 @@ class Command(BaseCommand):
             # Add more ranks as needed
         ]
         for rank_data in ranks_data:
-            Rank.objects.update_or_create(name=rank_data['name'], defaults=rank_data)
+            next_rank = rank_data.pop('next_rank_id', None)
+            rank,_ = Rank.objects.update_or_create(name=rank_data['name'], defaults=rank_data)
+            rank.next_rank_id = next_rank
+            rank.save()
+
 
     def seed_stage_templates(self):
         stage_temp_data = [
             {"id": 1, "name": "1_stage_1_rank_tmp", "keys_amount": 0, "jail_amount":0},
+            {"id": 2, "name": "1_stage_2_rank_tmp", "keys_amount": 0, "jail_amount":0},
         ]
         for rank_data in stage_temp_data:
             StageTemplate.objects.update_or_create(id=rank_data['id'], defaults=rank_data)
@@ -123,6 +127,7 @@ class Command(BaseCommand):
     def seed_stage(self):
         stage_data = [
             {"id": 1, "name": "1_stage_1_rank", "initial_task_id":1, "tasks":[1,2], "stage_template_id":1},
+            {"id": 2, "name": "1_stage_2_rank", "initial_task_id":3, "tasks":[x for x in range(3,11)], "stage_template_id":1},
         ]
         for stage_data in stage_data:
             st,_ = Stage.objects.update_or_create(id=stage_data['id'], defaults={"name":stage_data['name'], "initial_task_id":stage_data['initial_task_id'], "stage_template_id":stage_data['stage_template_id']})
@@ -134,65 +139,13 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def seed_task_templates(self):
+        desc = "Buy chest and get chance to get extra gnome"
         task_templates_data = [
-            {
-                "id":1,
-                "name": "Subscribe to Channel",
-                "text": "Subscribe to our channel.",
-                "task_type": TaskTemplate.TaskType.ch_sub,
-                "completion_number": 1,
-                "price": 0,
-                "rewards": [
-                    Reward.objects.get(name='energy +50', amount=50),
-                    Reward.objects.get(name='multiclick +2', amount=2)
-                ]
-            },
-            {
-                "id":2,
-                "name": "Invite 1 friends",
-                "text": "Invite a friend to join.",
-                "task_type": TaskTemplate.TaskType.inv_fren,
-                "completion_number": 1,
-                "price": 0,
-                "rewards": [
-                    Reward.objects.get(name='energy +50', amount=50),
-                    Reward.objects.get(name='multiclick +10', amount=10)
-                ]
-            },
-            {
-                "id":3,
-                "name": "chest_1000",
-                "text": "Buy chest and get chance to get extra gnome",
-                "task_type": TaskTemplate.TaskType.buy_chest,
-                "completion_number": 1,
-                "price": 1000,
-                "rewards": [
-                    Reward.objects.get(name='gold +1000', amount=1000),
-                    Reward.objects.get(name='gold -1000', amount=-1000)
-                ],  # Add reward instances if needed
-            },
-            {
-                "id":4,
-                "name": "Upgrade pickaxe",
-                "text": "Earn more gold with 1 click",
-                "task_type": TaskTemplate.TaskType.buy_multicklick,
-                "completion_number": 0,
-                "price": 2000,
-                "rewards": [
-                    Reward.objects.get(name='multiclick +2', amount=2)
-                ],  # Add reward instances if needed
-            },
-            {
-                "id":5,
-                "name": "Upgrade energy",
-                "text": "Buy more energy",
-                "task_type": TaskTemplate.TaskType.buy_energy,
-                "completion_number": 0,
-                "price": 2000,
-                "rewards": [
-                    Reward.objects.get(name='energy +50', amount=50),
-                ],  # Add reward instances if needed
-            },
+            { "id":1, "name": "Subscribe to Channel",   "text": "Subscribe to our channel.",    "task_type": TaskTemplate.TaskType.ch_sub,          "completion_number": 1, "price": 0,     "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=17)]},
+            { "id":2, "name": "Invite 1 friends",       "text": "Invite a friend to join.",     "task_type": TaskTemplate.TaskType.inv_fren,        "completion_number": 1, "price": 0,     "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=18) ]},
+            { "id":3, "name": "chest_1000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 1000,  "rewards": [Reward.objects.get(id=11), Reward.objects.get(id=12), Reward.objects.get(id=2)]},
+            { "id":4, "name": "Upgrade pickaxe",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multicklick, "completion_number": 0, "price": 2000,  "rewards": [Reward.objects.get(id=17) ]},
+            { "id":5, "name": "Upgrade energy",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 2000,  "rewards": [Reward.objects.get(id=16)]},
             # Add more task templates as needed
         ]
 
@@ -212,22 +165,17 @@ class Command(BaseCommand):
     @transaction.atomic
     def seed_task_routes(self):
         task_routes_data = [
-            {
-                "id":1,
-                "coord_x": 0,
-                "coord_y": 0,
-                "template_id": 1,
-                "parent":None,
-                "initial": True,
-            },
-            {
-                "id":2,
-                "coord_x": 0,
-                "coord_y": -1,
-                "template_id": 2,  
-                "parent_id": 1,
-                "initial": False,
-            },
+            {"id":1,"coord_x": 0,"coord_y": 0,"template_id": 1,"parent":None,"initial": True},
+            {"id":2,"coord_x": 0,"coord_y": -1,"template_id": 2,  "parent_id": 1,"initial": False},
+            # 2 rank 1 stage
+            {"id":  3, "coord_x":  0,  "coord_y":  0 ,  "template_id": 5,  "parent_id": None, "initial": True},
+            {"id":  4, "coord_x":  -1, "coord_y": 0,    "template_id": 4,  "parent_id": 3,    "initial": False},
+            {"id":  5, "coord_x":  -2, "coord_y":  0,   "template_id": 3,  "parent_id": 4,    "initial": False,},
+            {"id":  6, "coord_x":  1,  "coord_y": 0,    "template_id": 3,  "parent_id": 1,    "initial": False,},
+            {"id":  7, "coord_x":  0,  "coord_y":  -1,  "template_id": 5,  "parent_id": 1,    "initial": False,},
+            {"id":  8, "coord_x":  -1, "coord_y": -1,   "template_id": 4,  "parent_id": 7,    "initial": False},
+            {"id":  9, "coord_x":  0,  "coord_y":  -2,  "template_id": 5,  "parent_id": 7,    "initial": False,},
+            {"id": 10, "coord_x":  -1, "coord_y": -2,   "template_id": 2,  "parent_id": 9,    "initial": False,},
         ]
     
         for task_route_data in task_routes_data:

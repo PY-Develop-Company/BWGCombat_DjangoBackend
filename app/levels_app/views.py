@@ -5,12 +5,13 @@ from .models import Reward, Rank, SocialMedia, CompletedSocialTasks
 from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoutes
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
-from levels_app.serializer import RankInfoSerializer, StageSerializer
+from levels_app.serializer import RankInfoSerializer, TasksSerializer
 from rest_framework import status
 from .serializer import SocialMediaTasksSerializer
 from django.shortcuts import get_object_or_404
 from .utils import place_items
 from django.utils.timezone import now
+from django.db import transaction
 
 
 def levels_home(request):
@@ -49,13 +50,17 @@ def check_task_completion(request):
             done = userdata.is_referrals_quantity_exceeds(task.completion_number)
         case _:
             userdata.gold_balance -= task.task.template.price
-            task.status = UsersTasks.Status.COMPLETED
             done = True
 
     if done:
         rewards = task.rewards.all()
         for reward in rewards:
             userdata.receive_reward(reward)
+        task.status = UsersTasks.Status.COMPLETED
+        subtasks = task.get_user_subtasks(userdata.user)
+        for ts in subtasks:
+            ts.status = UsersTasks.Status.IN_PROGRESS
+            ts.save()
         userdata.save()
         task.save()
         return JsonResponse({"message":"success"})
@@ -65,6 +70,7 @@ def check_task_completion(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@transaction.atomic
 def go_to_next_rank(request):
     user_id = request.data.get("userId")
     userdata = get_object_or_404(UserData, user_id = user_id)
@@ -78,9 +84,15 @@ def go_to_next_rank(request):
     if userdata.gold_balance >= rank_to_go.gold_required:
         place_items(userdata, rank_to_go)
         userdata.rank = rank_to_go
-        userdata.max_energy_amount = rank_to_go.init_energy
-        userdata.multiclick_amount = rank_to_go.init_multiplier
+        userdata.max_energy_amount = rank_to_go.init_energy.amount
+        userdata.multiclick_amount = rank_to_go.init_multiplier.amount
         userdata.energy_regeneration = rank_to_go.init_energy_regeneration
+        userdata.current_stage = rank_to_go.init_stage
+        print(rank_to_go.init_stage.initial_task)
+        initial = UsersTasks.objects.get(task=rank_to_go.init_stage.initial_task, user=userdata.user)
+        initial.status = UsersTasks.Status.IN_PROGRESS
+
+        initial.save()
         userdata.save()
 
         return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
@@ -110,8 +122,15 @@ def get_stage_tasks_with_routes(request):
     user_id = request.data.get('userId')
     
     user_data = get_object_or_404(UserData, user_id=user_id)
-    serializer = StageSerializer(user_data.current_stage, context={'user_data': user_data}).data
-    return JsonResponse(serializer, status=status.HTTP_200_OK)
+    current_stage = user_data.current_stage
+    stage_tasks = current_stage.tasks.values_list('id', flat=True)
+    
+    user_tasks = UsersTasks.objects.filter(user=user_data.user, task__in=stage_tasks).all()
+    
+    serializer = TasksSerializer(user_tasks,context={'user_id':user_data.user.tg_id}, many=True).data
+
+    print(serializer)
+    return JsonResponse({"tasks": serializer}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
