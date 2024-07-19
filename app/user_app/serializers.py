@@ -40,8 +40,6 @@ class UserDataSerializer(serializers.ModelSerializer):
     gender = serializers.SerializerMethodField()
     lang_code = serializers.SerializerMethodField()
 
-
-
     def get_click_multiplier(self, obj: UserData):
         return obj.multiclick_amount
 
@@ -88,6 +86,23 @@ class UserDataSerializer(serializers.ModelSerializer):
         )
 
 
+class UserSettingsSerializer(serializers.ModelSerializer):
+    lang_code = serializers.SerializerMethodField()
+
+    def get_lang_code(self, obj: UserData):
+        return obj.user.interface_lang.lang_code
+
+    class Meta:
+        model = UserData
+        fields = (
+            "lang_code",
+            "visual_effects",
+            "general_volume",
+            "effects_volume",
+            "music_volume"
+        )
+
+
 class ClickSerializer(serializers.ModelSerializer):
 
     click_multiplier = serializers.SerializerMethodField()
@@ -102,7 +117,6 @@ class ClickSerializer(serializers.ModelSerializer):
     
     def get_energy(self, obj:UserData):
         return obj.max_energy_amount
-
 
     class Meta:
         model = UserData

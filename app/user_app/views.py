@@ -14,9 +14,9 @@ from .models import User, UserData, Fren, Link, LinkClick, Language
 # from aiogram.utils.deep_linking import create_start_link
 from levels_app.models import Rank
 import json
-from .serializer import UserDataSerializer, RankInfoSerializer, ClickSerializer, ReferralsSerializer
+from .serializers import UserDataSerializer, RankInfoSerializer, ClickSerializer, ReferralsSerializer, UserSettingsSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from user_app.serializer import CustomTokenObtainPairSerializer
+from user_app.serializers import CustomTokenObtainPairSerializer
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -205,3 +205,42 @@ def change_language(request):
     user_data.user_id.interface_lang = lang
     user_data.save()
     return JsonResponse(UserDataSerializer(user_data).data, status=status.HTTP_200_OK)
+
+
+@permission_classes([AllowAny])
+@api_view(["GET"])
+def get_user_settings(request):
+    user_id = request.data.get("userId")
+
+    user_data_obj = UserData.objects.get(user_id=user_id)
+    settings_data = UserSettingsSerializer(user_data_obj).data
+
+    return JsonResponse(settings_data)
+
+
+@permission_classes([AllowAny])
+@api_view(["POST"])
+def update_user_settings(request):
+    user_id = request.data.get("userId")
+    language_code = request.data.get("languageCode")
+    visual_effects = request.data.get("visualEffects")
+    general_volume = request.data.get("generalVolume")
+    effects_volume = request.data.get("effectsVolume")
+    music_volume = request.data.get("musicVolume")
+
+    user_data_obj = UserData.objects.get(user_id=user_id)
+    user_obj = user_data_obj.user
+
+    user_obj.interface_lang = Language.objects.get(lang_code=language_code)
+    user_data_obj.visual_effects = visual_effects
+    try:
+        user_data_obj.general_volume = int(general_volume)
+        user_data_obj.effects_volume = int(effects_volume)
+        user_data_obj.music_volume = int(music_volume)
+    except ValueError:
+        return JsonResponse({"result": "updating volume failed as not-numbers passed as parameters"})
+    else:
+        user_obj.save()
+        user_data_obj.save()
+
+    return JsonResponse({"result": "ok"})
