@@ -119,7 +119,7 @@ def execute_transfer(request):
     return JsonResponse({"result": "ok"})
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def get_all_transactions(request):
     user_id = request.data.get('userId')
     if not user_id:
