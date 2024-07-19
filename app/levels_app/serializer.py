@@ -21,10 +21,6 @@ class SocialMediaTasksSerializer(serializers.ModelSerializer):
 
 
 class RewardSerializer(serializers.ModelSerializer):
-    reward_type = serializers.SerializerMethodField()
-
-    def get_reward_type(self, obj):
-        return obj.get_reward_type_display()
 
     class Meta:
         model = Reward
@@ -90,3 +86,55 @@ class RankInfoSerializer(serializers.ModelSerializer):
                 current_task = current_task.next_task
             tasks.append(temp_tasks)
         return tasks
+
+
+class UserTaskSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = TaskRoutes
+
+class TaskCoordinatesSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = TaskRoutes
+        fields = ('coord_x', 'coord_y')
+
+class TasksSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    x = serializers.SerializerMethodField()
+    y = serializers.SerializerMethodField()
+    rewards = serializers.SerializerMethodField()
+    routes = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
+
+
+    def get_name(self, obj:UsersTasks):
+       return obj.task.template.name
+    
+    def get_x(self, obj:UsersTasks):
+       return obj.task.coord_x
+    
+    def get_y(self, obj:UsersTasks):
+       return obj.task.coord_y
+    
+    def get_type(self, obj):
+        return obj.task.template.get_task_type_display()
+    
+    def get_rewards(self, obj:UsersTasks):
+        return RewardSerializer(obj.rewards, many=True).data
+    
+    def get_status(self, obj:UsersTasks):
+        return obj.get_status_display()
+    
+    def get_routes(self, obj:UsersTasks):
+        if obj.status == UsersTasks.Status.COMPLETED:
+            tsks = obj.task.get_subtasks()
+            return TaskCoordinatesSerializer(tsks, many=True).data
+    
+
+    class Meta:
+        model = UsersTasks
+        fields = ('id', 'name', 'x', 'y', 'type', 'status', 'rewards', 'routes')

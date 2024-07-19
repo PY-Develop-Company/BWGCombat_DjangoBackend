@@ -2,64 +2,75 @@ from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Reward, Rank, SocialMedia, CompletedSocialTasks
-from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick
+from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoutes
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
-from levels_app.serializer import RankInfoSerializer, ClosedRankSerializer
+from levels_app.serializer import RankInfoSerializer, TasksSerializer
 from rest_framework import status
 from .serializer import SocialMediaTasksSerializer
 from django.shortcuts import get_object_or_404
 from .utils import place_items
+from django.utils.timezone import now
+from django.db import transaction
 
 
 def levels_home(request):
     return HttpResponse("levels home")
 
 
-# @api_view(["POST"])
-# @permission_classes([AllowAny])
-# def check_task_completion(user_id: int, task_id: int):
-#     task = Task.objects.get(id=task_id)
-#     userdata = UserData.objects.get(user_id=user_id)
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def check_task_completion(request):
+    task_id = request.data.get('taskId')
+    task = UsersTasks.objects.get(id=task_id)
+    userdata = UserData.objects.get(user_id=task.user.tg_id)
 
-#     done = False
+    if task.status != UsersTasks.Status.IN_PROGRESS:
+        return JsonResponse({"message":"Can't complete these task"}, status=status.HTTP_403_FORBIDDEN)
 
-#     match task.task_type:
-#         case 1:
-#             link = Link.objects.get(task=Task)
-#             if check_if_link_is_telegram(link):
-#                 pass  # there will be subscription checking
-#             else:
-#                 done = userdata.check_link_click()
-#         case 2:
-#             done = userdata.is_referrals_quantity_exceeds(task.completion_number)
-#         case 3:
-#             pass
-#         case 4:
-#             pass
-#         case 5:
-#             pass
-#         case 6:
-#             pass
-#         case 7:
-#             pass
-#         case _:
-#             return HttpResponse('No such task to check completion')
+    if task.status == UsersTasks.Status.COMPLETED:
+        return JsonResponse({"message":"Task already done"}, status=status.HTTP_200_OK)
 
-#     # temporarily only checking frens quantity
-#     if done:
-#         rewards = task.rewards
-#         for reward in rewards:
-#             userdata.receive_reward(reward)
-#         # user_task = get_object_or_404(UsersTasks, user_id=user_id)
-#         # user_task.status = True
-#         # user_task.save()
-#     else:
-#         return HttpResponse('You haven\'t completed the task or no checking for this task exists yet')
+    if userdata.blocked_until>now():
+        return JsonResponse({"message":"You can't buy tasks while prisoning"}, status=status.HTTP_403_FORBIDDEN)
+
+    if task.task.template.price > userdata.gold_balance:
+        return JsonResponse({"message":"You don't have enough money"}, status=status.HTTP_403_FORBIDDEN)
+
+    done = False
+
+    match task.task.template.task_type:
+        case 1:
+            link = Link.objects.get(task=TaskRoutes)
+            if check_if_link_is_telegram(link):
+                pass  # there will be subscription checking
+            else:
+                done = userdata.check_link_click()
+        case 2:
+            done = userdata.is_referrals_quantity_exceeds(task.completion_number)
+        case _:
+            userdata.gold_balance -= task.task.template.price
+            done = True
+
+    if done:
+        rewards = task.rewards.all()
+        for reward in rewards:
+            userdata.receive_reward(reward)
+        task.status = UsersTasks.Status.COMPLETED
+        subtasks = task.get_user_subtasks(userdata.user)
+        for ts in subtasks:
+            ts.status = UsersTasks.Status.IN_PROGRESS
+            ts.save()
+        userdata.save()
+        task.save()
+        return JsonResponse({"message":"success"})
+    else:
+        return JsonResponse({"message":"You haven't completed the task or no checking for this task exists yet"})
 
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@transaction.atomic
 def go_to_next_rank(request):
     user_id = request.data.get("userId")
     userdata = get_object_or_404(UserData, user_id = user_id)
@@ -73,9 +84,15 @@ def go_to_next_rank(request):
     if userdata.gold_balance >= rank_to_go.gold_required:
         place_items(userdata, rank_to_go)
         userdata.rank = rank_to_go
-        userdata.max_energy_amount = rank_to_go.init_energy
-        userdata.multiclick_amount = rank_to_go.init_multiplier
+        userdata.max_energy_amount = rank_to_go.init_energy.amount
+        userdata.multiclick_amount = rank_to_go.init_multiplier.amount
         userdata.energy_regeneration = rank_to_go.init_energy_regeneration
+        userdata.current_stage = rank_to_go.init_stage
+        print(rank_to_go.init_stage.initial_task)
+        initial = UsersTasks.objects.get(task=rank_to_go.init_stage.initial_task, user=userdata.user)
+        initial.status = UsersTasks.Status.IN_PROGRESS
+
+        initial.save()
         userdata.save()
 
         return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
@@ -92,10 +109,29 @@ def get_rank_info(request):
     user_data = get_object_or_404(UserData, user_id=user_id)
     rank_info = get_object_or_404(Rank, id=rank_id)
     if user_data.rank_id == rank_id:
-        serializer = RankInfoSerializer(rank_info, context={'user_id': user_data.user_id_id})
-        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+        serializer = RankInfoSerializer(rank_info, context={'user_data': user_data}).data
+        return JsonResponse(serializer, status=status.HTTP_200_OK)
     else:
         return JsonResponse(ClosedRankSerializer(rank_info).data, status=status.HTTP_200_OK)
+    
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def get_stage_tasks_with_routes(request):
+    user_id = request.data.get('userId')
+    
+    user_data = get_object_or_404(UserData, user_id=user_id)
+    current_stage = user_data.current_stage
+    stage_tasks = current_stage.tasks.values_list('id', flat=True)
+    
+    user_tasks = UsersTasks.objects.filter(user=user_data.user, task__in=stage_tasks).all()
+    
+    serializer = TasksSerializer(user_tasks,context={'user_id':user_data.user.tg_id}, many=True).data
+
+    print(serializer)
+    return JsonResponse({"tasks": serializer}, status=status.HTTP_200_OK)
+
 
 @api_view(["POST"])
 def get_social_media_tasks(request):
@@ -113,3 +149,6 @@ def get_partner_tasks(request):
     completed = CompletedSocialTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
     serializer = SocialMediaTasksSerializer(tasks, context={'completed_tasks': completed}, many=True)
     return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
+
+
+

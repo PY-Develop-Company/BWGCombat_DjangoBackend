@@ -1,5 +1,6 @@
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
+from datetime import datetime
 
 from django.contrib.auth.models import (
     BaseUserManager,
@@ -114,6 +115,7 @@ class UserData(models.Model):
     last_visited = models.DateTimeField(default=now)
 
     rank = models.ForeignKey(Rank, null=True, on_delete=models.SET_NULL, default=1)
+    current_stage = models.ForeignKey(Stage, null = True, default=1, on_delete=models.SET_NULL)
 
     multiclick_amount = models.IntegerField(null=True, blank=True, default=2)
     energy_regeneration = models.IntegerField(default=1)
@@ -128,7 +130,7 @@ class UserData(models.Model):
     music_volume = models.PositiveSmallIntegerField(default=50)
 
     has_key = models.BooleanField(default=False)
-    blocked_until = models.DateTimeField(default=None, null=True, blank=True)
+    blocked_until = models.DateTimeField(default = now)
 
     def add_gold_coins(self, coins: int):
         self.gold_balance += int(coins)
@@ -169,9 +171,15 @@ class UserData(models.Model):
     def set_energy(self, energy: int):
         self.max_energy_amount = energy
 
-    def increase_passive_income_level(self, levels_to_increase: int):
-        for __ in range(levels_to_increase):
-            self.passive_income = self.passive_income.next_level
+        
+    def add_gnome(self, amount: int):
+        self.gnome_amount += 1
+
+    def set_key(self):
+        self.has_key = True
+
+    def set_prisoning(self, amount: int):
+        self.blocked_until += now() + datetime.hour(amount)
 
     def is_referrals_quantity_exceeds(self, expected_quantity):
         user = User.objects.get(tg_id=self.user_id)
@@ -192,9 +200,13 @@ class UserData(models.Model):
         MULTIPLIER = "2", _("Increase gold multiplier")
         G_TOKEN = "3", _("Add G token")
         ENERGY_BALANCE = "4", _("Replenish energy")
-        PASSIVE_INCOME = "5", _("Improve passive income")
+        KEY = '5', _('Key')
+        GNOME = '6', _('Gnome')
+        JAIL = '7', _('Jail')
+
         """
         reward_type = int(reward.reward_type)
+        print(reward_type)
         reward_amount = int(reward.amount)
 
         match reward_type:
@@ -207,7 +219,12 @@ class UserData(models.Model):
             case 4:
                 self.add_energy(reward_amount)
             case 5:
-                self.increase_passive_income_level(reward_amount)
+                self.set_key()
+            case 6:
+                self.add_gnome(reward_amount)
+            case 7:
+                self.set_prisoning(reward_amount)
+            
             case _:
                 return "No such reward type"
 
@@ -233,7 +250,11 @@ class UsersTasks(models.Model):
         unique_together = ('user', 'task')
 
     def __str__(self) -> str:
-        return self.user.tg_username + self.task.template.name
+        return f"{self.id} {self.user.tg_username} {self.task.template.name}"
+    
+    def get_user_subtasks(self, user):
+        sub = self.task.subtasks.values_list('id', flat=True)
+        return UsersTasks.objects.filter(task__in=sub, user=user)
 
 
 class Fren(models.Model):

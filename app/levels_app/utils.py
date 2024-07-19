@@ -48,21 +48,17 @@ def place_key(user_data: UserData, stage: Stage):
         return
     task = random.choice(avaliable_keys)
     key = UsersTasks.objects.create(user=user_data.user, task=task)
-    key.rewards.add(Reward.objects.get(reward_type=Reward.RewardType.KEY))
+    key.rewards.add(Reward.objects.get(name="Key"))
     key.save()
+
 
 
 def place_rewards_for_chests(user_data, chests:list[TaskRoutes]):
     for chest in chests:
-        available_rewards = list(chest.template.rewards.exclude(Q(name='Key') | Q(name='Gnome')))
-        random_value = random.randint(0, 100)
-        if random_value % 2 == 0:
-            ts = UsersTasks.objects.create(user=user_data.user, task = chest)
-            ts.rewards.add(Reward.objects.get(name='Gnome'))
-        else:
-            random_value = random.randint(0, 100)
-            ts = UsersTasks.objects.create(user=user_data.user, task = chest)
-            ts.rewards.add(random.choice(available_rewards))
+        available_rewards = list(chest.template.rewards.exclude(Q(name='Key') | Q(name='Jail')))
+        ts = UsersTasks.objects.create(user=user_data.user, task = chest)
+        ts.rewards.add(random.choice(available_rewards))
+        ts.save
 
 
 def place_another_tasks(user_data:UserData, tasks:list[TaskRoutes]):
@@ -71,14 +67,26 @@ def place_another_tasks(user_data:UserData, tasks:list[TaskRoutes]):
         ts.rewards.add(*task.template.rewards.all())
         ts.save()
 
+def place_jail(user_data:UserData, stage:Stage):
+    amount = stage.stage_template.jail_amount
+    tasks = random.sample(list(stage.get_empty_chests(user_data)), amount)
+    for task in tasks:
+        ts = UsersTasks.objects.create(user=user_data.user, task = task)
+        ts.rewards.add(Reward.objects.get(name='Jail'))
+        ts.save()
+
+
 
 
 def place_items(user_data: UserData, rank:Rank):
     stages = rank.get_all_stages()
     for stage in stages:
         place_key(user_data, stage)
-
-    place_rewards_for_chests(user_data, rank.get_all_chests(user_data))
+        place_jail(user_data, stage)
+    place_rewards_for_chests(user_data, rank.get_empty_chests(user_data))
     place_another_tasks(user_data, rank.get_not_chest_tasks(user_data))
+    ts = UsersTasks.objects.get(user=user_data.user, task=rank.init_stage.initial_task)
+    ts.status = UsersTasks.Status.IN_PROGRESS
+    ts.save()
     
     

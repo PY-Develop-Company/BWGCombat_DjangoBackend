@@ -33,7 +33,7 @@ class Rank(models.Model):
         return tasks
     
 
-    def get_all_chests(self, user_data):
+    def get_empty_chests(self, user_data):
         from user_app.models import UsersTasks
 
         stages = self.get_all_stages()
@@ -44,7 +44,6 @@ class Rank(models.Model):
     
     def get_not_chest_tasks(self, user_data):
         from user_app.models import UsersTasks
-
 
         stages = self.get_all_stages()
         tasks = TaskRoutes.objects.filter(stage__in=stages).exclude(template__task_type=TaskTemplate.TaskType.buy_chest)\
@@ -72,6 +71,7 @@ class StageTemplate(models.Model):
     name = models.CharField(max_length=255, default='none')
     task_with_keys = models.ManyToManyField('TaskRoutes', blank=True)
     keys_amount = models.IntegerField(default=1)
+    jail_amount = models.IntegerField(default=1, )
 
 
     def __str__(self) -> str:
@@ -90,6 +90,23 @@ class Stage(models.Model):
 
     def __str__(self) -> str:
         return f'{self.name} -> {self.next_stage}'
+    
+    def get_empty_chests(self, user_data):
+        from user_app.models import UsersTasks
+        
+        chest_tasks = self.tasks.filter(template__task_type=TaskTemplate.TaskType.buy_chest)
+        empty_chests = chest_tasks.exclude(id__in=UsersTasks.objects.filter(user=user_data.user).values_list('task_id', flat=True))
+        
+        return empty_chests
+    
+    def get_not_chest_tasks(self, user_data):
+        from user_app.models import UsersTasks
+        
+        not_chest = self.tasks.exclude(template__task_type=TaskTemplate.TaskType.buy_chest)
+        empty_chests = not_chest.exclude(id__in=UsersTasks.objects.filter(user=user_data.user).values_list('task_id', flat=True))
+
+        return empty_chests
+        
 
     class Meta:
         verbose_name_plural = ('2.2_Stage model')
@@ -124,11 +141,15 @@ class TaskRoutes(models.Model):
     coord_x = models.IntegerField(default=0, null=False)
     coord_y = models.IntegerField(default=0, null=False)
     template = models.ForeignKey(TaskTemplate, blank=False, on_delete=models.CASCADE)
-    parent = models.ForeignKey('self', blank=True, on_delete=models.SET_NULL, null=True)
+    parent = models.ForeignKey('self', blank=True, on_delete=models.SET_NULL, null=True, related_name='subtasks')
     initial = models.BooleanField(default=False)
+
+    def get_subtasks(self):
+        return self.subtasks.all()
 
     def __str__(self) -> str:
         return f'{self.template} + ({self.coord_x},{self.coord_y})'
+
 
 
     class Meta:
@@ -141,9 +162,9 @@ class Reward(models.Model):
         MULTIPLIER = "2", _("Increase gold multiplier")
         G_TOKEN = "3", _("Add G token")
         ENERGY_BALANCE = "4", _("Replenish energy")
-        PASSIVE_INCOME = "5", _("Improve passive income")
-        KEY = '6', _('Key')
-        GNOME = '7', _('Gnome')
+        KEY = '5', _('Key')
+        GNOME = '6', _('Gnome')
+        JAIL = '7', _('Jail')
 
     name = models.CharField(max_length=200, unique=True)
     amount = models.FloatField()
