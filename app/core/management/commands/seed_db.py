@@ -88,9 +88,9 @@ class Command(BaseCommand):
     def seed_ranks(self):
         ranks_data = [
             {"id": 1, "name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10000,
-             "inviter_reward": Reward.objects.get(name="Referral reached Rank 1"), 'init_stage_id':1, 'next_rank_id':2},
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 1"), 'init_stage_id': 1, 'next_rank_id': None},
             {"id": 2, "name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30000,
-             "inviter_reward": Reward.objects.get(name="Referral reached Rank 2"),  'init_stage_id':2, 'next_rank_id':3},
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 2"), 'init_stage_id': 2, 'next_rank_id': None},
             {"id": 3, "name": "Rank 3", "description": "Intermediate rank", "gold_required": 60000,
              "inviter_reward": Reward.objects.get(name="Referral reached Rank 3")},
             {"id": 4, "name": "Rank 4", "description": "Intermediate rank", "gold_required": 90000,
@@ -115,7 +115,6 @@ class Command(BaseCommand):
             rank.next_rank_id = next_rank
             rank.save()
 
-
     def seed_stage_templates(self):
         stage_temp_data = [
             {"id": 1, "name": "1_stage_1_rank_tmp", "keys_amount": 0, "jail_amount":0},
@@ -126,16 +125,13 @@ class Command(BaseCommand):
 
     def seed_stage(self):
         stage_data = [
-            {"id": 1, "name": "1_stage_1_rank", "initial_task_id":1, "tasks":[1,2], "stage_template_id":1},
-            {"id": 2, "name": "1_stage_2_rank", "initial_task_id":3, "tasks":[x for x in range(3,11)], "stage_template_id":1},
+            {"id": 1, "name": "1_stage_1_rank", "initial_task_id": 1, "tasks": [1, 2], "stage_template_id":1},
+            {"id": 2, "name": "1_stage_2_rank", "initial_task_id": 3, "tasks": [x for x in range(3,11)], "stage_template_id":1},
         ]
         for stage_data in stage_data:
             st,_ = Stage.objects.update_or_create(id=stage_data['id'], defaults={"name":stage_data['name'], "initial_task_id":stage_data['initial_task_id'], "stage_template_id":stage_data['stage_template_id']})
             st.tasks.add(*stage_data['tasks'])
             st.save()
-
-
-
 
     @transaction.atomic
     def seed_task_templates(self):
@@ -180,7 +176,7 @@ class Command(BaseCommand):
     
         for task_route_data in task_routes_data:
             task_route, created = TaskRoutes.objects.update_or_create(
-                id = task_route_data['id'],
+                id=task_route_data['id'],
                 defaults=task_route_data
             )
             task_route.save()
