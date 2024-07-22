@@ -1,5 +1,6 @@
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
+from datetime import datetime
 
 from django.contrib.auth.models import (
     BaseUserManager,
@@ -105,7 +106,7 @@ class UserData(models.Model):
         MALE = 0, 'Male'
         FEMALE = 1, 'Female'
 
-    user_id = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     character_gender = models.IntegerField(null=True, blank=True, default=0, choices=Gender.choices)
 
     gold_balance = models.BigIntegerField(default=0)
@@ -114,15 +115,22 @@ class UserData(models.Model):
     last_visited = models.DateTimeField(default=now)
 
     rank = models.ForeignKey(Rank, null=True, on_delete=models.SET_NULL, default=1)
+    current_stage = models.ForeignKey(Stage, null = True, default=1, on_delete=models.SET_NULL)
 
     multiclick_amount = models.IntegerField(null=True, blank=True, default=2)
     energy_regeneration = models.IntegerField(default=1)
     max_energy_amount = models.IntegerField(null=True, blank=True, default=100)
     current_energy = models.IntegerField(default=0)
+    gnome_amount = models.IntegerField(default=0, null=True, blank=True)
 
-    passive_income_level = models.ForeignKey(PassiveIncomeLevel, null=True, blank=True, default=1, on_delete=models.SET_NULL, related_name='passive_level')
+    # language = models.ForeignKey(Language, to_field='lang_code', null=True, on_delete=models.SET_DEFAULT, default='en')
+    visual_effects = models.BooleanField(default=True)
+    general_volume = models.PositiveSmallIntegerField(default=50)
+    effects_volume = models.PositiveSmallIntegerField(default=50)
+    music_volume = models.PositiveSmallIntegerField(default=50)
 
     has_key = models.BooleanField(default=False)
+    blocked_until = models.DateTimeField(default = now)
 
     def add_gold_coins(self, coins: int):
         self.gold_balance += int(coins)
@@ -154,7 +162,6 @@ class UserData(models.Model):
     def set_multiplier(self, multiplier: int):
         self.multiclick_amount = multiplier
 
-
     def add_multiplier(self, multiplier: int):
         self.multiclick_amount += multiplier
 
@@ -165,10 +172,14 @@ class UserData(models.Model):
         self.max_energy_amount = energy
 
         
+    def add_gnome(self, amount: int):
+        self.gnome_amount += 1
 
-    def increase_passive_income_level(self, levels_to_increase: int):
-        for __ in range(levels_to_increase):
-            self.passive_income = self.passive_income_level.next_level
+    def set_key(self):
+        self.has_key = True
+
+    def set_prisoning(self, amount: int):
+        self.blocked_until += now() + datetime.hour(amount)
 
     def is_referrals_quantity_exceeds(self, expected_quantity):
         user = User.objects.get(tg_id=self.user_id)
@@ -176,6 +187,7 @@ class UserData(models.Model):
         return True if refs_quantity >= expected_quantity else False
 
     def check_channel_subscription(self, link):
+        # покамість
         pass
 
     def check_link_click(self, link):
@@ -188,9 +200,13 @@ class UserData(models.Model):
         MULTIPLIER = "2", _("Increase gold multiplier")
         G_TOKEN = "3", _("Add G token")
         ENERGY_BALANCE = "4", _("Replenish energy")
-        PASSIVE_INCOME = "5", _("Improve passive income")
+        KEY = '5', _('Key')
+        GNOME = '6', _('Gnome')
+        JAIL = '7', _('Jail')
+
         """
         reward_type = int(reward.reward_type)
+        print(reward_type)
         reward_amount = int(reward.amount)
 
         match reward_type:
@@ -203,12 +219,17 @@ class UserData(models.Model):
             case 4:
                 self.add_energy(reward_amount)
             case 5:
-                self.increase_passive_income_level(reward_amount)
+                self.set_key()
+            case 6:
+                self.add_gnome(reward_amount)
+            case 7:
+                self.set_prisoning(reward_amount)
+            
             case _:
                 return "No such reward type"
 
     def __str__(self):
-        return f'{self.user_id.tg_id} {self.last_visited}'
+        return f'{self.user_id} {self.last_visited}'
 
 
 class UsersTasks(models.Model): 
@@ -218,10 +239,9 @@ class UsersTasks(models.Model):
         COMPLETED = "2", _("Completed")
         EXPIRED = "3", _("Expired")
 
-
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(TaskRoutes, on_delete=models.CASCADE)
-    reward = models.ForeignKey(Reward, on_delete=models.CASCADE)
+    rewards = models.ManyToManyField(Reward, blank=True)
     completion_time = models.DateTimeField(null=True, blank=True, default=None)
 
     status = models.CharField(null=False, blank=False, choices=Status, default=Status.UNAVAILABLE)
@@ -230,7 +250,11 @@ class UsersTasks(models.Model):
         unique_together = ('user', 'task')
 
     def __str__(self) -> str:
-        return self.user.tg_username + self.task.name
+        return f"{self.id} {self.user.tg_username} {self.task.template.name}"
+    
+    def get_user_subtasks(self, user):
+        sub = self.task.subtasks.values_list('id', flat=True)
+        return UsersTasks.objects.filter(task__in=sub, user=user)
 
 
 class Fren(models.Model):

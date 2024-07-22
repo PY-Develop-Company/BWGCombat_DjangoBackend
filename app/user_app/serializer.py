@@ -36,18 +36,14 @@ class UserDataSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
     click_multiplier = serializers.SerializerMethodField()
     energy = serializers.SerializerMethodField()
-    passive_income = serializers.SerializerMethodField()
     is_picked_gender = serializers.SerializerMethodField()
     gender = serializers.SerializerMethodField()
     lang_code = serializers.SerializerMethodField()
 
 
 
-    def get_click_multiplier(self, obj:UserData):
+    def get_click_multiplier(self, obj: UserData):
         return obj.multiclick_amount
-
-    def get_passive_income(self, obj:UserData):
-        return EnergySerializer(obj.passive_income_level).data
 
     def get_energy(self, obj:UserData):
         return obj.max_energy_amount
@@ -56,18 +52,16 @@ class UserDataSerializer(serializers.ModelSerializer):
         return RankingSerializer(obj.rank).data
 
     def get_username(self, obj: UserData):
-        return User.objects.get(tg_id=obj.user_id.tg_id).tg_username
-    
+        return User.objects.get(tg_id=obj.user.tg_id).tg_username
+
     def get_is_picked_gender(self, obj:UserData):
         return obj.character_gender is not None
-    
+
     def get_gender(self, obj: UserData):
         return obj.character_gender
-    
-    def get_lang_code(self, obj: UserData):
-        return obj.user_id.interface_lang.lang_code
-    
 
+    def get_lang_code(self, obj: UserData):
+        return obj.user.interface_lang.lang_code
 
     class Meta:
         model = UserData
@@ -75,7 +69,6 @@ class UserDataSerializer(serializers.ModelSerializer):
             "user_id",
             "is_picked_gender",
             "gender",
-            "lang_code",
             "username",
             "gold_balance",
             "g_token",
@@ -86,8 +79,14 @@ class UserDataSerializer(serializers.ModelSerializer):
             "energy",
             "energy_regeneration",
             "current_energy",
-            "passive_income",
+            "gnome_amount",
+            "lang_code",
+            "visual_effects",
+            "general_volume",
+            "effects_volume",
+            "music_volume"
         )
+
 
 class ClickSerializer(serializers.ModelSerializer):
 
@@ -99,8 +98,8 @@ class ClickSerializer(serializers.ModelSerializer):
         return obj.multiclick_amount
 
     def get_passive_income(self, obj:UserData):
-        return EnergySerializer(obj.passive_income_level).data
-
+        return obj.gnome_amount
+    
     def get_energy(self, obj:UserData):
         return obj.max_energy_amount
 
@@ -127,7 +126,7 @@ class ReferralsSerializer(serializers.ModelSerializer):
         return obj.user_id.tg_username
     
     def get_passive_income(self, obj:UserData):
-        return obj.passive_income_level.amount
+        return obj.passive_income.amount
         
     
     class Meta:
