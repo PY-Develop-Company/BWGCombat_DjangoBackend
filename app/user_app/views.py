@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils.timezone import now
 
+from .utils import get_gnome_reward
 from .models import User, UserData, Fren, Link, LinkClick, Language
 
 # from aiogram import Bot
@@ -36,7 +37,7 @@ def get_user_info(request):
     delta = now() - user_data.last_visited
     user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.max_energy_amount - user_data.current_energy)
     print(delta.total_seconds())
-    income = round(user_data.gnome_amount*100/3600 * delta.total_seconds())
+    income = round(user_data.gnome_amount*get_gnome_reward()/3600 * delta.total_seconds())
     user_data.gold_balance += income
     print(user_data.rank.get_all_tasks(user_data))
     user_data.save()
@@ -174,11 +175,8 @@ def get_user_referrals(request):
 
 def track_link_click(request, link_id):
     link = get_object_or_404(Link, id=link_id)
-
     user_id = request.data.get("userId")
-
     user = User.objects.get(tg_id=user_id)
-
     LinkClick.objects.create(user=user, link=link)
 
     return redirect(link.url)
