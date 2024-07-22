@@ -4,6 +4,7 @@ from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyL
 from levels_app.serializer import RankInfoSerializer, RankingSerializer, RewardSerializer, TaskSerializer
 from user_app.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from user_app.utils import get_gnome_reward
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -136,12 +137,11 @@ class ReferralsSerializer(serializers.ModelSerializer):
     tg_username = serializers.SerializerMethodField()
     passive_income = serializers.SerializerMethodField()
 
-    def get_tg_username(self, obj:UserData):
-        return obj.user_id.tg_username
+    def get_tg_username(self, obj: UserData):
+        return obj.user.tg_username
     
-    def get_passive_income(self, obj:UserData):
-        return obj.passive_income.amount
-        
+    def get_passive_income(self, obj: UserData):
+        return obj.gnome_amount * get_gnome_reward()
     
     class Meta:
         model = UserData

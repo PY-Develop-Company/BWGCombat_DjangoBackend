@@ -200,7 +200,7 @@ def change_language(request):
     lang_code = request.data.get('languageCode')
     user_data = get_object_or_404(UserData, user_id=user_id)
     lang = get_object_or_404(Language, lang_code=lang_code)
-    user_data.user_id.interface_lang = lang
+    user_data.user.interface_lang = lang
     user_data.save()
     return JsonResponse(UserDataSerializer(user_data).data, status=status.HTTP_200_OK)
 

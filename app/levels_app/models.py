@@ -114,7 +114,7 @@ class TaskTemplate(models.Model):
         inv_fren = "2", _("invite friend")
         earn_gold = "3", _("earn N amount of gold")
         buy_energy = "4", _("buy energy")
-        buy_multicklick = "5", _("buy pickaxe")
+        buy_multiclick = "5", _("buy pickaxe")
         buy_chest = "6", _("buy chest")
         road = "7", _("buy road")
 

@@ -70,20 +70,20 @@ class RankInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rank
-        fields = ['id', 'name', 'description', 'tasks']
+        fields = ['id', 'name', 'description']
 
-    def get_tasks(self, obj):
-        tasks = []
-        initial_tasks = TaskTemplate.objects.filter(rank=obj, initial=True).all()
-
-        for i in initial_tasks:
-            current_task = i
-            temp_tasks = []
-            while current_task:
-                temp_tasks.append(TaskWithStatus(current_task, context=self.context).data)
-                current_task = current_task.next_task
-            tasks.append(temp_tasks)
-        return tasks
+    # def get_tasks(self, obj):
+    #     tasks = []
+    #     initial_tasks = TaskRoutes.objects.filter(stage=obj, initial=True).all()
+    #
+    #     for i in initial_tasks:
+    #         current_task = i
+    #         temp_tasks = []
+    #         while current_task:
+    #             temp_tasks.append(TaskWithStatus(current_task, context=self.context).data)
+    #             current_task = current_task.next_task
+    #         tasks.append(temp_tasks)
+    #     return tasks
 
 
 class UserTaskSerializer(serializers.ModelSerializer):
