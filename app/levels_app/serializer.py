@@ -1,19 +1,18 @@
 from rest_framework import serializers
+from user_app.models import UsersTasks
+
 from .models import Rank, TaskTemplate, TaskRoutes, Reward, SocialMedia
-from user_app.models import User, UsersTasks
 
 
 class SocialMediaTasksSerializer(serializers.ModelSerializer):
-
     amount = serializers.SerializerMethodField()
     is_completed = serializers.SerializerMethodField()
 
-    def get_is_completed(self, obj:SocialMedia):
+    def get_is_completed(self, obj: SocialMedia):
         return obj.id in self.context.get('completed_tasks')
 
-    def get_amount(self, obj:SocialMedia):
+    def get_amount(self, obj: SocialMedia):
         return obj.reward_amount
-    
 
     class Meta:
         model = SocialMedia
@@ -21,7 +20,6 @@ class SocialMediaTasksSerializer(serializers.ModelSerializer):
 
 
 class RewardSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Reward
         fields = "__all__"
@@ -89,17 +87,15 @@ class RankInfoSerializer(serializers.ModelSerializer):
 
 
 class UserTaskSerializer(serializers.ModelSerializer):
-
-
     class Meta:
         model = TaskRoutes
 
+
 class TaskCoordinatesSerializer(serializers.ModelSerializer):
-
-
     class Meta:
         model = TaskRoutes
         fields = ('coord_x', 'coord_y')
+
 
 class TasksSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
@@ -110,30 +106,28 @@ class TasksSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
 
+    def get_name(self, obj: UsersTasks):
+        return obj.task.template.name
 
-    def get_name(self, obj:UsersTasks):
-       return obj.task.template.name
-    
-    def get_x(self, obj:UsersTasks):
-       return obj.task.coord_x
-    
-    def get_y(self, obj:UsersTasks):
-       return obj.task.coord_y
-    
+    def get_x(self, obj: UsersTasks):
+        return obj.task.coord_x
+
+    def get_y(self, obj: UsersTasks):
+        return obj.task.coord_y
+
     def get_type(self, obj):
         return obj.task.template.get_task_type_display()
-    
-    def get_rewards(self, obj:UsersTasks):
+
+    def get_rewards(self, obj: UsersTasks):
         return RewardSerializer(obj.rewards, many=True).data
-    
-    def get_status(self, obj:UsersTasks):
+
+    def get_status(self, obj: UsersTasks):
         return obj.get_status_display()
-    
-    def get_routes(self, obj:UsersTasks):
+
+    def get_routes(self, obj: UsersTasks):
         if obj.status == UsersTasks.Status.COMPLETED:
             tsks = obj.task.get_subtasks()
             return TaskCoordinatesSerializer(tsks, many=True).data
-    
 
     class Meta:
         model = UsersTasks

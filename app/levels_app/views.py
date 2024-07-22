@@ -109,12 +109,11 @@ def get_rank_info(request):
     user_data = get_object_or_404(UserData, user_id=user_id)
     rank_info = get_object_or_404(Rank, id=rank_id)
     if user_data.rank_id == rank_id:
-        serializer = RankInfoSerializer(rank_info, context={'user_data': user_data}).data
-        return JsonResponse(serializer, status=status.HTTP_200_OK)
-    else:
-        return JsonResponse(ClosedRankSerializer(rank_info).data, status=status.HTTP_200_OK)
+        serializer_data = RankInfoSerializer(rank_info, context={'user_data': user_data}).data
+        return JsonResponse(serializer_data, status=status.HTTP_200_OK)
+    # else:
+    #     return JsonResponse(ClosedRankSerializer(rank_info).data, status=status.HTTP_200_OK)
     
-
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
