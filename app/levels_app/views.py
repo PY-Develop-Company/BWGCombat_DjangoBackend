@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Reward, Rank, SocialMedia, CompletedSocialTasks
-from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoutes
+from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoutes, User
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
 from levels_app.serializer import RankInfoSerializer, TasksSerializer
@@ -81,14 +81,13 @@ def go_to_next_rank(request):
     except Rank.DoesNotExist:
         return JsonResponse({"result": "no next rank exists"})
 
-    if userdata.gold_balance >= rank_to_go.gold_required:
+    if userdata.gold_balance >= current_rank.gold_required:
         place_items(userdata, rank_to_go)
         userdata.rank = rank_to_go
         userdata.max_energy_amount = rank_to_go.init_energy.amount
         userdata.multiclick_amount = rank_to_go.init_multiplier.amount
         userdata.energy_regeneration = rank_to_go.init_energy_regeneration
         userdata.current_stage = rank_to_go.init_stage
-        print(rank_to_go.init_stage.initial_task)
         initial = UsersTasks.objects.get(task=rank_to_go.init_stage.initial_task, user=userdata.user)
         initial.status = UsersTasks.Status.IN_PROGRESS
 
@@ -98,22 +97,24 @@ def go_to_next_rank(request):
         return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({"result": "You don't have enough money to move on the next rank"}, status=status.HTTP_403_FORBIDDEN)
-
+    
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
-def get_rank_info(request):
-    user_id = request.data.get('userId')
-    rank_id = request.data.get('rankId')
+@transaction.atomic
+def go_to_next_stage(request):
+    user_id = request.data.get("userId")
+    userdata = get_object_or_404(UserData, user_id = user_id)
+    if userdata.has_key:
+        if userdata.current_stage.next_stage:
+            userdata.current_stage = userdata.current_stage.next_stage
+            return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
+        else:
+            return go_to_next_rank(request)
 
-    user_data = get_object_or_404(UserData, user_id=user_id)
-    rank_info = get_object_or_404(Rank, id=rank_id)
-    if user_data.rank_id == rank_id:
-        serializer = RankInfoSerializer(rank_info, context={'user_data': user_data}).data
-        return JsonResponse(serializer, status=status.HTTP_200_OK)
     else:
-        return JsonResponse(ClosedRankSerializer(rank_info).data, status=status.HTTP_200_OK)
-    
+       return JsonResponse({"result":"You don't have key to go next stage"}, status=status.HTTP_403_FORBIDDEN)
+
 
 
 @api_view(["POST"])
@@ -149,6 +150,25 @@ def get_partner_tasks(request):
     completed = CompletedSocialTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
     serializer = SocialMediaTasksSerializer(tasks, context={'completed_tasks': completed}, many=True)
     return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
+
+@api_view(["POST"])
+def complete_partner_task(request):
+    user_id = request.data.get('userId')
+    task_id = request.data.get('taskId')
+    
+    task = SocialMedia.objects.get(id=task_id)
+    user = UserData.objects.get(user=user_id)
+    #check for completion
+    completed = True
+
+    if completed:
+        if not CompletedSocialTasks.objects.filter(task = task, user=user.user).exists():
+            user.gold_balance += task.reward_amount
+            CompletedSocialTasks.objects.update_or_create(task=task, user=user.user)
+            user.save()
+    else:
+        return JsonResponse({"result":"not ok"}, status=status.HTTP_403_FORBIDDEN)
+    return JsonResponse({"result":"ok"}, status=status.HTTP_200_OK)
 
 
 

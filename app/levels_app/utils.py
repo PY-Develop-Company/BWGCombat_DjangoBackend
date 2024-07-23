@@ -48,7 +48,7 @@ def place_key(user_data: UserData, stage: Stage):
         return
     task = random.choice(avaliable_keys)
     key = UsersTasks.objects.create(user=user_data.user, task=task)
-    key.rewards.add(Reward.objects.get(name="Key"))
+    key.rewards.add(Reward.objects.get(id=1))
     key.save()
 
 
@@ -81,6 +81,7 @@ def place_jail(user_data:UserData, stage:Stage):
 def place_items(user_data: UserData, rank:Rank):
     stages = rank.get_all_stages()
     for stage in stages:
+        print(stage)
         place_key(user_data, stage)
         place_jail(user_data, stage)
     place_rewards_for_chests(user_data, rank.get_empty_chests(user_data))
