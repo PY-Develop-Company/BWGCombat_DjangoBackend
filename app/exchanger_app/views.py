@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 
-from .serilizers import SwapSerializer, TransferSerializer
+from .serializers import SwapSerializer, TransferSerializer
 from .utils import is_exchange_pair_exists, is_asset_exists, is_sufficient
 
 from .models import Swap, Transfer, Asset
