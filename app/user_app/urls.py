@@ -16,6 +16,8 @@ urlpatterns = [
     path("get_user_referrals/", views.get_user_referrals, name="get_user_referrals"),
     path('track/<int:link_id>/', views.track_link_click, name='track_link_click'),
     path('pick_gender/', views.pick_character, name='pick_character'),
-    path('change_language/', views.change_language, name='pick_character')
+    path('change_language/', views.change_language, name='pick_character'),
+    path('user_settings/', views.get_user_settings, name='get_user_settings'),
+    path('update_settings/', views.update_user_settings, name='update_user_settings')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

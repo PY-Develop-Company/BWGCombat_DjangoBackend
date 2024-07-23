@@ -116,7 +116,6 @@ def go_to_next_stage(request):
        return JsonResponse({"result":"You don't have key to go next stage"}, status=status.HTTP_403_FORBIDDEN)
 
 
-
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def get_stage_tasks_with_routes(request):

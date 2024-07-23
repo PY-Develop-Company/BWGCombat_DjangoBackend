@@ -4,6 +4,7 @@ from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyL
 from levels_app.serializer import RankInfoSerializer, RankingSerializer, RewardSerializer, TaskSerializer
 from user_app.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from user_app.utils import get_gnome_reward
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -39,8 +40,6 @@ class UserDataSerializer(serializers.ModelSerializer):
     is_picked_gender = serializers.SerializerMethodField()
     gender = serializers.SerializerMethodField()
     lang_code = serializers.SerializerMethodField()
-
-
 
     def get_click_multiplier(self, obj: UserData):
         return obj.multiclick_amount
@@ -88,6 +87,23 @@ class UserDataSerializer(serializers.ModelSerializer):
         )
 
 
+class UserSettingsSerializer(serializers.ModelSerializer):
+    lang_code = serializers.SerializerMethodField()
+
+    def get_lang_code(self, obj: UserData):
+        return obj.user.interface_lang.lang_code
+
+    class Meta:
+        model = UserData
+        fields = (
+            "lang_code",
+            "visual_effects",
+            "general_volume",
+            "effects_volume",
+            "music_volume"
+        )
+
+
 class ClickSerializer(serializers.ModelSerializer):
 
     click_multiplier = serializers.SerializerMethodField()
@@ -102,7 +118,6 @@ class ClickSerializer(serializers.ModelSerializer):
     
     def get_energy(self, obj:UserData):
         return obj.max_energy_amount
-
 
     class Meta:
         model = UserData
@@ -122,12 +137,11 @@ class ReferralsSerializer(serializers.ModelSerializer):
     tg_username = serializers.SerializerMethodField()
     passive_income = serializers.SerializerMethodField()
 
-    def get_tg_username(self, obj:UserData):
-        return obj.user_id.tg_username
+    def get_tg_username(self, obj: UserData):
+        return obj.user.tg_username
     
-    def get_passive_income(self, obj:UserData):
-        return obj.passive_income.amount
-        
+    def get_passive_income(self, obj: UserData):
+        return obj.gnome_amount * get_gnome_reward()
     
     class Meta:
         model = UserData

@@ -2,17 +2,17 @@ import os
 
 from ads_app.models import Advert
 from django.core.management.base import BaseCommand
-from django.utils.timezone import now
-from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, PassiveIncomeLevel, SocialMedia, CompletedSocialTasks, StageTemplate, Stage
-from user_app.models import User, Language, UserData, CustomUserManager, Link, Fren
-from exchanger_app.models import Asset, ExchangePair
-import os
 from django.db import transaction
+from django.utils.timezone import now
+from exchanger_app.models import Asset, ExchangePair
+from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, \
+    PassiveIncomeLevel, SocialMedia, CompletedSocialTasks, StageTemplate, Stage
+from user_app.models import User, Language, UserData, Link, Fren
 
 
 class Command(BaseCommand):
     help = 'Seed database with initial data'
-    
+
     tasks_1_stage = []
 
     def handle(self, *args, **kwargs):
@@ -23,9 +23,7 @@ class Command(BaseCommand):
 
         self.seed_lang()
 
-
         self.seed_rewards()
-
 
         self.seed_task_templates()
         self.seed_task_routes()
@@ -33,7 +31,6 @@ class Command(BaseCommand):
 
         self.seed_stage_templates()
         self.seed_stage()
-
 
         self.seed_ranks()
 
@@ -48,7 +45,6 @@ class Command(BaseCommand):
         self.seed_assets()
         self.seed_exchange_pairs()
         self.seed_ads()
-
 
         self.stdout.write('Data seeded successfully.')
 
@@ -80,8 +76,6 @@ class Command(BaseCommand):
             {"id":16, "name": "energy +50", "amount": 50, "reward_type": Reward.RewardType.ENERGY_BALANCE},
             {"id":17, "name": "multiclick +2", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
             {"id":18, "name": "multiclick +10", "amount": 10, "reward_type": Reward.RewardType.MULTIPLIER},
-            {"id":19, "name": "multiclick +1", "amount": 1, "reward_type": Reward.RewardType.MULTIPLIER},
-            {"id":20, "name": "energy +100", "amount": 100, "reward_type": Reward.RewardType.ENERGY_BALANCE},
             # Add more rewards as needed
         ]
         for reward_data in rewards_data:
@@ -89,6 +83,12 @@ class Command(BaseCommand):
 
     def seed_ranks(self):
         ranks_data = [
+            {"id": 1, "name": "Ельфійський ліс", "description": "Starting rank", "gold_required": 10000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 1"), 'init_stage_id':1, 'next_rank_id':2},
+            {"id": 2, "name": "Вічна мерзлота", "description": "Intermediate rank", "gold_required": 30000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 2"),  'init_stage_id':2, 'next_rank_id':3},
+            {"id": 3, "name": "Rank 3", "description": "Intermediate rank", "gold_required": 60000,
+             "inviter_reward": Reward.objects.get(name="Referral reached Rank 3")},
             {"id": 4, "name": "Rank 4", "description": "Intermediate rank", "gold_required": 90000,
              "inviter_reward": Reward.objects.get(name="Referral reached Rank 4")},
             {"id": 5, "name": "Rank 5", "description": "Intermediate rank", "gold_required": 120000,
@@ -113,41 +113,27 @@ class Command(BaseCommand):
         ]
         for rank_data in ranks_data:
             next_rank = rank_data.pop('next_rank_id', None)
-            rank,_ = Rank.objects.update_or_create(name=rank_data['name'], defaults=rank_data)
+            rank, _ = Rank.objects.update_or_create(name=rank_data['name'], defaults=rank_data)
             rank.next_rank_id = next_rank
             rank.save()
 
-
     def seed_stage_templates(self):
         stage_temp_data = [
-            {"id": 1, "name": "1_stage_1_rank_tmp", "keys_amount": 0, "jail_amount":0, 'task_with_keys':[]},
-            {"id": 2, "name": "1_stage_2_rank_tmp", "keys_amount": 0, "jail_amount":0, 'task_with_keys':[]},
-            {"id": 3, "name": "1_stage_3_rank_tmp", "keys_amount": 1, "jail_amount":2, 'task_with_keys': {x for x in [16,17,20,24,26,27,29]}},
-            {"id": 4, "name": "2_stage_3_rank_tmp", "keys_amount": 1, "jail_amount":2, 'task_with_keys': {x for x in [34,35,39,47,48,44,45]}},
-            {"id": 5, "name": "3_stage_3_rank_tmp", "keys_amount": 1, "jail_amount":2, 'task_with_keys': {x for x in [62,63,65,67,56,58,53,54]}},
+            {"id": 1, "name": "1_stage_1_rank_tmp", "keys_amount": 0, "jail_amount":0},
+            {"id": 2, "name": "1_stage_2_rank_tmp", "keys_amount": 0, "jail_amount":0},
         ]
-        for stage_temp in stage_temp_data:
-            st,_ = StageTemplate.objects.update_or_create(id=stage_temp['id'], defaults={"name":stage_temp['name'], 'keys_amount':stage_temp['keys_amount'], "jail_amount":stage_temp['jail_amount']})
-            for i in stage_temp['task_with_keys']:
-                st.task_with_keys.add(i)
-            st.save()
-
+        for rank_data in stage_temp_data:
+            StageTemplate.objects.update_or_create(id=rank_data['id'], defaults=rank_data)
 
     def seed_stage(self):
         stage_data = [
             {"id": 1, "name": "1_stage_1_rank", "initial_task_id":1, "tasks":[1,2], "stage_template_id":1},
-            {"id": 2, "name": "1_stage_2_rank", "initial_task_id":3, "tasks":[x for x in range(3,11)], "stage_template_id":2},
-            {"id": 3, "name": "3_stage_3_rank", "initial_task_id":49, "tasks":[x for x in range(49,68)], "stage_template_id":5},
-            {"id": 4, "name": "2_stage_3_rank", "initial_task_id":30, "tasks":[x for x in range(30,49)], "stage_template_id":4, 'next_stage_id':3},
-            {"id": 5, "name": "1_stage_3_rank", "initial_task_id":11, "tasks":[x for x in range(11,30)], "stage_template_id":3, 'next_stage_id':4},
+            {"id": 2, "name": "1_stage_2_rank", "initial_task_id":3, "tasks":[x for x in range(3,11)], "stage_template_id":1},
         ]
         for stage_data in stage_data:
-            st,_ = Stage.objects.update_or_create(id=stage_data['id'], defaults={"name":stage_data['name'], "initial_task_id":stage_data['initial_task_id'], "stage_template_id":stage_data['stage_template_id'], 'next_stage_id':stage_data.get('next_stage_id', None)})
+            st,_ = Stage.objects.update_or_create(id=stage_data['id'], defaults={"name":stage_data['name'], "initial_task_id":stage_data['initial_task_id'], "stage_template_id":stage_data['stage_template_id']})
             st.tasks.add(*stage_data['tasks'])
             st.save()
-
-
-
 
     @transaction.atomic
     def seed_task_templates(self):
@@ -155,23 +141,15 @@ class Command(BaseCommand):
         task_templates_data = [
             { "id":1, "name": "Subscribe to Channel",   "text": "Subscribe to our channel.",    "task_type": TaskTemplate.TaskType.ch_sub,          "completion_number": 1, "price": 0,     "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=17)]},
             { "id":2, "name": "Invite 1 friends",       "text": "Invite a friend to join.",     "task_type": TaskTemplate.TaskType.inv_fren,        "completion_number": 1, "price": 0,     "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=18) ]},
-            { "id":3, "name": "chest_1000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 1_000,  "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
-            { "id":4, "name": "Upgrade pickaxe +2",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multicklick, "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=17) ]},
-            { "id":5, "name": "Upgrade energy",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=16)]},
-            { "id":6, "name": "Upgrade pickaxe +1",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multicklick, "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=19) ]},
-            { "id":7, "name": "chest_2000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 2_000,  "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
-            { "id":8, "name": "Upgrade energy",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 5_000,  "rewards": [Reward.objects.get(id=16)]},
-            { "id":9, "name": "Upgrade pickaxe +2",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multicklick, "completion_number": 0, "price": 5_000,  "rewards": [Reward.objects.get(id=17) ]},
-            { "id":10, "name": "Upgrade energy +100",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=20)]},
-            { "id":11, "name": "chest_3000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 3_000,  "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
-            { "id":12, "name": "Upgrade energy +100",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 10_000,  "rewards": [Reward.objects.get(id=20)]},
-            { "id":13, "name": "Upgrade energy +50",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 10_000,  "rewards": [Reward.objects.get(id=16)]},
-            { "id":14, "name": "Upgrade pickaxe +1",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multicklick, "completion_number": 0, "price": 5_000,  "rewards": [Reward.objects.get(id=19) ]},
-            
+            { "id":3, "name": "chest_1000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 1000,  "rewards": [Reward.objects.get(id=11), Reward.objects.get(id=12), Reward.objects.get(id=2)]},
+            { "id":4, "name": "Upgrade pickaxe",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multicklick, "completion_number": 0, "price": 2000,  "rewards": [Reward.objects.get(id=17) ]},
+            { "id":5, "name": "Upgrade energy",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 2000,  "rewards": [Reward.objects.get(id=16)]},
             # Add more task templates as needed
         ]
 
         for task_template_data in task_templates_data:
+            if task_template_data["id"] in [1,2]:
+                self.tasks_1_stage.append(task_template_data)
             rewards = task_template_data.pop("rewards", [])
             task_template, created = TaskTemplate.objects.update_or_create(
                 id=task_template_data['id'],
@@ -180,87 +158,25 @@ class Command(BaseCommand):
             task_template.rewards.set(rewards)
             task_template.save()
 
-
     @transaction.atomic
     def seed_task_routes(self):
         task_routes_data = [
-            {"id":1,"coord_x": 0,"coord_y": 0,"template_id": 1,"parent":None,"initial": True},
-            {"id":2,"coord_x": 0,"coord_y": -1,"template_id": 2,  "parent_id": 1,"initial": False},
+            {"id": 1, "coord_x": 0, "coord_y": 0, "template_id": 1, "parent": None, "initial": True},
+            {"id": 2, "coord_x": 0, "coord_y": -1, "template_id": 2, "parent_id": 1, "initial": False},
             # 2 rank 1 stage
             {"id":  3, "coord_x":  0,  "coord_y":  0 ,  "template_id": 5,  "parent_id": None, "initial": True},
             {"id":  4, "coord_x":  -1, "coord_y": 0,    "template_id": 4,  "parent_id": 3,    "initial": False},
             {"id":  5, "coord_x":  -2, "coord_y":  0,   "template_id": 3,  "parent_id": 4,    "initial": False,},
-            {"id":  6, "coord_x":  1,  "coord_y": 0,    "template_id": 3,  "parent_id": 3,    "initial": False,},
-            {"id":  7, "coord_x":  0,  "coord_y":  -1,  "template_id": 8,  "parent_id": 3,    "initial": False,},
-            {"id":  8, "coord_x":  -1, "coord_y": -1,   "template_id": 9,  "parent_id": 7,    "initial": False},
-            {"id":  9, "coord_x":  0,  "coord_y":  -2,  "template_id": 8,  "parent_id": 7,    "initial": False,},
-            {"id": 10, "coord_x":  -1, "coord_y": -2,   "template_id": 9,  "parent_id": 9,    "initial": False,},
-            # 3 rank 1 stage(left)
-            {"id": 11, "coord_x":  0,  "coord_y":  0 ,  "template_id": 5,  "parent_id": None, "initial": True},
-            {"id": 12, "coord_x": -1,  "coord_y":  0 ,  "template_id": 6,  "parent_id": 11, "initial": False},
-            {"id": 13, "coord_x": -2,  "coord_y":  0 ,  "template_id": 3,  "parent_id": 12, "initial": False}, #central
-            {"id": 14, "coord_x": -3,  "coord_y":  0 ,  "template_id": 3,  "parent_id": 13, "initial": False},
-            {"id": 15, "coord_x": -2,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 13, "initial": False},
-            {"id": 16, "coord_x": -3,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 15, "initial": False},#key
-            {"id": 17, "coord_x": -1,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 15, "initial": False},#key
-            {"id": 18, "coord_x": -2,  "coord_y":  1 ,  "template_id": 3,  "parent_id": 13, "initial": False},
-            {"id": 19, "coord_x": -3,  "coord_y":  1 ,  "template_id": 6,  "parent_id": 18, "initial": False},
-            {"id": 20, "coord_x": -1,  "coord_y":  1 ,  "template_id": 3,  "parent_id": 18, "initial": False},#key
-            # 3 rank 1 stage(right)
-            {"id": 21, "coord_x":  1,  "coord_y":  0 ,  "template_id": 3,  "parent_id": 11, "initial": True},
-            {"id": 22, "coord_x":  2,  "coord_y":  0 ,  "template_id": 3,  "parent_id": 21, "initial": False},
-            {"id": 23, "coord_x":  2,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 22, "initial": False},
-            {"id": 24, "coord_x":  1,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 23, "initial": False},#key
-            {"id": 25, "coord_x":  3,  "coord_y":  0 ,  "template_id": 5,  "parent_id": 22, "initial": False},
-            {"id": 26, "coord_x":  3,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 25, "initial": False},#key
-            {"id": 27, "coord_x":  3,  "coord_y":  1 ,  "template_id": 3,  "parent_id": 25, "initial": False},#key
-            {"id": 28, "coord_x":  2,  "coord_y":  1 ,  "template_id": 3,  "parent_id": 27, "initial": False},
-            {"id": 29, "coord_x":  1,  "coord_y":  1 ,  "template_id": 3,  "parent_id": 28, "initial": False},#key
-            # 3 rank 2 stage
-            {"id": 30, "coord_x":  0,  "coord_y":  0 ,  "template_id": 8,  "parent_id": None, "initial": True},
-            {"id": 31, "coord_x":  1,  "coord_y":  0 ,  "template_id": 8,  "parent_id": 30, "initial": False},
-            {"id": 32, "coord_x":  2,  "coord_y":  0 ,  "template_id": 7,  "parent_id": 31, "initial": False},
-            {"id": 33, "coord_x":  2,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 32, "initial": False},
-            {"id": 34, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 33, "initial": False},#key
-            {"id": 35, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 33, "initial": False},#key
-            {"id": 36, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 35, "initial": False},
-            {"id": 37, "coord_x":  1,  "coord_y":  1 ,  "template_id":10,  "parent_id": 36, "initial": False},
-            {"id": 38, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 37, "initial": False},
-            {"id": 39, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 38, "initial": False},#key
-            {"id": 40, "coord_x":  1,  "coord_y":  1 ,  "template_id": 9,  "parent_id": 30, "initial": False},
-            {"id": 41, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 40, "initial": False},
-            {"id": 42, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 41, "initial": False},
-            {"id": 43, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 41, "initial": False},
-            {"id": 44, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 42, "initial": False},#key
-            {"id": 45, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 42, "initial": False},#key
-            {"id": 46, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 41, "initial": False},
-            {"id": 47, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 46, "initial": False},#key
-            {"id": 48, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 46, "initial": False},#key
-            # 3 rank 3 stage
-            {"id": 49, "coord_x":  0,  "coord_y":  0 ,  "template_id": 12,  "parent_id": None, "initial": True},
-            {"id": 50, "coord_x":  1,  "coord_y":  0 ,  "template_id": 11,  "parent_id": 49, "initial": False},
-            {"id": 51, "coord_x":  2,  "coord_y":  0 ,  "template_id": 11,  "parent_id": 50, "initial": False},
-            {"id": 52, "coord_x":  2,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 51, "initial": False},
-            {"id": 53, "coord_x":  1,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 52, "initial": False},#key
-            {"id": 54, "coord_x":  3,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 52, "initial": False},#key
-            {"id": 55, "coord_x":  3,  "coord_y":  0 ,  "template_id": 13,  "parent_id": 54, "initial": False},
-            {"id": 56, "coord_x":  3,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 55, "initial": False},#key
-            {"id": 57, "coord_x":  2,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 51, "initial": False},
-            {"id": 58, "coord_x":  1,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 57, "initial": False},#key
-            {"id": 59, "coord_x": -1,  "coord_y":  0 ,  "template_id": 14,  "parent_id": 49, "initial": False},
-            {"id": 60, "coord_x": -2,  "coord_y":  0 ,  "template_id": 11,  "parent_id": 59, "initial": False},
-            {"id": 61, "coord_x": -2,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 60, "initial": False},
-            {"id": 62, "coord_x": -1,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 61, "initial": False},#key
-            {"id": 63, "coord_x": -3,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 61, "initial": False},#key
-            {"id": 64, "coord_x": -3,  "coord_y":  0 ,  "template_id": 14,  "parent_id": 63, "initial": False},
-            {"id": 65, "coord_x": -3,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 64, "initial": False},#key
-            {"id": 66, "coord_x": -2,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 65, "initial": False},
-            {"id": 67, "coord_x": -1,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 66, "initial": False},#key
-            ]
+            {"id":  6, "coord_x":  1,  "coord_y": 0,    "template_id": 3,  "parent_id": 1,    "initial": False,},
+            {"id":  7, "coord_x":  0,  "coord_y":  -1,  "template_id": 5,  "parent_id": 1,    "initial": False,},
+            {"id":  8, "coord_x":  -1, "coord_y": -1,   "template_id": 4,  "parent_id": 7,    "initial": False},
+            {"id":  9, "coord_x":  0,  "coord_y":  -2,  "template_id": 5,  "parent_id": 7,    "initial": False,},
+            {"id": 10, "coord_x":  -1, "coord_y": -2,   "template_id": 2,  "parent_id": 9,    "initial": False,},
+        ]
     
         for task_route_data in task_routes_data:
             task_route, created = TaskRoutes.objects.update_or_create(
-                id = task_route_data['id'],
+                id=task_route_data['id'],
                 defaults=task_route_data
             )
             task_route.save()

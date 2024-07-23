@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 
-from .serilizer import SwapSerializer, TransferSerializer
+from .serilizers import SwapSerializer, TransferSerializer
 from .utils import is_exchange_pair_exists, is_asset_exists, is_sufficient
 
 from .models import Swap, Transfer, Asset
@@ -120,7 +120,7 @@ def execute_transfer(request):
     return JsonResponse({"result": "ok"})
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def get_all_transactions(request):
     user_id = request.data.get('userId')
     if not user_id:

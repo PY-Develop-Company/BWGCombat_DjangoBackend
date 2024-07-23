@@ -130,7 +130,7 @@ class UserData(models.Model):
     music_volume = models.PositiveSmallIntegerField(default=50)
 
     has_key = models.BooleanField(default=False)
-    blocked_until = models.DateTimeField(default = now)
+    blocked_until = models.DateTimeField(default=now)
 
     def add_gold_coins(self, coins: int):
         self.gold_balance += int(coins)

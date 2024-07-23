@@ -8,15 +8,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils.timezone import now
 
+from .utils import get_gnome_reward
 from .models import User, UserData, Fren, Link, LinkClick, Language
 
 # from aiogram import Bot
 # from aiogram.utils.deep_linking import create_start_link
 from levels_app.models import Rank
 import json
-from .serializer import UserDataSerializer, RankInfoSerializer, ClickSerializer, ReferralsSerializer
+from .serializers import UserDataSerializer, RankInfoSerializer, ClickSerializer, ReferralsSerializer, UserSettingsSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from user_app.serializer import CustomTokenObtainPairSerializer
+from user_app.serializers import CustomTokenObtainPairSerializer
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -36,7 +37,7 @@ def get_user_info(request):
     delta = now() - user_data.last_visited
     user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.max_energy_amount - user_data.current_energy)
     print(delta.total_seconds())
-    income = round(user_data.gnome_amount*100/3600 * delta.total_seconds())
+    income = round(user_data.gnome_amount*get_gnome_reward()/3600 * delta.total_seconds())
     user_data.gold_balance += income
     print(user_data.rank.get_all_tasks(user_data))
     user_data.save()
@@ -174,11 +175,8 @@ def get_user_referrals(request):
 
 def track_link_click(request, link_id):
     link = get_object_or_404(Link, id=link_id)
-
     user_id = request.data.get("userId")
-
     user = User.objects.get(tg_id=user_id)
-
     LinkClick.objects.create(user=user, link=link)
 
     return redirect(link.url)
@@ -202,6 +200,45 @@ def change_language(request):
     lang_code = request.data.get('languageCode')
     user_data = get_object_or_404(UserData, user_id=user_id)
     lang = get_object_or_404(Language, lang_code=lang_code)
-    user_data.user_id.interface_lang = lang
+    user_data.user.interface_lang = lang
     user_data.save()
     return JsonResponse(UserDataSerializer(user_data).data, status=status.HTTP_200_OK)
+
+
+@permission_classes([AllowAny])
+@api_view(["GET"])
+def get_user_settings(request):
+    user_id = request.data.get("userId")
+
+    user_data_obj = UserData.objects.get(user_id=user_id)
+    settings_data = UserSettingsSerializer(user_data_obj).data
+
+    return JsonResponse(settings_data)
+
+
+@permission_classes([AllowAny])
+@api_view(["POST"])
+def update_user_settings(request):
+    user_id = request.data.get("userId")
+    language_code = request.data.get("languageCode")
+    visual_effects = request.data.get("visualEffects")
+    general_volume = request.data.get("generalVolume")
+    effects_volume = request.data.get("effectsVolume")
+    music_volume = request.data.get("musicVolume")
+
+    user_data_obj = UserData.objects.get(user_id=user_id)
+    user_obj = user_data_obj.user
+
+    user_obj.interface_lang = Language.objects.get(lang_code=language_code)
+    user_data_obj.visual_effects = visual_effects
+    try:
+        user_data_obj.general_volume = int(general_volume)
+        user_data_obj.effects_volume = int(effects_volume)
+        user_data_obj.music_volume = int(music_volume)
+    except ValueError:
+        return JsonResponse({"result": "updating volume failed as not-numbers passed as parameters"})
+    else:
+        user_obj.save()
+        user_data_obj.save()
+
+    return JsonResponse({"result": "ok"})

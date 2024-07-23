@@ -52,13 +52,12 @@ def place_key(user_data: UserData, stage: Stage):
     key.save()
 
 
-
 def place_rewards_for_chests(user_data, chests:list[TaskRoutes]):
     for chest in chests:
         available_rewards = list(chest.template.rewards.exclude(Q(name='Key') | Q(name='Jail')))
         ts = UsersTasks.objects.create(user=user_data.user, task = chest)
         ts.rewards.add(random.choice(available_rewards))
-        ts.save
+        ts.save()
 
 
 def place_another_tasks(user_data:UserData, tasks:list[TaskRoutes]):
@@ -67,6 +66,7 @@ def place_another_tasks(user_data:UserData, tasks:list[TaskRoutes]):
         ts.rewards.add(*task.template.rewards.all())
         ts.save()
 
+
 def place_jail(user_data:UserData, stage:Stage):
     amount = stage.stage_template.jail_amount
     tasks = random.sample(list(stage.get_empty_chests(user_data)), amount)
@@ -74,8 +74,6 @@ def place_jail(user_data:UserData, stage:Stage):
         ts = UsersTasks.objects.create(user=user_data.user, task = task)
         ts.rewards.add(Reward.objects.get(name='Jail'))
         ts.save()
-
-
 
 
 def place_items(user_data: UserData, rank:Rank):
@@ -89,5 +87,3 @@ def place_items(user_data: UserData, rank:Rank):
     ts = UsersTasks.objects.get(user=user_data.user, task=rank.init_stage.initial_task)
     ts.status = UsersTasks.Status.IN_PROGRESS
     ts.save()
-    
-    
