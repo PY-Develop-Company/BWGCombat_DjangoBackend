@@ -63,7 +63,7 @@ def check_task_completion(request):
             ts.save()
         userdata.save()
         task.save()
-        return JsonResponse({"message":"success"})
+        return JsonResponse({"message":"success", "reward":f"{task.rewards.first().name}", "amount":f"{task.rewards.first().amount}"})
     else:
         return JsonResponse({"message":"You haven't completed the task or no checking for this task exists yet"})
 

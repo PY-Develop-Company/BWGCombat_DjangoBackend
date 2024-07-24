@@ -142,7 +142,7 @@ class Command(BaseCommand):
             { "id":1, "name": "Subscribe to Channel",   "text": "Subscribe to our channel.",    "task_type": TaskTemplate.TaskType.ch_sub,          "completion_number": 1, "price": 0,     "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=17)]},
             { "id":2, "name": "Invite 1 friends",       "text": "Invite a friend to join.",     "task_type": TaskTemplate.TaskType.inv_fren,        "completion_number": 1, "price": 0,     "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=18) ]},
             { "id":3, "name": "chest_1000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 1000,  "rewards": [Reward.objects.get(id=11), Reward.objects.get(id=12), Reward.objects.get(id=2)]},
-            { "id":4, "name": "Upgrade pickaxe",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multicklick, "completion_number": 0, "price": 2000,  "rewards": [Reward.objects.get(id=17) ]},
+            { "id":4, "name": "Upgrade pickaxe",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 2000,  "rewards": [Reward.objects.get(id=17) ]},
             { "id":5, "name": "Upgrade energy",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 2000,  "rewards": [Reward.objects.get(id=16)]},
             # Add more task templates as needed
         ]
