@@ -164,14 +164,14 @@ class Command(BaseCommand):
             {"id": 1, "coord_x": 0, "coord_y": 0, "template_id": 1, "parent": None, "initial": True},
             {"id": 2, "coord_x": 0, "coord_y": -1, "template_id": 2, "parent_id": 1, "initial": False},
             # 2 rank 1 stage
-            {"id":  3, "coord_x":  0,  "coord_y":  0 ,  "template_id": 5,  "parent_id": None, "initial": True},
-            {"id":  4, "coord_x":  -1, "coord_y": 0,    "template_id": 4,  "parent_id": 3,    "initial": False},
-            {"id":  5, "coord_x":  -2, "coord_y":  0,   "template_id": 3,  "parent_id": 4,    "initial": False,},
-            {"id":  6, "coord_x":  1,  "coord_y": 0,    "template_id": 3,  "parent_id": 1,    "initial": False,},
-            {"id":  7, "coord_x":  0,  "coord_y":  -1,  "template_id": 5,  "parent_id": 1,    "initial": False,},
-            {"id":  8, "coord_x":  -1, "coord_y": -1,   "template_id": 4,  "parent_id": 7,    "initial": False},
-            {"id":  9, "coord_x":  0,  "coord_y":  -2,  "template_id": 5,  "parent_id": 7,    "initial": False,},
-            {"id": 10, "coord_x":  -1, "coord_y": -2,   "template_id": 2,  "parent_id": 9,    "initial": False,},
+            {"id":  3, "coord_x": 0,  "coord_y": 0,  "template_id": 5,  "parent_id": None, "initial": True},
+            {"id":  4, "coord_x": -1, "coord_y": 0,    "template_id": 4,  "parent_id": 3,    "initial": False},
+            {"id":  5, "coord_x": -2, "coord_y": 0,   "template_id": 3,  "parent_id": 4,    "initial": False},
+            {"id":  6, "coord_x": 1,  "coord_y": 0,    "template_id": 3,  "parent_id": 1,    "initial": False},
+            {"id":  7, "coord_x": 0,  "coord_y": -1,  "template_id": 5,  "parent_id": 1,    "initial": False},
+            {"id":  8, "coord_x": -1, "coord_y": -1,   "template_id": 4,  "parent_id": 7,    "initial": False},
+            {"id":  9, "coord_x": 0,  "coord_y": -2,  "template_id": 5,  "parent_id": 7,    "initial": False,},
+            {"id": 10, "coord_x": -1, "coord_y": -2,   "template_id": 2,  "parent_id": 9,    "initial": False,},
         ]
     
         for task_route_data in task_routes_data:

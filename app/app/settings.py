@@ -193,3 +193,6 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 ]
 
 CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "https://*"]
+
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
