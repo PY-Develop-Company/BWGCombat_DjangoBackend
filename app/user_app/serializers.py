@@ -73,7 +73,7 @@ class UserDataSerializer(serializers.ModelSerializer):
             "g_token",
             "last_visited",
             "rank",
-            # "stage",
+            "current_stage",
             "click_multiplier",
             "energy",
             "energy_regeneration",

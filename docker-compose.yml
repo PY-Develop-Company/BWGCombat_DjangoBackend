@@ -55,8 +55,8 @@ services:
           - NGROK_PORT=app:${NGROK_PORT}
 
     redis:
-        image: redis:alpine
-        expose:
+        image: redislabs/rejson:latest
+        ports:
           - "6379:6379"
 
 #    celery:

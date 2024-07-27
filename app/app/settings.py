@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
-    "django_seed",
+    "django_redis",
 
     "core",
     "user_app",
