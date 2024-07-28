@@ -28,6 +28,7 @@ NGROK_AUTHTOKEN=__token__
 NGROK_PORT=8000
 
 JWT_SIGNING_KEY=some_key
+BOT_TOKEN=__token__
 
 TG_CHANNEL=https://t.me/justforcheckingone
 ```

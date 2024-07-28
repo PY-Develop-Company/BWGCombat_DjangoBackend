@@ -1,30 +1,34 @@
+import asyncio
+
 import django.db
 from django.http import HttpResponse, JsonResponse
-
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.timezone import now
+from django.forms.models import model_to_dict
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from django.utils.timezone import now
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+from adrf.decorators import api_view as async_api_view
 
 from .utils import get_gnome_reward
 from .models import User, UserData, Fren, Link, LinkClick, Language
 
-# from aiogram import Bot
-# from aiogram.utils.deep_linking import create_start_link
 from levels_app.models import Rank
 import json
 from .serializers import UserDataSerializer, ClickSerializer, ReferralsSerializer, UserSettingsSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
 from user_app.serializers import CustomTokenObtainPairSerializer
+
 from redis import StrictRedis
-from django.forms.models import model_to_dict
 from datetime import datetime
+from tg_connection import get_fren_link
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    # Replace the serializer with your custom
     serializer_class = CustomTokenObtainPairSerializer
 
 
@@ -140,7 +144,6 @@ def add_user(request):
     except django.db.Error:
         return JsonResponse({"result": "Unexpected DB error"})
 
-    # both "tries" without exceptions
     return JsonResponse({"result": "The user has been registered successfully"})
 
 
@@ -248,3 +251,12 @@ def update_user_settings(request):
         user_data_obj.save()
 
     return JsonResponse({"result": "ok"})
+
+
+@permission_classes([AllowAny])
+@async_api_view(["POST"])
+async def async_get_fren_link(request):
+    user_id = request.data.get("userId")
+    task = asyncio.ensure_future(get_fren_link(user_id))
+    link = await task
+    return JsonResponse({"link": link})
