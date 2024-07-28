@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
-    "django_seed",
+    "django_redis",
 
     "core",
     "user_app",
@@ -193,3 +193,6 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 ]
 
 CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "https://*"]
+
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"

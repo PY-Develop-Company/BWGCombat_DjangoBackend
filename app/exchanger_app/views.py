@@ -11,6 +11,7 @@ from user_app.models import UserData, User
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
 
 
 def exchanger_home(request):
@@ -137,3 +138,10 @@ def get_all_transactions(request):
     transfer_data = TransferSerializer(transfers, many=True).data
 
     return JsonResponse({"swaps": swap_data, 'transfers': transfer_data})
+
+@api_view(["POST"])
+def buy_gnome(request):
+    user_id = request.data.get('userId')
+    user_data = get_object_or_404(UserData, user=user_id)
+    user_data.add_gnome()
+    user_data.save()

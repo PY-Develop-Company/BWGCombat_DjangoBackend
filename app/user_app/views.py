@@ -2,30 +2,33 @@ import asyncio
 
 import django.db
 from django.http import HttpResponse, JsonResponse
-
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.timezone import now
+from django.forms.models import model_to_dict
+
 from rest_framework.decorators import api_view, permission_classes
-from adrf.decorators import api_view as async_api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from django.utils.timezone import now
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+from adrf.decorators import api_view as async_api_view
 
 from .utils import get_gnome_reward
 from .models import User, UserData, Fren, Link, LinkClick, Language
 
-# from aiogram import Bot
-# from aiogram.utils.deep_linking import create_start_link
 from levels_app.models import Rank
 import json
-from .serializers import UserDataSerializer, RankInfoSerializer, ClickSerializer, ReferralsSerializer, UserSettingsSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import UserDataSerializer, ClickSerializer, ReferralsSerializer, UserSettingsSerializer
 from user_app.serializers import CustomTokenObtainPairSerializer
+
+from redis import StrictRedis
+from datetime import datetime
 from tg_connection import get_fren_link
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    # Replace the serializer with your custom
     serializer_class = CustomTokenObtainPairSerializer
 
 
@@ -36,18 +39,21 @@ def user_home(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_user_info(request):
+    red = StrictRedis('redis', 6379)
     user_id = request.query_params.get("userId")
-    user_data = get_object_or_404(UserData, user_id=user_id)
-    delta = now() - user_data.last_visited
-    user_data.current_energy += min(delta.total_seconds() * user_data.energy_regeneration, user_data.max_energy_amount - user_data.current_energy)
-    print(delta.total_seconds())
-    income = round(user_data.gnome_amount*get_gnome_reward()/3600 * delta.total_seconds())
-    user_data.gold_balance += income
-    print(user_data.rank.get_all_tasks(user_data))
-    user_data.save()
-
-    serializer = UserDataSerializer(user_data)
-    return Response({"info": serializer.data, 'passive_income': income}, status=status.HTTP_200_OK)
+    if not red.exists(f"user_{user_id}"):
+        print(red.keys())
+        user_data = get_object_or_404(UserData, user_id=user_id)
+        red.json().set(f"user_{user_id}", "$", UserDataSerializer(user_data).data)
+    user_data = red.json().get(f'user_{user_id}')
+    delta = now() - datetime.fromisoformat(
+        user_data["last_visited"]
+    )
+    user_data['current_energy'] += min(delta.total_seconds() * user_data['energy_regeneration'], user_data['energy'] - user_data['current_energy'])
+    income = round(user_data['gnome_amount']*get_gnome_reward()/3600 * delta.total_seconds())
+    user_data['gold_balance'] += income
+    red.json().set(f"user_{user_id}", "$", user_data, xx=True)
+    return Response({"info": user_data, 'passive_income': income}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -138,7 +144,6 @@ def add_user(request):
     except django.db.Error:
         return JsonResponse({"result": "Unexpected DB error"})
 
-    # both "tries" without exceptions
     return JsonResponse({"result": "The user has been registered successfully"})
 
 

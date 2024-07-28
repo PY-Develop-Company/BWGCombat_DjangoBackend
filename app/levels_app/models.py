@@ -35,9 +35,8 @@ class Rank(models.Model):
         from user_app.models import UsersTasks
 
         stages = self.get_all_stages()
-        tasks = TaskRoutes.objects.filter(stage__in=stages,
-                                          template=TaskTemplate.objects.get(task_type=TaskTemplate.TaskType.buy_chest)) \
-            .exclude(id__in=UsersTasks.objects.filter(user=user_data.user).values_list('task_id', flat=True)).distinct()
+        tasks = TaskRoutes.objects.filter(stage__in=stages, template__in=TaskTemplate.objects.filter(task_type=TaskTemplate.TaskType.buy_chest))\
+        .exclude(id__in=UsersTasks.objects.filter(user=user_data.user).values_list('task_id', flat=True)).distinct()
 
         return tasks
 
