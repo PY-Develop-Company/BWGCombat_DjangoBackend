@@ -44,7 +44,7 @@ class UserDataSerializer(serializers.ModelSerializer):
     def get_click_multiplier(self, obj: UserData):
         return obj.multiclick_amount
 
-    def get_energy(self, obj:UserData):
+    def get_energy(self, obj: UserData):
         return obj.max_energy_amount
 
     def get_rank(self, obj: UserData):
@@ -53,7 +53,7 @@ class UserDataSerializer(serializers.ModelSerializer):
     def get_username(self, obj: UserData):
         return User.objects.get(tg_id=obj.user.tg_id).tg_username
 
-    def get_is_picked_gender(self, obj:UserData):
+    def get_is_picked_gender(self, obj: UserData):
         return obj.character_gender is not None
 
     def get_gender(self, obj: UserData):
@@ -110,13 +110,13 @@ class ClickSerializer(serializers.ModelSerializer):
     energy = serializers.SerializerMethodField()
     passive_income = serializers.SerializerMethodField()
 
-    def get_click_multiplier(self, obj:UserData):
+    def get_click_multiplier(self, obj: UserData):
         return obj.multiclick_amount
 
-    def get_passive_income(self, obj:UserData):
+    def get_passive_income(self, obj: UserData):
         return obj.gnome_amount
     
-    def get_energy(self, obj:UserData):
+    def get_energy(self, obj: UserData):
         return obj.max_energy_amount
 
     class Meta:
