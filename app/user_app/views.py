@@ -1,8 +1,11 @@
+import asyncio
+
 import django.db
 from django.http import HttpResponse, JsonResponse
 
 from django.shortcuts import get_object_or_404, redirect
 from rest_framework.decorators import api_view, permission_classes
+from adrf.decorators import api_view as async_api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
@@ -18,6 +21,7 @@ import json
 from .serializers import UserDataSerializer, RankInfoSerializer, ClickSerializer, ReferralsSerializer, UserSettingsSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from user_app.serializers import CustomTokenObtainPairSerializer
+from tg_connection import get_fren_link
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -242,3 +246,12 @@ def update_user_settings(request):
         user_data_obj.save()
 
     return JsonResponse({"result": "ok"})
+
+
+@permission_classes([AllowAny])
+@async_api_view(["POST"])
+async def async_get_fren_link(request):
+    user_id = request.data.get("userId")
+    task = asyncio.ensure_future(get_fren_link(user_id))
+    link = await task
+    return JsonResponse({"link": link})
