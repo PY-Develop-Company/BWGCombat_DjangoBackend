@@ -123,7 +123,7 @@ def go_to_next_stage(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
-def get_stage_tasks_with_routes(request):
+def get_user_current_stage_info(request):
     user_id = request.data.get('userId')
     
     user_data = get_object_or_404(UserData, user_id=user_id)
@@ -132,10 +132,9 @@ def get_stage_tasks_with_routes(request):
     
     user_tasks = UsersTasks.objects.filter(user=user_data.user, task__in=stage_tasks).all()
     
-    serializer = TasksSerializer(user_tasks,context={'user_id':user_data.user.tg_id}, many=True).data
+    tasks_serializer = TasksSerializer(user_tasks,context={'user_id':user_data.user.tg_id}, many=True).data
 
-    print(serializer)
-    return JsonResponse({"tasks": serializer}, status=status.HTTP_200_OK)
+    return JsonResponse({"stage_has_keylock": current_stage.has_keylock, "user_has_key": user_data.has_key, "tasks": tasks_serializer}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -174,6 +173,3 @@ def complete_partner_task(request):
     else:
         return JsonResponse({"result": "not ok"}, status=status.HTTP_403_FORBIDDEN)
     return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
-
-
-

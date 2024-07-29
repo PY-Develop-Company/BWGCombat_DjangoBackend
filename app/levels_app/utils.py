@@ -8,17 +8,6 @@ from .models import Reward
 from django.db.models import Q
 
 
-# async def check_subscription(user_id):
-#     chat_member = await bot.get_chat_member(chat_id=channel_id, user_id=user_id)
-#     return False if chat_member.status in ['left', 'kicked'] else True
-#
-#
-# def check_subscription_sync(user_id):
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     return loop.run_until_complete(check_subscription(user_id))
-
-
 def give_reward_to_inviter(fren_id):
     try:
         inviter_id = Fren.objects.get(fren_id=fren_id)
@@ -44,8 +33,9 @@ def check_if_link_is_telegram(link: Link):
 
 def place_key(user_data: UserData, stage: Stage):
     avaliable_keys = list(stage.stage_template.task_with_keys.all())
-    if not avaliable_keys: 
+    if not avaliable_keys:
         return
+
     task = random.choice(avaliable_keys)
     key = UsersTasks.objects.create(user=user_data.user, task=task)
     key.rewards.add(Reward.objects.get(id=1))
@@ -67,19 +57,19 @@ def place_another_tasks(user_data:UserData, tasks:list[TaskRoutes]):
         ts.save()
 
 
-def place_jail(user_data:UserData, stage:Stage):
+def place_jail(user_data: UserData, stage: Stage):
     amount = stage.stage_template.jail_amount
-    tasks = random.sample(list(stage.get_empty_chests(user_data)), amount)
+    lst = list(stage.get_empty_chests(user_data))
+    tasks = random.sample(lst, amount)
     for task in tasks:
-        ts = UsersTasks.objects.create(user=user_data.user, task = task)
-        ts.rewards.add(Reward.objects.get(name='Jail'))
+        ts = UsersTasks.objects.create(user=user_data.user, task=task)
+        ts.rewards.add(Reward.objects.get(name='JAIL_12'))
         ts.save()
 
 
 def place_items(user_data: UserData, rank:Rank):
     stages = rank.get_all_stages()
     for stage in stages:
-        print(stage)
         place_key(user_data, stage)
         place_jail(user_data, stage)
     place_rewards_for_chests(user_data, rank.get_empty_chests(user_data))
