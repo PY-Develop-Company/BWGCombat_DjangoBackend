@@ -39,20 +39,20 @@ def user_home(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_user_info(request):
-    red = StrictRedis('redis', 6379)
+    redis_db = StrictRedis('redis', 6379)
     user_id = request.query_params.get("userId")
-    if not red.exists(f"user_{user_id}"):
-        print(red.keys())
+
+    if not redis_db.exists(f"user_{user_id}"):
+        print(redis_db.keys())
         user_data = get_object_or_404(UserData, user_id=user_id)
-        red.json().set(f"user_{user_id}", "$", UserDataSerializer(user_data).data)
-    user_data = red.json().get(f'user_{user_id}')
-    delta = now() - datetime.fromisoformat(
-        user_data["last_visited"]
-    )
+        redis_db.json().set(f"user_{user_id}", "$", UserDataSerializer(user_data).data)
+
+    user_data = redis_db.json().get(f'user_{user_id}')
+    delta = now() - datetime.fromisoformat(user_data["last_visited"])
     user_data['current_energy'] += min(delta.total_seconds() * user_data['energy_regeneration'], user_data['energy'] - user_data['current_energy'])
     income = round(user_data['gnome_amount']*get_gnome_reward()/3600 * delta.total_seconds())
     user_data['gold_balance'] += income
-    red.json().set(f"user_{user_id}", "$", user_data, xx=True)
+    redis_db.json().set(f"user_{user_id}", "$", user_data, xx=True)
     return Response({"info": user_data, 'passive_income': income}, status=status.HTTP_200_OK)
 
 

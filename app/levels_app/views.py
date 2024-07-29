@@ -1,4 +1,5 @@
 from django.http import JsonResponse, HttpResponse
+from rest_framework.request import Request
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Reward, Rank, SocialMedia, CompletedSocialTasks
@@ -26,16 +27,16 @@ def check_task_completion(request):
     userdata = UserData.objects.get(user_id=task.user.tg_id)
 
     if task.status != UsersTasks.Status.IN_PROGRESS:
-        return JsonResponse({"message":"Can't complete these task"}, status=status.HTTP_403_FORBIDDEN)
+        return JsonResponse({"message": "Can't complete these task"}, status=status.HTTP_403_FORBIDDEN)
 
     if task.status == UsersTasks.Status.COMPLETED:
-        return JsonResponse({"message":"Task already done"}, status=status.HTTP_200_OK)
+        return JsonResponse({"message": "Task already done"}, status=status.HTTP_200_OK)
 
-    if userdata.blocked_until>now():
-        return JsonResponse({"message":"You can't buy tasks while prisoning"}, status=status.HTTP_403_FORBIDDEN)
+    if userdata.blocked_until > now():
+        return JsonResponse({"message": "You can't buy tasks while prisoning"}, status=status.HTTP_403_FORBIDDEN)
 
     if task.task.template.price > userdata.gold_balance:
-        return JsonResponse({"message":"You don't have enough money"}, status=status.HTTP_403_FORBIDDEN)
+        return JsonResponse({"message": "You don't have enough money"}, status=status.HTTP_403_FORBIDDEN)
 
     done = False
 
@@ -63,9 +64,9 @@ def check_task_completion(request):
             ts.save()
         userdata.save()
         task.save()
-        return JsonResponse({"message":"success", "reward":f"{task.rewards.first().name}", "amount":f"{task.rewards.first().amount}"})
+        return JsonResponse({"message": "success", "reward": f"{task.rewards.first().name}", "amount": f"{task.rewards.first().amount}"})
     else:
-        return JsonResponse({"message":"You haven't completed the task or no checking for this task exists yet"})
+        return JsonResponse({"message": "You haven't completed the task or no checking for this task exists yet"})
 
 
 @api_view(["POST"])
@@ -73,7 +74,11 @@ def check_task_completion(request):
 @transaction.atomic
 def go_to_next_rank(request):
     user_id = request.data.get("userId")
-    userdata = get_object_or_404(UserData, user_id = user_id)
+    return go_to_next_rank_func(user_id)
+
+
+def go_to_next_rank_func(user_id):
+    userdata = get_object_or_404(UserData, user_id=user_id)
 
     current_rank = userdata.rank
     try:
@@ -96,24 +101,24 @@ def go_to_next_rank(request):
 
         return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
     else:
-        return JsonResponse({"result": "You don't have enough money to move on the next rank"}, status=status.HTTP_403_FORBIDDEN)
-    
+        return JsonResponse({"result": "You don't have enough money to move on the next rank"},
+                            status=status.HTTP_403_FORBIDDEN)
+
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @transaction.atomic
 def go_to_next_stage(request):
     user_id = request.data.get("userId")
-    userdata = get_object_or_404(UserData, user_id = user_id)
-    if userdata.has_key:
-        if userdata.current_stage.next_stage:
-            userdata.current_stage = userdata.current_stage.next_stage
-            return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
-        else:
-            return go_to_next_rank(request)
+    userdata = get_object_or_404(UserData, user_id=user_id)
+    if userdata.current_stage.has_keylock and not userdata.has_key:
+        return JsonResponse({"result": "You don't have key to go next stage"}, status=status.HTTP_403_FORBIDDEN)
 
+    if userdata.current_stage.next_stage:
+        userdata.current_stage = userdata.current_stage.next_stage
+        return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
     else:
-       return JsonResponse({"result":"You don't have key to go next stage"}, status=status.HTTP_403_FORBIDDEN)
+        return go_to_next_rank_func(user_id)
 
 
 @api_view(["POST"])
@@ -150,6 +155,7 @@ def get_partner_tasks(request):
     serializer = SocialMediaTasksSerializer(tasks, context={'completed_tasks': completed}, many=True)
     return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
 
+
 @api_view(["POST"])
 def complete_partner_task(request):
     user_id = request.data.get('userId')
@@ -161,13 +167,13 @@ def complete_partner_task(request):
     completed = True
 
     if completed:
-        if not CompletedSocialTasks.objects.filter(task = task, user=user.user).exists():
+        if not CompletedSocialTasks.objects.filter(task=task, user=user.user).exists():
             user.gold_balance += task.reward_amount
             CompletedSocialTasks.objects.update_or_create(task=task, user=user.user)
             user.save()
     else:
-        return JsonResponse({"result":"not ok"}, status=status.HTTP_403_FORBIDDEN)
-    return JsonResponse({"result":"ok"}, status=status.HTTP_200_OK)
+        return JsonResponse({"result": "not ok"}, status=status.HTTP_403_FORBIDDEN)
+    return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
 
 
 

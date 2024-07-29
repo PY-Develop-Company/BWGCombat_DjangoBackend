@@ -132,22 +132,26 @@ class Command(BaseCommand):
                 st.task_with_keys.add(i)
             st.save()
 
-
     def seed_stage(self):
         stage_data = [
-            {"id": 1, "name": "1_stage_1_rank", "initial_task_id":1, "tasks":[1,2], "stage_template_id":1},
-            {"id": 2, "name": "1_stage_2_rank", "initial_task_id":3, "tasks":[x for x in range(3,11)], "stage_template_id":2},
-            {"id": 3, "name": "3_stage_3_rank", "initial_task_id":49, "tasks":[x for x in range(49,68)], "stage_template_id":5},
-            {"id": 4, "name": "2_stage_3_rank", "initial_task_id":30, "tasks":[x for x in range(30,49)], "stage_template_id":4, 'next_stage_id':3},
-            {"id": 5, "name": "1_stage_3_rank", "initial_task_id":11, "tasks":[x for x in range(11,30)], "stage_template_id":3, 'next_stage_id':4},
+            {"id": 1, "name": "1_stage_1_rank", "initial_task_id": 1, "tasks": [1, 2], "stage_template_id": 1, "has_keylock": False},
+            {"id": 2, "name": "1_stage_2_rank", "initial_task_id": 3, "tasks": list(range(3, 11)), "stage_template_id": 2, "has_keylock": False},
+            {"id": 3, "name": "3_stage_3_rank", "initial_task_id": 49, "tasks": list(range(49, 68)), "stage_template_id": 5},
+            {"id": 4, "name": "2_stage_3_rank", "initial_task_id": 30, "tasks": list(range(30, 49)), "stage_template_id": 4, 'next_stage_id': 3},
+            {"id": 5, "name": "1_stage_3_rank", "initial_task_id": 11, "tasks": list((11, 30)), "stage_template_id": 3, 'next_stage_id': 4},
         ]
         for stage_data in stage_data:
-            st,_ = Stage.objects.update_or_create(id=stage_data['id'], defaults={"name":stage_data['name'], "initial_task_id":stage_data['initial_task_id'], "stage_template_id":stage_data['stage_template_id'], 'next_stage_id':stage_data.get('next_stage_id', None)})
+            st, _ = Stage.objects.update_or_create(id=stage_data['id'], defaults=
+            {
+                "name": stage_data['name'],
+                "initial_task_id": stage_data['initial_task_id'],
+                "stage_template_id": stage_data['stage_template_id'],
+                "next_stage_id": stage_data.get('next_stage_id', None)
+            })
+            if "has_keylock" in stage_data.keys():
+                st.has_keylock = stage_data['has_keylock']
             st.tasks.add(*stage_data['tasks'])
             st.save()
-
-
-
 
     @transaction.atomic
     def seed_task_templates(self):
@@ -179,7 +183,6 @@ class Command(BaseCommand):
             )
             task_template.rewards.set(rewards)
             task_template.save()
-
 
     @transaction.atomic
     def seed_task_routes(self):

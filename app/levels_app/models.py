@@ -79,6 +79,7 @@ class Stage(models.Model):
     name = models.CharField(max_length=255)
     next_stage = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
     initial_task = models.ForeignKey('TaskRoutes', null=True, on_delete=models.SET_NULL, related_name='ini_task')
+    has_keylock = models.BooleanField(default=True)
     tasks = models.ManyToManyField('TaskRoutes', related_name='stage')
     stage_template = models.ForeignKey('StageTemplate', null=True, on_delete=models.SET_NULL)
 
