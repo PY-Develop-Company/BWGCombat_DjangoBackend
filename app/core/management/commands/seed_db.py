@@ -359,7 +359,8 @@ class Command(BaseCommand):
     def seed_assets(self):
         assets = [
             {"id": 1, "name": "G-Token"},
-            {"id": 2, "name": "Gold"}
+            {"id": 2, "name": "Gold"},
+            {"id": 3, "name": "Gnome"}
         ]
         for data in assets:
             Asset.objects.update_or_create(id=data['id'], defaults=data)
@@ -367,7 +368,9 @@ class Command(BaseCommand):
     def seed_exchange_pairs(self):
         pairs = [
             {"id": 1, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=2), "rate": 100_000},
-            {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1), "rate": 0.00001}
+            {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1), "rate": 0.00001},
+            {"id": 3, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=3), "rate": 4},
+            {"id": 4, "asset_1": Asset.objects.get(id=3), "asset_2": Asset.objects.get(id=1), "rate": 0.25}
         ]
         for data in pairs:
             ExchangePair.objects.update_or_create(id=data['id'], defaults=data)

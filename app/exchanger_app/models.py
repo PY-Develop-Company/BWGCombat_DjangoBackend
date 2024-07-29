@@ -38,3 +38,11 @@ class ExchangePair(models.Model):
     asset_1 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='rates_sell')
     asset_2 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='rates_buy')
     rate = models.FloatField(default=1.0)
+
+
+class VipPurchase(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user} purchased VIP-status at {self.time}"

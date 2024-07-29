@@ -32,6 +32,9 @@ def execute_swap(request):
 
     checkpoint = transaction.savepoint()
 
+    if not user_id:
+        return JsonResponse({"error": "user_id is required"}, status=400)
+
     if not is_exchange_pair_exists(asset_1_id=asset_1_id, asset_2_id=asset_2_id):
         transaction.rollback()
         return JsonResponse({"result": "no such pair"}, status=status.HTTP_400_BAD_REQUEST)
@@ -52,6 +55,14 @@ def execute_swap(request):
         user_data.add_gold_coins(amount_2)
     elif asset_1_id == 2 and asset_2_id == 1:
         user_data.remove_gold_coins(amount_1 + fee)
+        checkpoint = transaction.savepoint()
+        user_data.add_g_token_coins(amount_2)
+    elif asset_1_id == 1 and asset_2_id == 3:
+        user_data.remove_g_token_coins(amount_1 + fee)
+        checkpoint = transaction.savepoint()
+        user_data.add_gnomes(amount_2)
+    elif asset_1_id == 3 and asset_2_id == 1:
+        user_data.remove_gnomes(amount_1 + fee)
         checkpoint = transaction.savepoint()
         user_data.add_g_token_coins(amount_2)
     else:
@@ -80,6 +91,8 @@ def execute_transfer(request):
     fee = request.data.get("fee")
 
     checkpoint = transaction.savepoint()
+    if not user_1_id or not user_2_id:
+        return JsonResponse({"error": "user_id is required"}, status=400)
 
     if not is_asset_exists(asset_id=asset_id):
         transaction.rollback()
@@ -139,9 +152,42 @@ def get_all_transactions(request):
 
     return JsonResponse({"swaps": swap_data, 'transfers': transfer_data})
 
+
+# @api_view(["POST"])
+# def buy_gnome(request):
+#     user_id = request.data.get('userId')
+#     g_token_amount = request.data.get('gTokenAmount')
+#
+#     if not user_id:
+#         return JsonResponse({"error": "user_id is required"}, status=400)
+#
+#     if True:
+#         pass
+#
+#     user_data = get_object_or_404(UserData, user=user_id)
+#
+#     user_data.add_gnome()
+#     user_data.save()
+
+
 @api_view(["POST"])
-def buy_gnome(request):
+# @transaction.atomic()
+def buy_vip(request):
     user_id = request.data.get('userId')
+
+    if not user_id:
+        return JsonResponse({"error": "user_id is required"}, status=400)
+
+    # vip price temp
+    vip_price = 20
+
     user_data = get_object_or_404(UserData, user=user_id)
-    user_data.add_gnome()
-    user_data.save()
+
+    if not is_sufficient(userdata=user_data, asset_id=1, amount=vip_price, fee=0):
+        transaction.rollback()
+        return JsonResponse({"result": "not enough balance"}, status=status.HTTP_200_OK)
+    else:
+        user_data.remove_g_token_coins(vip_price)
+        user_data.make_vip()
+        user_data.save()
+        return JsonResponse({"result": "ok"})
