@@ -2,10 +2,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 
-from .serializers import SwapSerializer, TransferSerializer
+from .serializers import SwapSerializer, TransferSerializer, RateSerializer
 from .utils import is_exchange_pair_exists, is_asset_exists, is_sufficient
 
-from .models import Swap, Transfer, Asset
+from .models import Swap, Transfer, Asset, ExchangePair
 from user_app.models import UserData, User
 
 from django.http import JsonResponse, HttpResponse
@@ -53,6 +53,8 @@ def execute_swap(request):
         swap_limit_on_rank = user_data.rank.swap_limit
         g_tokens_swapped_on_rank = sum(Swap.objects.filter(user_id=user_id, user_rank=user_data.rank,
                                                        asset_1_id=1).values_list("amount_1", flat=True))
+        if not g_tokens_swapped_on_rank:
+            g_tokens_swapped_on_rank = 0
 
         if g_tokens_swapped_on_rank + amount_1 > swap_limit_on_rank:
             transaction.rollback()
@@ -179,6 +181,15 @@ def get_all_transactions(request):
 #
 #     user_data.add_gnome()
 #     user_data.save()
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_all_rates(request):
+    rates = ExchangePair.objects.all()
+    rates_data = RateSerializer(rates, many=True).data
+
+    return JsonResponse({"rates": rates_data})
 
 
 @api_view(["POST"])
