@@ -34,7 +34,6 @@ class Command(BaseCommand):
         self.seed_stage_templates()
         self.seed_stage()
 
-
         self.seed_ranks()
 
         self.seed_users()
@@ -117,7 +116,6 @@ class Command(BaseCommand):
             rank.next_rank_id = next_rank
             rank.save()
 
-
     def seed_stage_templates(self):
         stage_temp_data = [
             {"id": 1, "name": "1_stage_1_rank_tmp", "keys_amount": 0, "jail_amount":0, 'task_with_keys':[]},
@@ -157,20 +155,20 @@ class Command(BaseCommand):
     def seed_task_templates(self):
         desc = "Buy chest and get chance to get extra gnome"
         task_templates_data = [
-            { "id":1, "name": "Subscribe to Channel",   "text": "Subscribe to our channel.",    "task_type": TaskTemplate.TaskType.ch_sub,          "completion_number": 1, "price": 0,     "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=17)]},
-            { "id":2, "name": "Invite 1 friends",       "text": "Invite a friend to join.",     "task_type": TaskTemplate.TaskType.inv_fren,        "completion_number": 1, "price": 0,     "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=18) ]},
-            { "id":3, "name": "chest_1000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 1_000,  "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
-            { "id":4, "name": "Upgrade pickaxe +2",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=17) ]},
-            { "id":5, "name": "Upgrade energy",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=16)]},
-            { "id":6, "name": "Upgrade pickaxe +1",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=19) ]},
-            { "id":7, "name": "chest_2000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 2_000,  "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
-            { "id":8, "name": "Upgrade energy",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 5_000,  "rewards": [Reward.objects.get(id=16)]},
-            { "id":9, "name": "Upgrade pickaxe +2",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 5_000,  "rewards": [Reward.objects.get(id=17) ]},
-            { "id":10, "name": "Upgrade energy +100",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=20)]},
-            { "id":11, "name": "chest_3000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 3_000,  "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
-            { "id":12, "name": "Upgrade energy +100",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 10_000,  "rewards": [Reward.objects.get(id=20)]},
-            { "id":13, "name": "Upgrade energy +50",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 10_000,  "rewards": [Reward.objects.get(id=16)]},
-            { "id":14, "name": "Upgrade pickaxe +1",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 5_000,  "rewards": [Reward.objects.get(id=19) ]},
+            {"id": 1, "name": "Subscribe to Channel",   "text": "Subscribe to our channel.",    "task_type": TaskTemplate.TaskType.ch_sub,          "completion_number": 1, "price": 0,     "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=17)]},
+            {"id": 2, "name": "Invite 1 friends",       "text": "Invite a friend to join.",     "task_type": TaskTemplate.TaskType.inv_fren,        "completion_number": 1, "price": 0,     "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=18) ]},
+            {"id": 3, "name": "chest_1000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 1_000,  "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
+            {"id": 4, "name": "Upgrade pickaxe +2",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=17) ]},
+            {"id": 5, "name": "Upgrade energy",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=16)]},
+            {"id": 6, "name": "Upgrade pickaxe +1",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=19) ]},
+            {"id": 7, "name": "chest_2000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 2_000,  "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
+            {"id": 8, "name": "Upgrade energy",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 5_000,  "rewards": [Reward.objects.get(id=16)]},
+            {"id": 9, "name": "Upgrade pickaxe +2",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 5_000,  "rewards": [Reward.objects.get(id=17) ]},
+            {"id": 10, "name": "Upgrade energy +100",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 2_000,  "rewards": [Reward.objects.get(id=20)]},
+            {"id": 11, "name": "chest_3000",             "text": f"{desc}",                      "task_type": TaskTemplate.TaskType.buy_chest,       "completion_number": 1, "price": 3_000,  "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
+            {"id": 12, "name": "Upgrade energy +100",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 10_000,  "rewards": [Reward.objects.get(id=20)]},
+            {"id": 13, "name": "Upgrade energy +50",         "text": "Buy more energy",              "task_type": TaskTemplate.TaskType.buy_energy,      "completion_number": 0, "price": 10_000,  "rewards": [Reward.objects.get(id=16)]},
+            {"id": 14, "name": "Upgrade pickaxe +1",        "text": "Earn more gold with 1 click",  "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 5_000,  "rewards": [Reward.objects.get(id=19) ]},
 
             # Add more task templates as needed
         ]
@@ -190,75 +188,75 @@ class Command(BaseCommand):
             {"id":1,"coord_x": 0,"coord_y": 0,"template_id": 1,"parent":None,"initial": True},
             {"id":2,"coord_x": 0,"coord_y": -1,"template_id": 2,  "parent_id": 1,"initial": False},
             # 2 rank 1 stage
-            {"id":  3, "coord_x":  0,  "coord_y":  0 ,  "template_id": 5,  "parent_id": None, "initial": True},
-            {"id":  4, "coord_x":  -1, "coord_y": 0,    "template_id": 4,  "parent_id": 3,    "initial": False},
-            {"id":  5, "coord_x":  -2, "coord_y":  0,   "template_id": 3,  "parent_id": 4,    "initial": False,},
-            {"id":  6, "coord_x":  1,  "coord_y": 0,    "template_id": 3,  "parent_id": 3,    "initial": False,},
-            {"id":  7, "coord_x":  0,  "coord_y":  -1,  "template_id": 8,  "parent_id": 3,    "initial": False,},
-            {"id":  8, "coord_x":  -1, "coord_y": -1,   "template_id": 9,  "parent_id": 7,    "initial": False},
-            {"id":  9, "coord_x":  0,  "coord_y":  -2,  "template_id": 8,  "parent_id": 7,    "initial": False,},
-            {"id": 10, "coord_x":  -1, "coord_y": -2,   "template_id": 9,  "parent_id": 9,    "initial": False,},
+            {"id":  3, "coord_x": 0,  "coord_y":  0 ,  "template_id": 5,  "parent_id": None, "initial": True},
+            {"id":  4, "coord_x": -1, "coord_y": 0,    "template_id": 4,  "parent_id": 3,    "initial": False},
+            {"id":  5, "coord_x": -2, "coord_y":  0,   "template_id": 3,  "parent_id": 4,    "initial": False,},
+            {"id":  6, "coord_x": 1,  "coord_y": 0,    "template_id": 3,  "parent_id": 3,    "initial": False,},
+            {"id":  7, "coord_x": 0,  "coord_y":  -1,  "template_id": 8,  "parent_id": 3,    "initial": False,},
+            {"id":  8, "coord_x": -1, "coord_y": -1,   "template_id": 9,  "parent_id": 7,    "initial": False},
+            {"id":  9, "coord_x": 0,  "coord_y":  -2,  "template_id": 8,  "parent_id": 7,    "initial": False,},
+            {"id": 10, "coord_x": -1, "coord_y": -2,   "template_id": 9,  "parent_id": 9,    "initial": False,},
             # 3 rank 1 stage(left)
-            {"id": 11, "coord_x":  0,  "coord_y":  0 ,  "template_id": 5,  "parent_id": None, "initial": True},
-            {"id": 12, "coord_x": -1,  "coord_y":  0 ,  "template_id": 6,  "parent_id": 11, "initial": False},
-            {"id": 13, "coord_x": -2,  "coord_y":  0 ,  "template_id": 3,  "parent_id": 12, "initial": False}, #central
-            {"id": 14, "coord_x": -3,  "coord_y":  0 ,  "template_id": 3,  "parent_id": 13, "initial": False},
-            {"id": 15, "coord_x": -2,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 13, "initial": False},
-            {"id": 16, "coord_x": -3,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 15, "initial": False},#key
-            {"id": 17, "coord_x": -1,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 15, "initial": False},#key
-            {"id": 18, "coord_x": -2,  "coord_y":  1 ,  "template_id": 3,  "parent_id": 13, "initial": False},
-            {"id": 19, "coord_x": -3,  "coord_y":  1 ,  "template_id": 6,  "parent_id": 18, "initial": False},
-            {"id": 20, "coord_x": -1,  "coord_y":  1 ,  "template_id": 3,  "parent_id": 18, "initial": False},#key
+            {"id": 11, "coord_x":  0,  "coord_y":  0,  "template_id": 5,  "parent_id": None, "initial": True},
+            {"id": 12, "coord_x": -1,  "coord_y":  0,  "template_id": 6,  "parent_id": 11, "initial": False},
+            {"id": 13, "coord_x": -2,  "coord_y":  0,  "template_id": 3,  "parent_id": 12, "initial": False}, #central
+            {"id": 14, "coord_x": -3,  "coord_y":  0,  "template_id": 3,  "parent_id": 13, "initial": False},
+            {"id": 15, "coord_x": -2,  "coord_y": -1,  "template_id": 3,  "parent_id": 13, "initial": False},
+            {"id": 16, "coord_x": -3,  "coord_y": -1,  "template_id": 3,  "parent_id": 15, "initial": False},#key
+            {"id": 17, "coord_x": -1,  "coord_y": -1,  "template_id": 3,  "parent_id": 15, "initial": False},#key
+            {"id": 18, "coord_x": -2,  "coord_y":  1,  "template_id": 3,  "parent_id": 13, "initial": False},
+            {"id": 19, "coord_x": -3,  "coord_y":  1,  "template_id": 6,  "parent_id": 18, "initial": False},
+            {"id": 20, "coord_x": -1,  "coord_y":  1,  "template_id": 3,  "parent_id": 18, "initial": False},#key
             # 3 rank 1 stage(right)
-            {"id": 21, "coord_x":  1,  "coord_y":  0 ,  "template_id": 3,  "parent_id": 11, "initial": True},
-            {"id": 22, "coord_x":  2,  "coord_y":  0 ,  "template_id": 3,  "parent_id": 21, "initial": False},
-            {"id": 23, "coord_x":  2,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 22, "initial": False},
-            {"id": 24, "coord_x":  1,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 23, "initial": False},#key
-            {"id": 25, "coord_x":  3,  "coord_y":  0 ,  "template_id": 5,  "parent_id": 22, "initial": False},
-            {"id": 26, "coord_x":  3,  "coord_y": -1 ,  "template_id": 3,  "parent_id": 25, "initial": False},#key
-            {"id": 27, "coord_x":  3,  "coord_y":  1 ,  "template_id": 3,  "parent_id": 25, "initial": False},#key
-            {"id": 28, "coord_x":  2,  "coord_y":  1 ,  "template_id": 3,  "parent_id": 27, "initial": False},
-            {"id": 29, "coord_x":  1,  "coord_y":  1 ,  "template_id": 3,  "parent_id": 28, "initial": False},#key
+            {"id": 21, "coord_x":  1,  "coord_y":  0,  "template_id": 3,  "parent_id": 11, "initial": True},
+            {"id": 22, "coord_x":  2,  "coord_y":  0,  "template_id": 3,  "parent_id": 21, "initial": False},
+            {"id": 23, "coord_x":  2,  "coord_y": -1,  "template_id": 3,  "parent_id": 22, "initial": False},
+            {"id": 24, "coord_x":  1,  "coord_y": -1,  "template_id": 3,  "parent_id": 23, "initial": False},#key
+            {"id": 25, "coord_x":  3,  "coord_y":  0,  "template_id": 5,  "parent_id": 22, "initial": False},
+            {"id": 26, "coord_x":  3,  "coord_y": -1,  "template_id": 3,  "parent_id": 25, "initial": False},#key
+            {"id": 27, "coord_x":  3,  "coord_y":  1,  "template_id": 3,  "parent_id": 25, "initial": False},#key
+            {"id": 28, "coord_x":  2,  "coord_y":  1,  "template_id": 3,  "parent_id": 27, "initial": False},
+            {"id": 29, "coord_x":  1,  "coord_y":  1,  "template_id": 3,  "parent_id": 28, "initial": False},#key
             # 3 rank 2 stage
-            {"id": 30, "coord_x":  0,  "coord_y":  0 ,  "template_id": 8,  "parent_id": None, "initial": True},
-            {"id": 31, "coord_x":  1,  "coord_y":  0 ,  "template_id": 8,  "parent_id": 30, "initial": False},
-            {"id": 32, "coord_x":  2,  "coord_y":  0 ,  "template_id": 7,  "parent_id": 31, "initial": False},
-            {"id": 33, "coord_x":  2,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 32, "initial": False},
-            {"id": 34, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 33, "initial": False},#key
-            {"id": 35, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 33, "initial": False},#key
-            {"id": 36, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 35, "initial": False},
-            {"id": 37, "coord_x":  1,  "coord_y":  1 ,  "template_id":10,  "parent_id": 36, "initial": False},
-            {"id": 38, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 37, "initial": False},
-            {"id": 39, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 38, "initial": False},#key
-            {"id": 40, "coord_x":  1,  "coord_y":  1 ,  "template_id": 9,  "parent_id": 30, "initial": False},
-            {"id": 41, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 40, "initial": False},
-            {"id": 42, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 41, "initial": False},
-            {"id": 43, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 41, "initial": False},
-            {"id": 44, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 42, "initial": False},#key
-            {"id": 45, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 42, "initial": False},#key
-            {"id": 46, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 41, "initial": False},
-            {"id": 47, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 46, "initial": False},#key
-            {"id": 48, "coord_x":  1,  "coord_y":  1 ,  "template_id": 7,  "parent_id": 46, "initial": False},#key
+            {"id": 30, "coord_x":  0,  "coord_y":  0,  "template_id": 8,  "parent_id": None, "initial": True},
+            {"id": 31, "coord_x":  1,  "coord_y":  0,  "template_id": 8,  "parent_id": 30, "initial": False},
+            {"id": 32, "coord_x":  2,  "coord_y":  0,  "template_id": 7,  "parent_id": 31, "initial": False},
+            {"id": 33, "coord_x":  2,  "coord_y":  1,  "template_id": 7,  "parent_id": 32, "initial": False},
+            {"id": 34, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 33, "initial": False},#key
+            {"id": 35, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 33, "initial": False},#key
+            {"id": 36, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 35, "initial": False},
+            {"id": 37, "coord_x":  1,  "coord_y":  1,  "template_id":10,  "parent_id": 36, "initial": False},
+            {"id": 38, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 37, "initial": False},
+            {"id": 39, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 38, "initial": False},#key
+            {"id": 40, "coord_x":  1,  "coord_y":  1,  "template_id": 9,  "parent_id": 30, "initial": False},
+            {"id": 41, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 40, "initial": False},
+            {"id": 42, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 41, "initial": False},
+            {"id": 43, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 41, "initial": False},
+            {"id": 44, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 42, "initial": False},#key
+            {"id": 45, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 42, "initial": False},#key
+            {"id": 46, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 41, "initial": False},
+            {"id": 47, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 46, "initial": False},#key
+            {"id": 48, "coord_x":  1,  "coord_y":  1,  "template_id": 7,  "parent_id": 46, "initial": False},#key
             # 3 rank 3 stage
-            {"id": 49, "coord_x":  0,  "coord_y":  0 ,  "template_id": 12,  "parent_id": None, "initial": True},
-            {"id": 50, "coord_x":  1,  "coord_y":  0 ,  "template_id": 11,  "parent_id": 49, "initial": False},
-            {"id": 51, "coord_x":  2,  "coord_y":  0 ,  "template_id": 11,  "parent_id": 50, "initial": False},
-            {"id": 52, "coord_x":  2,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 51, "initial": False},
-            {"id": 53, "coord_x":  1,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 52, "initial": False},#key
-            {"id": 54, "coord_x":  3,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 52, "initial": False},#key
-            {"id": 55, "coord_x":  3,  "coord_y":  0 ,  "template_id": 13,  "parent_id": 54, "initial": False},
-            {"id": 56, "coord_x":  3,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 55, "initial": False},#key
-            {"id": 57, "coord_x":  2,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 51, "initial": False},
-            {"id": 58, "coord_x":  1,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 57, "initial": False},#key
-            {"id": 59, "coord_x": -1,  "coord_y":  0 ,  "template_id": 14,  "parent_id": 49, "initial": False},
-            {"id": 60, "coord_x": -2,  "coord_y":  0 ,  "template_id": 11,  "parent_id": 59, "initial": False},
-            {"id": 61, "coord_x": -2,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 60, "initial": False},
-            {"id": 62, "coord_x": -1,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 61, "initial": False},#key
-            {"id": 63, "coord_x": -3,  "coord_y":  1 ,  "template_id": 11,  "parent_id": 61, "initial": False},#key
-            {"id": 64, "coord_x": -3,  "coord_y":  0 ,  "template_id": 14,  "parent_id": 63, "initial": False},
-            {"id": 65, "coord_x": -3,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 64, "initial": False},#key
-            {"id": 66, "coord_x": -2,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 65, "initial": False},
-            {"id": 67, "coord_x": -1,  "coord_y": -1 ,  "template_id": 11,  "parent_id": 66, "initial": False},#key
+            {"id": 49, "coord_x":  0,  "coord_y":  0,  "template_id": 12,  "parent_id": None, "initial": True},
+            {"id": 50, "coord_x":  1,  "coord_y":  0,  "template_id": 11,  "parent_id": 49, "initial": False},
+            {"id": 51, "coord_x":  2,  "coord_y":  0,  "template_id": 11,  "parent_id": 50, "initial": False},
+            {"id": 52, "coord_x":  2,  "coord_y": -1,  "template_id": 11,  "parent_id": 51, "initial": False},
+            {"id": 53, "coord_x":  1,  "coord_y": -1,  "template_id": 11,  "parent_id": 52, "initial": False},#key
+            {"id": 54, "coord_x":  3,  "coord_y": -1,  "template_id": 11,  "parent_id": 52, "initial": False},#key
+            {"id": 55, "coord_x":  3,  "coord_y":  0,  "template_id": 13,  "parent_id": 54, "initial": False},
+            {"id": 56, "coord_x":  3,  "coord_y":  1,  "template_id": 11,  "parent_id": 55, "initial": False},#key
+            {"id": 57, "coord_x":  2,  "coord_y":  1,  "template_id": 11,  "parent_id": 51, "initial": False},
+            {"id": 58, "coord_x":  1,  "coord_y":  1,  "template_id": 11,  "parent_id": 57, "initial": False},#key
+            {"id": 59, "coord_x": -1,  "coord_y":  0,  "template_id": 14,  "parent_id": 49, "initial": False},
+            {"id": 60, "coord_x": -2,  "coord_y":  0,  "template_id": 11,  "parent_id": 59, "initial": False},
+            {"id": 61, "coord_x": -2,  "coord_y":  1,  "template_id": 11,  "parent_id": 60, "initial": False},
+            {"id": 62, "coord_x": -1,  "coord_y":  1,  "template_id": 11,  "parent_id": 61, "initial": False},#key
+            {"id": 63, "coord_x": -3,  "coord_y":  1,  "template_id": 11,  "parent_id": 61, "initial": False},#key
+            {"id": 64, "coord_x": -3,  "coord_y":  0,  "template_id": 14,  "parent_id": 63, "initial": False},
+            {"id": 65, "coord_x": -3,  "coord_y": -1,  "template_id": 11,  "parent_id": 64, "initial": False},#key
+            {"id": 66, "coord_x": -2,  "coord_y": -1,  "template_id": 11,  "parent_id": 65, "initial": False},
+            {"id": 67, "coord_x": -1,  "coord_y": -1,  "template_id": 11,  "parent_id": 66, "initial": False},#key
             ]
 
         for task_route_data in task_routes_data:
