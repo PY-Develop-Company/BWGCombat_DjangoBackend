@@ -50,8 +50,10 @@ def get_user_info(request):
     user_data = redis_db.json().get(f'user_{user_id}')
     delta = now() - datetime.fromisoformat(user_data["last_visited"])
     user_data['current_energy'] += min(delta.total_seconds() * user_data['energy_regeneration'], user_data['energy'] - user_data['current_energy'])
+
     income = round(user_data['gnome_amount']*get_gnome_reward()/3600 * delta.total_seconds())
-    user_data['gold_balance'] += income
+    user_data['g_token'] += income
+
     redis_db.json().set(f"user_{user_id}", "$", user_data, xx=True)
     return Response({"info": user_data, 'passive_income': income}, status=status.HTTP_200_OK)
 
