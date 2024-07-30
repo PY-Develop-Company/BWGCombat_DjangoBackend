@@ -367,8 +367,8 @@ class Command(BaseCommand):
         pairs = [
             {"id": 1, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=2), "rate": 100_000},
             {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1), "rate": 0.00001},
-            {"id": 3, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=3), "rate": 4},
-            {"id": 4, "asset_1": Asset.objects.get(id=3), "asset_2": Asset.objects.get(id=1), "rate": 0.25}
+            {"id": 3, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=3), "rate": 0.33333},
+            {"id": 4, "asset_1": Asset.objects.get(id=3), "asset_2": Asset.objects.get(id=1), "rate": 6}
         ]
         for data in pairs:
             ExchangePair.objects.update_or_create(id=data['id'], defaults=data)
