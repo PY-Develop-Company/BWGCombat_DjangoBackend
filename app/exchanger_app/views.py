@@ -42,11 +42,22 @@ def execute_swap(request):
     checkpoint = transaction.savepoint()
 
     user_data = UserData.objects.get(user_id=user_id)
+
     if not is_sufficient(userdata=user_data, asset_id=asset_1_id, amount=amount_1, fee=fee):
         transaction.rollback()
         return JsonResponse({"result": "not enough balance"}, status=status.HTTP_200_OK)
 
     checkpoint = transaction.savepoint()
+
+    if asset_1_id == 1:
+        swap_limit_on_rank = user_data.rank.swap_limit
+        g_tokens_swapped_on_rank = sum(Swap.objects.filter(user_id=user_id, user_rank=user_data.rank,
+                                                       asset_1_id=1).values_list("amount_1", flat=True))
+
+        if g_tokens_swapped_on_rank + amount_1 > swap_limit_on_rank:
+            transaction.rollback()
+            return JsonResponse({"result": "g_tokens swap limit on rank exceeded"}, status=status.HTTP_200_OK)
+
 
     print(amount_1 + fee)
     if asset_1_id == 1 and asset_2_id == 2:
