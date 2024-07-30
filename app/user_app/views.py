@@ -51,7 +51,7 @@ def get_user_info(request):
     delta = now() - datetime.fromisoformat(user_data["last_visited"])
     user_data['current_energy'] += min(delta.total_seconds() * user_data['energy_regeneration'], user_data['energy'] - user_data['current_energy'])
 
-    income = round(user_data['gnome_amount']*get_gnome_reward()/3600 * delta.total_seconds())
+    income = user_data['gnome_amount']*get_gnome_reward()/24/3600 * delta.total_seconds()
     user_data['g_token'] += income
 
     redis_db.json().set(f"user_{user_id}", "$", user_data, xx=True)
