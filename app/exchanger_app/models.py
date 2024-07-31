@@ -10,7 +10,7 @@ class Asset(models.Model):
 
 class Swap(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    user_rank = models.ForeignKey(Rank, on_delete=models.DO_NOTHING)
+    user_rank = models.ForeignKey(Rank, default=1, on_delete=models.DO_NOTHING)
     asset_1 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='swaps_giving')
     asset_2 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='swaps_receiving')
     fee = models.FloatField(default=0.0)
