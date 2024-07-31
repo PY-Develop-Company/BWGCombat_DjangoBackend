@@ -177,23 +177,28 @@ def get_all_rates(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def get_exchange_rate(request):
-    asset_1_id = request.data.get["asset1Id"]
-    asset_2_id = request.data.get["asset2Id"]
-    amount_1 = request.data.get["amount1"]
+    asset_1_id = request.data.get("asset1Id")
+    asset_2_id = request.data.get("asset2Id")
+    amount_1 = request.data.get("amount1")
 
-    # BE CAREFUL! Assets INVERSION!
-    exchange_pair = ExchangePair.objects.get(asset_1_id=asset_2_id, asset_2_id=asset_1_id)
-    if not exchange_pair:
+    try:
+        # BE CAREFUL! Assets INVERSION!
+        exchange_pair = ExchangePair.objects.get(asset_1_id=asset_2_id, asset_2_id=asset_1_id)
+    except ExchangePair.DoesNotExist:
         return JsonResponse({"result": "no such exchange pair"})
 
     amount_2 = amount_1 / exchange_pair.rate
-    fee_amount = amount_1 * (exchange_pair.fee / 100)
+
+    if not exchange_pair.fee_percentage:
+        fee_amount = 0
+    else:
+        fee_amount = amount_1 * (exchange_pair.fee_percentage / 100)
 
     return JsonResponse({"exchange_rate": round(1/exchange_pair.rate, 6),
-                         "fee_percentage": exchange_pair.fee,
-                         "fee_amount": fee_amount,
+                         "fee_percentage": exchange_pair.fee_percentage,
+                         "fee_amount": round(fee_amount, 6),
                          "amount_1": amount_1,
-                         "amount_2": amount_2})
+                         "amount_2": round(amount_2, 6)})
 
 
 @api_view(["POST"])

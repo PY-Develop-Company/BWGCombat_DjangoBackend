@@ -365,10 +365,14 @@ class Command(BaseCommand):
 
     def seed_exchange_pairs(self):
         pairs = [
-            {"id": 1, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=2), "rate": 100_000},
-            {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1), "rate": 0.000001},
-            {"id": 3, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=3), "rate": 0.333333, "fee_percentage": None},
-            {"id": 4, "asset_1": Asset.objects.get(id=3), "asset_2": Asset.objects.get(id=1), "rate": 6, "fee_percentage": None}
+            {"id": 1, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=2),
+             "rate": 100_000},
+            {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1),
+             "rate": 0.000001},
+            {"id": 3, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=3),
+             "rate": 0.333333333333, "fee_percentage": None},
+            {"id": 4, "asset_1": Asset.objects.get(id=3), "asset_2": Asset.objects.get(id=1),
+             "rate": 6, "fee_percentage": None}
         ]
         for data in pairs:
             ExchangePair.objects.update_or_create(id=data['id'], defaults=data)
