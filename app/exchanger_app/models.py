@@ -39,6 +39,7 @@ class Transfer(models.Model):
 class ExchangePair(models.Model):
     asset_1 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='rates_sell')
     asset_2 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='rates_buy')
+    fee_percentage = models.FloatField(null=True, blank=True, default=5.0)
     rate = models.FloatField(default=1.0)  # how much asset_2 you should give to get 1 unit of asset_1
 
 
