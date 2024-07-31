@@ -103,10 +103,16 @@ def execute_transfer(request):
     fee = request.data.get("fee")
 
     if not user_1_id or not user_2_id:
-        return JsonResponse({"error": "user_id is required"}, status=400)
+        return JsonResponse({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
     if not is_asset_exists(asset_id=asset_id):
         return JsonResponse({"result": "no such asset"}, status=status.HTTP_400_BAD_REQUEST)
+
+    backend_fee_percentage = float(os.environ.get("TRANSFER_FEE_PERCENTAGE"))
+    backend_calculated_fee = round(amount * (backend_fee_percentage / 100), 6)
+    if fee != backend_calculated_fee:
+        return JsonResponse({"result": "fee is incorrect or irrelevant",
+                            "hint": "try erasing and entering value again"})
 
     sender_data = UserData.objects.get(user_id=user_1_id)
     if not is_sufficient(userdata=sender_data, asset_id=asset_id, amount=amount, fee=fee):
