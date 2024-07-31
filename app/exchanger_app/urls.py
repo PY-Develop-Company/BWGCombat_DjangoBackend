@@ -9,5 +9,6 @@ urlpatterns = [
     path("buy_vip/", views.buy_vip, name="buy_vip"),
     path("all_transactions/", views.get_all_transactions, name="all_transactions"),
     path("all_rates/", views.get_all_rates, name="all_rates"),
-    path("get_exchange_rate/", views.get_exchange_rate, name="get_exchange_rate")
+    path("get_exchange_rate/", views.get_exchange_rate, name="get_exchange_rate"),
+    path("get_transfer_fee/", views.get_transfer_fee, name="get_transfer_fee")
 ]

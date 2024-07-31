@@ -1,4 +1,5 @@
 import logging
+import os
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -199,6 +200,13 @@ def get_exchange_rate(request):
                          "fee_amount": round(fee_amount, 6),
                          "amount_1": amount_1,
                          "amount_2": round(amount_2, 6)})
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_transfer_fee(request):
+    transfer_fee = float(os.environ.get("TRANSFER_FEE_PERCENTAGE"))
+    return JsonResponse({"transfer_fee": transfer_fee})
 
 
 @api_view(["POST"])
