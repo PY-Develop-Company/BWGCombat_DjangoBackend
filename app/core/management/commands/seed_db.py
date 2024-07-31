@@ -368,7 +368,7 @@ class Command(BaseCommand):
             {"id": 1, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=2),
              "rate": 100_000},
             {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1),
-             "rate": 0.000001},
+             "rate": 0.00001},
             {"id": 3, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=3),
              "rate": 0.333333333333, "fee_percentage": None},
             {"id": 4, "asset_1": Asset.objects.get(id=3), "asset_2": Asset.objects.get(id=1),

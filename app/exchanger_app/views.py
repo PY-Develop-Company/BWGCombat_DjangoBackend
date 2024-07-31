@@ -6,7 +6,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 
 from .serializers import SwapSerializer, TransferSerializer, RateSerializer
-from .utils import is_exchange_pair_exists, is_asset_exists, is_sufficient, is_fee_correct
+from .utils import (is_exchange_pair_exists, is_asset_exists, is_sufficient,
+                    is_transfer_fee_correct, is_swap_fee_correct, is_swap_receive_amount_correct)
 
 from .models import Swap, Transfer, Asset, ExchangePair
 from user_app.models import UserData, User
@@ -34,10 +35,23 @@ def execute_swap(request):
     fee = request.data.get("fee")  # fee amount is tied to asset_1 amount
 
     if not user_id:
-        return JsonResponse({"error": "user_id is required"}, status=400)
+        return JsonResponse({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-    if not is_exchange_pair_exists(asset_1_id=asset_1_id, asset_2_id=asset_2_id):
+    try:
+        # BE CAREFUL! Assets inversion!!!
+        exchange_pair = ExchangePair.objects.get(asset_1_id=asset_2_id, asset_2_id=asset_1_id)
+    except ExchangePair.DoesNotExist:
         return JsonResponse({"result": "no such pair"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not is_swap_fee_correct(amount_1, fee, exchange_pair):
+        return JsonResponse({"result": "fee is incorrect or irrelevant",
+                            "hint": "try erasing and entering value again"},
+                            status=status.HTTP_423_LOCKED)
+
+    if not is_swap_receive_amount_correct(amount_1, amount_2, exchange_pair):
+        return JsonResponse({"result": "receive amount is incorrect or irrelevant",
+                            "hint": "try erasing and entering value again"},
+                            status=status.HTTP_423_LOCKED)
 
     try:
         user_data = UserData.objects.get(user_id=user_id)
@@ -57,7 +71,7 @@ def execute_swap(request):
         if g_tokens_swapped_on_rank + amount_1 > swap_limit_on_rank:
             return JsonResponse({"result": "g_tokens swap limit on rank exceeded"}, status=status.HTTP_200_OK)
 
-    print(amount_1 + fee)
+    # print(amount_1 + fee)
     try:
         if asset_1_id == 1 and asset_2_id == 2:
             user_data.remove_g_token_coins(amount_1 + fee)
@@ -108,9 +122,10 @@ def execute_transfer(request):
     if not is_asset_exists(asset_id=asset_id):
         return JsonResponse({"result": "no such asset"}, status=status.HTTP_400_BAD_REQUEST)
 
-    if not is_fee_correct(amount, fee):
+    if not is_transfer_fee_correct(amount, fee):
         return JsonResponse({"result": "fee is incorrect or irrelevant",
-                      "hint": "try erasing and entering value again"})
+                            "hint": "try erasing and entering value again"},
+                            status=status.HTTP_423_LOCKED)
 
     sender_data = UserData.objects.get(user_id=user_1_id)
     if not is_sufficient(userdata=sender_data, asset_id=asset_id, amount=amount, fee=fee):
