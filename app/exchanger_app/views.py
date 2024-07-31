@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework import status
@@ -31,17 +33,17 @@ def execute_swap(request):
     fee = request.data.get("fee")  # fee amount is tied to asset_1 amount
 
     if not user_id:
-        transaction.rollback()
         return JsonResponse({"error": "user_id is required"}, status=400)
 
     if not is_exchange_pair_exists(asset_1_id=asset_1_id, asset_2_id=asset_2_id):
-        transaction.rollback()
         return JsonResponse({"result": "no such pair"}, status=status.HTTP_400_BAD_REQUEST)
 
-    user_data = UserData.objects.get(user_id=user_id)
+    try:
+        user_data = UserData.objects.get(user_id=user_id)
+    except UserData.DoesNotExist:
+        return JsonResponse({"result": "user does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
     if not is_sufficient(userdata=user_data, asset_id=asset_1_id, amount=amount_1, fee=fee):
-        transaction.rollback()
         return JsonResponse({"result": "not enough balance"}, status=status.HTTP_200_OK)
 
     if asset_1_id == 1:
@@ -52,36 +54,39 @@ def execute_swap(request):
             g_tokens_swapped_on_rank = 0
 
         if g_tokens_swapped_on_rank + amount_1 > swap_limit_on_rank:
-            transaction.rollback()
             return JsonResponse({"result": "g_tokens swap limit on rank exceeded"}, status=status.HTTP_200_OK)
 
     print(amount_1 + fee)
+    try:
+        if asset_1_id == 1 and asset_2_id == 2:
+            user_data.remove_g_token_coins(amount_1 + fee)
+            user_data.add_gold_coins(amount_2)
+        elif asset_1_id == 2 and asset_2_id == 1:
+            user_data.remove_gold_coins(amount_1 + fee)
+            user_data.add_g_token_coins(amount_2)
+        elif asset_1_id == 1 and asset_2_id == 3:
+            user_data.remove_g_token_coins(amount_1 + fee)
+            user_data.add_gnomes(amount_2)
+        elif asset_1_id == 3 and asset_2_id == 1:
+            user_data.remove_gnomes(amount_1 + fee)
+            user_data.add_g_token_coins(amount_2)
+        else:
+            return JsonResponse({"result": "no such exchange pair"})
 
-    if asset_1_id == 1 and asset_2_id == 2:
-        user_data.remove_g_token_coins(amount_1 + fee)
-        user_data.add_gold_coins(amount_2)
-    elif asset_1_id == 2 and asset_2_id == 1:
-        user_data.remove_gold_coins(amount_1 + fee)
-        user_data.add_g_token_coins(amount_2)
-    elif asset_1_id == 1 and asset_2_id == 3:
-        user_data.remove_g_token_coins(amount_1 + fee)
-        user_data.add_gnomes(amount_2)
-    elif asset_1_id == 3 and asset_2_id == 1:
-        user_data.remove_gnomes(amount_1 + fee)
-        user_data.add_g_token_coins(amount_2)
-    else:
-        return JsonResponse({"result": "unexpected error while adding and/or removing coins"})
+        user = User.objects.get(tg_id=user_id)
+        asset_1 = Asset.objects.get(id=asset_1_id)
+        asset_2 = Asset.objects.get(id=asset_2_id)
 
-    user = User.objects.get(tg_id=user_id)
-    asset_1 = Asset.objects.get(id=asset_1_id)
-    asset_2 = Asset.objects.get(id=asset_2_id)
+        swap = Swap(user=user, user_rank=user_data.rank,
+                    asset_1=asset_1, asset_2=asset_2,
+                    fee=fee, amount_1=amount_1, amount_2=amount_2)
+        swap.save()
 
-    swap = Swap(user=user, user_rank=user_data.rank,
-                asset_1=asset_1, asset_2=asset_2,
-                fee=fee, amount_1=amount_1, amount_2=amount_2)
-    swap.save()
-
-    user_data.save()
+        user_data.save()
+    except Exception as e:
+        logging.error(e)
+        raise
+        # transaction rollback
 
     return JsonResponse({"result": "ok"})
 
@@ -97,42 +102,44 @@ def execute_transfer(request):
     fee = request.data.get("fee")
 
     if not user_1_id or not user_2_id:
-        transaction.rollback()
         return JsonResponse({"error": "user_id is required"}, status=400)
 
     if not is_asset_exists(asset_id=asset_id):
-        transaction.rollback()
         return JsonResponse({"result": "no such asset"}, status=status.HTTP_400_BAD_REQUEST)
 
     sender_data = UserData.objects.get(user_id=user_1_id)
     if not is_sufficient(userdata=sender_data, asset_id=asset_id, amount=amount, fee=fee):
-        transaction.rollback()
         return JsonResponse({"result": "not enough balance"}, status=status.HTTP_200_OK)
 
-    receiver_data = UserData.objects.get(user_id=user_2_id)
+    try:
+        receiver_data = UserData.objects.get(user_id=user_2_id)
+    except UserData.DoesNotExist:
+        return JsonResponse({"result": "user does not exist"})
 
-    if asset_id == 1:
-        sender_data.remove_g_token_coins(amount + fee)
-        
-        receiver_data.add_g_token_coins(amount)
-    elif asset_id == 2:
-        sender_data.remove_gold_coins(amount + fee)
-        
-        receiver_data.add_gold_coins(amount)
+    try:
+        if asset_id == 1:
+            sender_data.remove_g_token_coins(amount + fee)
+            receiver_data.add_g_token_coins(amount)
+        elif asset_id == 2:
+            sender_data.remove_gold_coins(amount + fee)
+            receiver_data.add_gold_coins(amount)
+        else:
+            return JsonResponse({"result": "no such currency"})
 
-    else:
-        return JsonResponse({"result": "unexpected error while adding and/or removing coins"})
+        sender = User.objects.get(tg_id=user_1_id)
+        receiver = User.objects.get(tg_id=user_2_id)
 
-    sender = User.objects.get(tg_id=user_1_id)
-    receiver = User.objects.get(tg_id=user_2_id)
+        asset = Asset.objects.get(id=asset_id)
 
-    asset = Asset.objects.get(id=asset_id)
+        transfer = Transfer(user_1=sender, user_2=receiver, asset=asset, fee=fee, amount=amount)
+        transfer.save()
 
-    transfer = Transfer(user_1=sender, user_2=receiver, asset=asset, fee=fee, amount=amount)
-    transfer.save()
-
-    sender_data.save()
-    receiver_data.save()
+        sender_data.save()
+        receiver_data.save()
+    except Exception as e:
+        logging.error(e)
+        raise
+        # transaction rollback
 
     return JsonResponse({"result": "ok"})
 
@@ -173,23 +180,29 @@ def buy_vip(request):
     user_id = request.data.get('userId')
 
     if not user_id:
-        transaction.rollback()
         return JsonResponse({"error": "user_id is required"}, status=400)
 
     # vip price temp
     vip_price = 10
 
-    user_data = get_object_or_404(UserData, user=user_id)
+    try:
+        user_data = UserData.objects.get(pk=user_id)
+    except UserData.DoesNotExist:
+        return JsonResponse({"result": "user does not exist"})
 
     if user_data.is_vip:
-        transaction.rollback()
         return JsonResponse({"result": "user is already vip"}, status=status.HTTP_200_OK)
 
     if not is_sufficient(userdata=user_data, asset_id=1, amount=vip_price, fee=0):
-        transaction.rollback()
         return JsonResponse({"result": "not enough balance"}, status=status.HTTP_200_OK)
 
-    user_data.remove_g_token_coins(vip_price)
-    user_data.make_vip()
-    user_data.save()
+    try:
+        user_data.remove_g_token_coins(vip_price)
+        user_data.make_vip()
+        user_data.save()
+    except Exception as e:
+        logging.error(e)
+        raise
+        # transaction rollback
+
     return JsonResponse({"result": "ok"})
