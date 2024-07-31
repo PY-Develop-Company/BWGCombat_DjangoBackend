@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 
 from .serializers import SwapSerializer, TransferSerializer, RateSerializer
-from .utils import is_exchange_pair_exists, is_asset_exists, is_sufficient
+from .utils import is_exchange_pair_exists, is_asset_exists, is_sufficient, is_fee_correct
 
 from .models import Swap, Transfer, Asset, ExchangePair
 from user_app.models import UserData, User
@@ -108,11 +108,9 @@ def execute_transfer(request):
     if not is_asset_exists(asset_id=asset_id):
         return JsonResponse({"result": "no such asset"}, status=status.HTTP_400_BAD_REQUEST)
 
-    backend_fee_percentage = float(os.environ.get("TRANSFER_FEE_PERCENTAGE"))
-    backend_calculated_fee = round(amount * (backend_fee_percentage / 100), 6)
-    if fee != backend_calculated_fee:
+    if not is_fee_correct(amount, fee):
         return JsonResponse({"result": "fee is incorrect or irrelevant",
-                            "hint": "try erasing and entering value again"})
+                      "hint": "try erasing and entering value again"})
 
     sender_data = UserData.objects.get(user_id=user_1_id)
     if not is_sufficient(userdata=sender_data, asset_id=asset_id, amount=amount, fee=fee):

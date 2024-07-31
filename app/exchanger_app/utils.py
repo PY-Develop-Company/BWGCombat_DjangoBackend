@@ -1,3 +1,4 @@
+import os
 from user_app.models import UserData
 
 from .models import Asset, ExchangePair
@@ -10,6 +11,13 @@ def is_exchange_pair_exists(asset_1_id: int, asset_2_id: int):
         return False
     else:
         return True
+
+
+def is_fee_correct(currency_amount, frontend_calculated_fee):
+    backend_fee_percentage = float(os.environ.get("TRANSFER_FEE_PERCENTAGE"))
+    backend_calculated_fee = round(currency_amount * (backend_fee_percentage / 100), 6)
+
+    return False if float(frontend_calculated_fee) != backend_calculated_fee else True
 
 
 def is_asset_exists(asset_id: int):
