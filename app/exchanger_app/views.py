@@ -85,7 +85,9 @@ def execute_swap(request):
     asset_1 = Asset.objects.get(id=asset_1_id)
     asset_2 = Asset.objects.get(id=asset_2_id)
 
-    swap = Swap(user=user, asset_1=asset_1, asset_2=asset_2, fee=fee, amount_1=amount_1, amount_2=amount_2)
+    swap = Swap(user=user, user_rank=user_data.rank,
+                asset_1=asset_1, asset_2=asset_2,
+                fee=fee, amount_1=amount_1, amount_2=amount_2)
     swap.save()
 
     user_data.save()
