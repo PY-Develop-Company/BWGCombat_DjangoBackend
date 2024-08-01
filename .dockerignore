@@ -17,5 +17,4 @@ venv
 
 *.png
 readme.md
-requirements.txt
 nginx/

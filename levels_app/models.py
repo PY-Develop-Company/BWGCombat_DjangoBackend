@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from user_app.models import User
 
 
 class Rank(models.Model):
@@ -223,10 +222,10 @@ class PartnersButtonTypes(models.Model):
 
 
 class PartnersTasks(models.Model):
-    name = models.CharField(max_length=64, null=False, blank=False)
-    button_type = models.ForeignKey(PartnersButtonTypes, on_delete=models.SET_NULL)
-    link = models.CharField(max_length=1024, null=False, blank=False)
-    reward_amount = models.BigIntegerField(null=False, blank=False)
+    name = models.CharField(max_length=64)
+    button_type = models.ForeignKey(PartnersButtonTypes, on_delete=models.SET_DEFAULT, default=0)
+    link = models.CharField(max_length=1024)
+    reward_amount = models.BigIntegerField()
 
 
 class SocialTasks(models.Model):
@@ -241,7 +240,7 @@ class SocialTasks(models.Model):
 
 
 class CompletedSocialTasks(models.Model):
-    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey("user_app.User", null=False, on_delete=models.CASCADE)
     task = models.ForeignKey(SocialTasks, null=False, on_delete=models.CASCADE)
 
 
@@ -264,5 +263,5 @@ class PartnerSocialTasks(models.Model):
 
 
 class CompletedPartnersTasks(models.Model):
-    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey("user_app.User", null=False, on_delete=models.CASCADE)
     task = models.ForeignKey(PartnersTasks, null=False, on_delete=models.CASCADE)

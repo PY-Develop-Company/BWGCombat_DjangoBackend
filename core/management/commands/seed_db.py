@@ -5,8 +5,9 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.timezone import now
 from exchanger_app.models import Asset, ExchangePair
-from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, \
-    PassiveIncomeLevel, PartnerSocialTasks, CompletedPartnersTasks, StageTemplate, Stage
+from levels_app.models import (Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, \
+    PassiveIncomeLevel, PartnersTasks, SocialTasks, CompletedSocialTasks, CompletedPartnersTasks, StageTemplate, \
+    Stage, PartnersButtonTypes)
 from user_app.models import User, Language, UserData, Link, Fren
 
 
@@ -37,8 +38,11 @@ class Command(BaseCommand):
         self.seed_users()
         self.seed_frens()
 
-        self.seed_social_media()
-        # self.seed_completed_social_tasks()
+        self.seed_partners_task_buttons()
+        self.seed_social_tasks()
+        self.seed_partners_tasks()
+        self.seed_completed_partners_tasks()
+        self.seed_completed_social_tasks()
 
         self.seed_superuser()
 
@@ -436,22 +440,53 @@ class Command(BaseCommand):
         for data in pairs:
             ExchangePair.objects.update_or_create(id=data['id'], defaults=data)
 
-    def seed_social_media(self):
+    def seed_partners_task_buttons(self):
         social_medias = [
-            {"id": 1, "name_en": "Facebook", "link": "https://www.facebook.com", "reward_amount": 5000,
-             "is_partner": True},
-            {"id": 2, "name_en": "Twitter", "link": "https://www.twitter.com", "reward_amount": 3000, "is_partner": False},
-            {"id": 3, "name_en": "Instagram", "link": "https://www.instagram.com", "reward_amount": 4000,
-             "is_partner": True}
+            {"id": 1, "name_en": "Play", "name_de": "Spielen", "name_fr": "Jouer", "name_ru": "Играть",
+             "name_uk": "Грати", "name_zh": "游戏"},
+            {"id": 2, "name_en": "Register", "name_de": "Register", "name_fr": "Registre", "name_ru": "Регистрация",
+             "name_uk": "Зареєструйся", "name_zh": "注册"},
+            {"id": 2, "name_en": "Subscribe", "name_de": "Abonnieren", "name_fr": "S'abonner", "name_ru": "Подписаться",
+             "name_uk": "Підписатись", "name_zh": "订阅"},
         ]
         for data in social_medias:
-            PartnerSocialTasks.objects.update_or_create(id=data['id'], defaults=data)
+            PartnersButtonTypes.objects.update_or_create(id=data['id'], defaults=data)
+
+    def seed_social_tasks(self):
+        social_tasks = [
+            {"id": 1, "link": "https://www.facebook.com", "reward_amount": 5000,
+             "name_en": "Facebook english", "name_de": "Facebook deutsch", "name_fr": "Facebook franc",
+             "name_ru": "Facebook ru", "name_uk": "Facebook uk", "name_zh": "Facebook zh"},
+            {"id": 2, "link": "https://www.twitter.com", "reward_amount": 3000,
+             "name_en": "Facebook english", "name_de": "Facebook deutsch", "name_fr": "Facebook franc",
+             "name_ru": "Facebook ru", "name_uk": "Facebook uk", "name_zh": "Facebook zh"},
+            {"id": 3, "link": "https://www.instagram.com", "reward_amount": 4000,
+             "name_en": "Facebook english", "name_de": "Facebook deutsch", "name_fr": "Facebook franc",
+             "name_ru": "Facebook ru", "name_uk": "Facebook uk", "name_zh": "Facebook zh"}
+        ]
+        for data in social_tasks:
+            SocialTasks.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_completed_social_tasks(self):
         tasks = [
-            {"user": User.objects.get(tg_id=123456), "task": PartnerSocialTasks.objects.get(id=1)},
-            {"user": User.objects.get(tg_id=123456), "task": PartnerSocialTasks.objects.get(id=2)},
-            {"user": User.objects.get(tg_id=123568), "task": PartnerSocialTasks.objects.get(id=2)},
+            {"user": User.objects.get(tg_id=123568), "task": SocialTasks.objects.get(id=1)},
+            {"user": User.objects.get(tg_id=123456), "task": SocialTasks.objects.get(id=2)},
+        ]
+        for data in tasks:
+            CompletedSocialTasks.objects.update_or_create(data)
+
+    def seed_partners_tasks(self):
+        partners_tasks = [
+            {"id": 1, "name": "BWG", "button_type": PartnersButtonTypes.objects.get(id=2), "link": "https://t.me/BWGOLDEN_Bot", "reward_amount": 5000},
+            {"id": 2, "name": "Catizen", "button_type": PartnersButtonTypes.objects.get(id=1), "link": "https://t.me/catizenbot", "reward_amount": 3000},
+        ]
+        for data in partners_tasks:
+            PartnersTasks.objects.update_or_create(id=data['id'], defaults=data)
+
+    def seed_completed_partners_tasks(self):
+        tasks = [
+            {"user": User.objects.get(tg_id=123568), "task": PartnersTasks.objects.get(id=1)},
+            {"user": User.objects.get(tg_id=123456), "task": PartnersTasks.objects.get(id=2)},
         ]
         for data in tasks:
             CompletedPartnersTasks.objects.update_or_create(data)
