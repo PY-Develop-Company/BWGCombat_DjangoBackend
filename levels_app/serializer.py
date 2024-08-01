@@ -1,22 +1,71 @@
 from rest_framework import serializers
 from user_app.models import UsersTasks
 
-from .models import Rank, TaskTemplate, TaskRoutes, Reward, PartnerSocialTasks, Stage
+from .models import Rank, TaskTemplate, TaskRoutes, Reward, PartnersTasks, SocialTasks, Stage
 
 
-class SocialMediaTasksSerializer(serializers.ModelSerializer):
+class SocialTasksSerializer(serializers.ModelSerializer):
     amount = serializers.SerializerMethodField()
     is_completed = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
-    def get_is_completed(self, obj: PartnerSocialTasks):
+    def get_name(self, obj: SocialTasks):
+        user_language = self.context.get('user_language')
+        if user_language == 'en':
+            return obj.name_en
+        elif user_language == 'de':
+            return obj.name_de
+        elif user_language == 'fr':
+            return obj.name_fr
+        elif user_language == 'ru':
+            return obj.name_ru
+        elif user_language == 'uk':
+            return obj.name_uk
+        elif user_language == 'zh':
+            return obj.name_zh
+        raise TypeError("Unknown language: %s" % user_language)
+
+    def get_is_completed(self, obj: SocialTasks):
         return obj.id in self.context.get('completed_tasks')
 
-    def get_amount(self, obj: PartnerSocialTasks):
+    def get_amount(self, obj: SocialTasks):
         return obj.reward_amount
 
     class Meta:
-        model = PartnerSocialTasks
+        model = SocialTasks
         fields = ('name', 'link', 'amount', 'is_completed')
+
+
+class PartnersTasksSerializer(serializers.ModelSerializer):
+    amount = serializers.SerializerMethodField()
+    is_completed = serializers.SerializerMethodField()
+    button_type = serializers.SerializerMethodField()
+
+    def get_is_completed(self, obj: PartnersTasks):
+        return obj.id in self.context.get('completed_tasks')
+
+    def get_amount(self, obj: PartnersTasks):
+        return obj.reward_amount
+
+    def get_button_type(self, obj: PartnersTasks):
+        user_language = self.context.get('user_language')
+        if user_language == 'en':
+            return obj.button_type.name_en
+        elif user_language == 'de':
+            return obj.button_type.name_de
+        elif user_language == 'fr':
+            return obj.button_type.name_fr
+        elif user_language == 'ru':
+            return obj.button_type.name_ru
+        elif user_language == 'uk':
+            return obj.button_type.name_uk
+        elif user_language == 'zh':
+            return obj.button_type.name_zh
+        raise TypeError("Unknown language: %s" % user_language)
+
+    class Meta:
+        model = PartnersTasks
+        fields = ('name', 'button_type', 'link', 'amount', 'is_completed')
 
 
 class RewardSerializer(serializers.ModelSerializer):

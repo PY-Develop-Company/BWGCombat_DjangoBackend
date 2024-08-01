@@ -458,22 +458,23 @@ class Command(BaseCommand):
              "name_en": "Facebook english", "name_de": "Facebook deutsch", "name_fr": "Facebook franc",
              "name_ru": "Facebook ru", "name_uk": "Facebook uk", "name_zh": "Facebook zh"},
             {"id": 2, "link": "https://www.twitter.com", "reward_amount": 3000,
-             "name_en": "Facebook english", "name_de": "Facebook deutsch", "name_fr": "Facebook franc",
-             "name_ru": "Facebook ru", "name_uk": "Facebook uk", "name_zh": "Facebook zh"},
+             "name_en": "Twitter english", "name_de": "Twitter deutsch", "name_fr": "Twitter franc",
+             "name_ru": "Twitter ru", "name_uk": "Twitter uk", "name_zh": "Twitter zh"},
             {"id": 3, "link": "https://www.instagram.com", "reward_amount": 4000,
-             "name_en": "Facebook english", "name_de": "Facebook deutsch", "name_fr": "Facebook franc",
-             "name_ru": "Facebook ru", "name_uk": "Facebook uk", "name_zh": "Facebook zh"}
+             "name_en": "Instagram english", "name_de": "Instagram deutsch", "name_fr": "Instagram franc",
+             "name_ru": "Instagram ru", "name_uk": "Instagram uk", "name_zh": "Instagram zh"}
         ]
         for data in social_tasks:
             SocialTasks.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_completed_social_tasks(self):
         tasks = [
-            {"user": User.objects.get(tg_id=123568), "task": SocialTasks.objects.get(id=1)},
-            {"user": User.objects.get(tg_id=123456), "task": SocialTasks.objects.get(id=2)},
+            {"id": 1, "user": User.objects.get(tg_id=123568), "task": SocialTasks.objects.get(id=1)},
+            {"id": 2, "user": User.objects.get(tg_id=123456), "task": SocialTasks.objects.get(id=2)},
+            {"id": 3, "user": User.objects.get(tg_id=123568), "task": SocialTasks.objects.get(id=3)}
         ]
         for data in tasks:
-            CompletedSocialTasks.objects.update_or_create(data)
+            CompletedSocialTasks.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_partners_tasks(self):
         partners_tasks = [
@@ -485,11 +486,11 @@ class Command(BaseCommand):
 
     def seed_completed_partners_tasks(self):
         tasks = [
-            {"user": User.objects.get(tg_id=123568), "task": PartnersTasks.objects.get(id=1)},
-            {"user": User.objects.get(tg_id=123456), "task": PartnersTasks.objects.get(id=2)},
+            {"id": 1, "user": User.objects.get(tg_id=123568), "task": PartnersTasks.objects.get(id=1)},
+            {"id": 2, "user": User.objects.get(tg_id=123568), "task": PartnersTasks.objects.get(id=2)},
         ]
         for data in tasks:
-            CompletedPartnersTasks.objects.update_or_create(data)
+            CompletedPartnersTasks.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_ads(self):
         ads = [

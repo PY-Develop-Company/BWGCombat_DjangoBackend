@@ -244,24 +244,6 @@ class CompletedSocialTasks(models.Model):
     task = models.ForeignKey(SocialTasks, null=False, on_delete=models.CASCADE)
 
 
-class PartnerSocialTasks(models.Model):
-    description_en = models.TextField(blank=False)
-    description_de = models.TextField(blank=False)
-    description_fr = models.TextField(blank=False)
-    description_ru = models.TextField(blank=False)
-    description_uk = models.TextField(blank=False)
-    description_zh = models.TextField(blank=False)
-    link = models.CharField(max_length=1024, null=False, blank=False)
-    reward_amount = models.BigIntegerField(null=False, blank=False)
-    is_partner = models.BooleanField(default=False)
-
-    def __str__(self) -> str:
-        return self.name
-
-    class Meta:
-        verbose_name_plural = ('9.1_Out_Rank_Tasks model')
-
-
 class CompletedPartnersTasks(models.Model):
     user = models.ForeignKey("user_app.User", null=False, on_delete=models.CASCADE)
     task = models.ForeignKey(PartnersTasks, null=False, on_delete=models.CASCADE)
