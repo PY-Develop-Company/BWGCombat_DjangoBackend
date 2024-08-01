@@ -1,5 +1,6 @@
 from django.db import models
 from user_app.models import User
+from levels_app.models import Rank
 from django.utils import timezone
 
 
@@ -9,6 +10,7 @@ class Asset(models.Model):
 
 class Swap(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    user_rank = models.ForeignKey(Rank, default=1, on_delete=models.DO_NOTHING)
     asset_1 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='swaps_giving')
     asset_2 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='swaps_receiving')
     fee = models.FloatField(default=0.0)
@@ -37,4 +39,13 @@ class Transfer(models.Model):
 class ExchangePair(models.Model):
     asset_1 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='rates_sell')
     asset_2 = models.ForeignKey(Asset, on_delete=models.DO_NOTHING, related_name='rates_buy')
-    rate = models.FloatField(default=1.0)
+    fee_percentage = models.FloatField(null=True, blank=True, default=5.0)
+    rate = models.FloatField(default=1.0)  # how much asset_2 you should give to get 1 unit of asset_1
+
+
+class VipPurchase(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user} purchased VIP-status at {self.time}"

@@ -12,6 +12,7 @@ from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
 from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MulticlickLevel, MaxEnergyLevel, PassiveIncomeLevel, Stage
+import tg_connection
 
 
 class CustomUserManager(BaseUserManager):
@@ -123,6 +124,8 @@ class UserData(models.Model):
     current_energy = models.IntegerField(default=0)
     gnome_amount = models.IntegerField(default=0, null=True, blank=True)
 
+    is_vip = models.BooleanField(default=False)
+
     # language = models.ForeignKey(Language, to_field='lang_code', null=True, on_delete=models.SET_DEFAULT, default='en')
     visual_effects = models.BooleanField(default=True)
     general_volume = models.PositiveSmallIntegerField(default=50)
@@ -170,10 +173,15 @@ class UserData(models.Model):
 
     def set_energy(self, energy: int):
         self.max_energy_amount = energy
-
         
-    def add_gnome(self, amount: int):
-        self.gnome_amount += 1
+    def add_gnomes(self, amount: int = 1):
+        self.gnome_amount += amount
+
+    def set_gnomes(self, amount: int):
+        self.gnome_amount = amount
+
+    def remove_gnomes(self, amount: int):
+        self.gnome_amount -= amount
 
     def set_key(self):
         self.has_key = True
@@ -186,13 +194,22 @@ class UserData(models.Model):
         refs_quantity = user.referrals.count()
         return True if refs_quantity >= expected_quantity else False
 
-    def check_channel_subscription(self, link):
-        # покамість
+    async def check_channel_subscription(self, channel_id):
         pass
+        # channel_id = 'https://t.me/justforcheckingone'
+        # await tg_connection.is_subscribed_to_channel(...)
 
     def check_link_click(self, link):
         user = User.objects.get(user_id=self.user_id)
         return LinkClick.objects.filter(user=user, link=link).exists()
+
+    def make_vip(self):
+        self.is_vip = True
+        self.save()
+
+    def revoke_vip(self):
+        self.is_vip = False
+        self.save()
 
     def receive_reward(self, reward: Reward):
         """
@@ -221,7 +238,7 @@ class UserData(models.Model):
             case 5:
                 self.set_key()
             case 6:
-                self.add_gnome(reward_amount)
+                self.add_gnomes(reward_amount)
             case 7:
                 self.set_prisoning(reward_amount)
             

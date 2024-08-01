@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Swap, Transfer
+from .models import Swap, Transfer, ExchangePair
 from user_app.models import User, UserData
 
 
@@ -24,3 +24,9 @@ class TransferSerializer(serializers.ModelSerializer):
         model = Transfer
         fields = ("user_1", "user_2", "asset", "fee", "amount", "time",
                   "receiver_username", "receiver_gender")
+
+
+class RateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExchangePair
+        fields = "__all__"
