@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from rest_framework.request import Request
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from .models import Reward, Rank, SocialMedia, CompletedSocialTasks
+from .models import Reward, Rank, PartnerSocialTasks, CompletedPartnersTasks
 from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoutes, User
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
@@ -140,8 +140,8 @@ def get_user_current_stage_info(request):
 @api_view(["POST"])
 def get_social_media_tasks(request):
     user_id = request.data.get('userId')
-    tasks = SocialMedia.objects.filter(is_partner=False)
-    completed = CompletedSocialTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
+    tasks = PartnerSocialTasks.objects.filter(is_partner=False)
+    completed = CompletedPartnersTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
     serializer = SocialMediaTasksSerializer(tasks, context={'completed_tasks': completed}, many=True)
     return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
 
@@ -149,8 +149,8 @@ def get_social_media_tasks(request):
 @api_view(["POST"])
 def get_partner_tasks(request):
     user_id = request.data.get('userId')
-    tasks = SocialMedia.objects.filter(is_partner=True)
-    completed = CompletedSocialTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
+    tasks = PartnerSocialTasks.objects.filter(is_partner=True)
+    completed = CompletedPartnersTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
     serializer = SocialMediaTasksSerializer(tasks, context={'completed_tasks': completed}, many=True)
     return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
 
@@ -160,15 +160,15 @@ def complete_partner_task(request):
     user_id = request.data.get('userId')
     task_id = request.data.get('taskId')
     
-    task = SocialMedia.objects.get(id=task_id)
+    task = PartnerSocialTasks.objects.get(id=task_id)
     user = UserData.objects.get(user=user_id)
     #check for completion
     completed = True
 
     if completed:
-        if not CompletedSocialTasks.objects.filter(task=task, user=user.user).exists():
+        if not CompletedPartnersTasks.objects.filter(task=task, user=user.user).exists():
             user.gold_balance += task.reward_amount
-            CompletedSocialTasks.objects.update_or_create(task=task, user=user.user)
+            CompletedPartnersTasks.objects.update_or_create(task=task, user=user.user)
             user.save()
     else:
         return JsonResponse({"result": "not ok"}, status=status.HTTP_403_FORBIDDEN)

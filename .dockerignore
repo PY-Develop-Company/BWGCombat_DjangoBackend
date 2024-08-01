@@ -2,14 +2,20 @@
 .git
 .gitignore
 
+
 # Docker
 .docker
 
 # Python
-app/__pychache__/
-app/*/__pychache__/
-app/*/*/__pychache__/
-app/*/*/*/__pychache__/
-.env/
-.venv/
-venv/
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
+.env
+.venv
+venv
+
+*.png
+readme.md
+requirements.txt
+nginx/

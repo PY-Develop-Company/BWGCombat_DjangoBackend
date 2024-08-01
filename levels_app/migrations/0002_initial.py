@@ -51,11 +51,6 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='levels_app.reward'),
         ),
         migrations.AddField(
-            model_name='completedsocialtasks',
-            name='task',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='levels_app.socialmedia'),
-        ),
-        migrations.AddField(
             model_name='stage',
             name='next_stage',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='levels_app.stage'),

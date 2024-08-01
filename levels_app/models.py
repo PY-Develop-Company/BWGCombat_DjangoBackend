@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from user_app.models import User
 
 
 class Rank(models.Model):
@@ -210,11 +211,47 @@ class PassiveIncomeLevel(models.Model):
         verbose_name_plural = ('8_PassiveIncome model')
 
 
-class SocialMedia(models.Model):
+class PartnersButtonTypes(models.Model):
+    name_en = models.CharField(max_length=64, blank=False, default="Register")
+    name_de = models.CharField(max_length=64, blank=False, default="Register")
+    name_fr = models.CharField(max_length=64, blank=False, default="Register")
+    name_ru = models.CharField(max_length=64, blank=False, default="Register")
+    name_uk = models.CharField(max_length=64, blank=False, default="Register")
+    name_zh = models.CharField(max_length=64, blank=False, default="Register")
+
+
+class PartnersTasks(models.Model):
     name = models.CharField(max_length=64, null=False, blank=False)
+    button_type = models.ForeignKey(PartnersButtonTypes, on_delete=models.SET_NULL)
     link = models.CharField(max_length=1024, null=False, blank=False)
     reward_amount = models.BigIntegerField(null=False, blank=False)
-    # maybe add imageField?
+
+
+class SocialTasks(models.Model):
+    name_en = models.CharField(max_length=64, blank=False)
+    name_de = models.CharField(max_length=64, blank=False)
+    name_fr = models.CharField(max_length=64, blank=False)
+    name_ru = models.CharField(max_length=64, blank=False)
+    name_uk = models.CharField(max_length=64, blank=False)
+    name_zh = models.CharField(max_length=64, blank=False)
+    link = models.CharField(max_length=1024, null=False, blank=False)
+    reward_amount = models.BigIntegerField(null=False, blank=False)
+
+
+class CompletedSocialTasks(models.Model):
+    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+    task = models.ForeignKey(SocialTasks, null=False, on_delete=models.CASCADE)
+
+
+class PartnerSocialTasks(models.Model):
+    description_en = models.TextField(blank=False)
+    description_de = models.TextField(blank=False)
+    description_fr = models.TextField(blank=False)
+    description_ru = models.TextField(blank=False)
+    description_uk = models.TextField(blank=False)
+    description_zh = models.TextField(blank=False)
+    link = models.CharField(max_length=1024, null=False, blank=False)
+    reward_amount = models.BigIntegerField(null=False, blank=False)
     is_partner = models.BooleanField(default=False)
 
     def __str__(self) -> str:
@@ -224,9 +261,6 @@ class SocialMedia(models.Model):
         verbose_name_plural = ('9.1_Out_Rank_Tasks model')
 
 
-class CompletedSocialTasks(models.Model):
-    user = models.ForeignKey('user_app.User', null=False, on_delete=models.CASCADE)
-    task = models.ForeignKey(SocialMedia, null=False, on_delete=models.CASCADE)
-
-    class Meta:
-        verbose_name_plural = ('9.2_Completed_Out_Rank_Tasks model')
+class CompletedPartnersTasks(models.Model):
+    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+    task = models.ForeignKey(PartnersTasks, null=False, on_delete=models.CASCADE)

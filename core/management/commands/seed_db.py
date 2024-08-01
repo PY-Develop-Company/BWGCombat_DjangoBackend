@@ -6,7 +6,7 @@ from django.db import transaction
 from django.utils.timezone import now
 from exchanger_app.models import Asset, ExchangePair
 from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, \
-    PassiveIncomeLevel, SocialMedia, CompletedSocialTasks, StageTemplate, Stage
+    PassiveIncomeLevel, PartnerSocialTasks, CompletedPartnersTasks, StageTemplate, Stage
 from user_app.models import User, Language, UserData, Link, Fren
 
 
@@ -425,23 +425,23 @@ class Command(BaseCommand):
 
     def seed_social_media(self):
         social_medias = [
-            {"id": 1, "name": "Facebook", "link": "https://www.facebook.com", "reward_amount": 5000,
+            {"id": 1, "name_en": "Facebook", "link": "https://www.facebook.com", "reward_amount": 5000,
              "is_partner": True},
-            {"id": 2, "name": "Twitter", "link": "https://www.twitter.com", "reward_amount": 3000, "is_partner": False},
-            {"id": 3, "name": "Instagram", "link": "https://www.instagram.com", "reward_amount": 4000,
+            {"id": 2, "name_en": "Twitter", "link": "https://www.twitter.com", "reward_amount": 3000, "is_partner": False},
+            {"id": 3, "name_en": "Instagram", "link": "https://www.instagram.com", "reward_amount": 4000,
              "is_partner": True}
         ]
         for data in social_medias:
-            SocialMedia.objects.update_or_create(id=data['id'], defaults=data)
+            PartnerSocialTasks.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_completed_social_tasks(self):
         tasks = [
-            {"user": User.objects.get(tg_id=123456), "task": SocialMedia.objects.get(id=1)},
-            {"user": User.objects.get(tg_id=123456), "task": SocialMedia.objects.get(id=2)},
-            {"user": User.objects.get(tg_id=123568), "task": SocialMedia.objects.get(id=2)},
+            {"user": User.objects.get(tg_id=123456), "task": PartnerSocialTasks.objects.get(id=1)},
+            {"user": User.objects.get(tg_id=123456), "task": PartnerSocialTasks.objects.get(id=2)},
+            {"user": User.objects.get(tg_id=123568), "task": PartnerSocialTasks.objects.get(id=2)},
         ]
         for data in tasks:
-            CompletedSocialTasks.objects.update_or_create(data)
+            CompletedPartnersTasks.objects.update_or_create(data)
 
     def seed_ads(self):
         ads = [

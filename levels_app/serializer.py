@@ -1,21 +1,21 @@
 from rest_framework import serializers
 from user_app.models import UsersTasks
 
-from .models import Rank, TaskTemplate, TaskRoutes, Reward, SocialMedia, Stage
+from .models import Rank, TaskTemplate, TaskRoutes, Reward, PartnerSocialTasks, Stage
 
 
 class SocialMediaTasksSerializer(serializers.ModelSerializer):
     amount = serializers.SerializerMethodField()
     is_completed = serializers.SerializerMethodField()
 
-    def get_is_completed(self, obj: SocialMedia):
+    def get_is_completed(self, obj: PartnerSocialTasks):
         return obj.id in self.context.get('completed_tasks')
 
-    def get_amount(self, obj: SocialMedia):
+    def get_amount(self, obj: PartnerSocialTasks):
         return obj.reward_amount
 
     class Meta:
-        model = SocialMedia
+        model = PartnerSocialTasks
         fields = ('name', 'link', 'amount', 'is_completed')
 
 
