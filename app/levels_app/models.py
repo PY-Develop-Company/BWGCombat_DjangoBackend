@@ -17,6 +17,8 @@ class Rank(models.Model):
     init_multiplier = models.ForeignKey('MulticlickLevel', null=False, on_delete=models.SET_DEFAULT, default=1)
     init_energy_regeneration = models.IntegerField(null=False, default=1)
 
+    swap_limit = models.IntegerField(null=False, default=10)  # in G-tokens
+
     next_rank = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:

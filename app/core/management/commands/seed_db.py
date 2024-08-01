@@ -240,6 +240,7 @@ class Command(BaseCommand):
             {"id": 1, "coord_x": 0, "coord_y": 0, "template_id": 1, "parent": None, "initial": True},
             {"id": 2, "coord_x": 0, "coord_y": -1, "template_id": 2, "parent_id": 1, "initial": False},
             # 2 rank 1 stage
+          
             {"id": 3, "coord_x": 0, "coord_y": 0, "template_id": 5, "parent_id": None, "initial": True},
             {"id": 4, "coord_x": -1, "coord_y": 0, "template_id": 4, "parent_id": 3, "initial": False},
             {"id": 5, "coord_x": -2, "coord_y": 0, "template_id": 3, "parent_id": 4, "initial": False},
@@ -248,10 +249,12 @@ class Command(BaseCommand):
             {"id": 8, "coord_x": -1, "coord_y": -1, "template_id": 9, "parent_id": 7, "initial": False},
             {"id": 9, "coord_x": 0, "coord_y": -2, "template_id": 8, "parent_id": 7, "initial": False},
             {"id": 10, "coord_x": -1, "coord_y": -2, "template_id": 9, "parent_id": 9, "initial": False},
+          
             # 3 rank 1 stage(left)
             {"id": 11, "coord_x": 0, "coord_y": 0, "template_id": 5, "parent_id": None, "initial": True},
             {"id": 12, "coord_x": -1, "coord_y": 0, "template_id": 6, "parent_id": 11, "initial": False},
             {"id": 13, "coord_x": -2, "coord_y": 0, "template_id": 3, "parent_id": 12, "initial": False},
+          
             # central
             {"id": 14, "coord_x": -3, "coord_y": 0, "template_id": 3, "parent_id": 13, "initial": False},
             {"id": 15, "coord_x": -2, "coord_y": -1, "template_id": 3, "parent_id": 13, "initial": False},
@@ -260,6 +263,7 @@ class Command(BaseCommand):
             {"id": 18, "coord_x": -2, "coord_y": 1, "template_id": 3, "parent_id": 13, "initial": False},
             {"id": 19, "coord_x": -3, "coord_y": 1, "template_id": 6, "parent_id": 18, "initial": False},
             {"id": 20, "coord_x": -1, "coord_y": 1, "template_id": 3, "parent_id": 18, "initial": False},  # key
+          
             # 3 rank 1 stage(right)
             {"id": 21, "coord_x": 1, "coord_y": 0, "template_id": 3, "parent_id": 11, "initial": True},
             {"id": 22, "coord_x": 2, "coord_y": 0, "template_id": 3, "parent_id": 21, "initial": False},
@@ -270,6 +274,7 @@ class Command(BaseCommand):
             {"id": 27, "coord_x": 3, "coord_y": 1, "template_id": 3, "parent_id": 25, "initial": False},  # key
             {"id": 28, "coord_x": 2, "coord_y": 1, "template_id": 3, "parent_id": 27, "initial": False},
             {"id": 29, "coord_x": 1, "coord_y": 1, "template_id": 3, "parent_id": 28, "initial": False},  # key
+          
             # 3 rank 2 stage
             {"id": 30, "coord_x": 0, "coord_y": 0, "template_id": 8, "parent_id": None, "initial": True},
             {"id": 31, "coord_x": 1, "coord_y": 0, "template_id": 8, "parent_id": 30, "initial": False},
@@ -290,6 +295,7 @@ class Command(BaseCommand):
             {"id": 46, "coord_x": 1, "coord_y": 1, "template_id": 7, "parent_id": 41, "initial": False},
             {"id": 47, "coord_x": 1, "coord_y": 1, "template_id": 7, "parent_id": 46, "initial": False},  # key
             {"id": 48, "coord_x": 1, "coord_y": 1, "template_id": 7, "parent_id": 46, "initial": False},  # key
+          
             # 3 rank 3 stage
             {"id": 49, "coord_x": 0, "coord_y": 0, "template_id": 12, "parent_id": None, "initial": True},
             {"id": 50, "coord_x": 1, "coord_y": 0, "template_id": 11, "parent_id": 49, "initial": False},
@@ -410,15 +416,22 @@ class Command(BaseCommand):
     def seed_assets(self):
         assets = [
             {"id": 1, "name": "G-Token"},
-            {"id": 2, "name": "Gold"}
+            {"id": 2, "name": "Gold"},
+            {"id": 3, "name": "Gnome"}
         ]
         for data in assets:
             Asset.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_exchange_pairs(self):
         pairs = [
-            {"id": 1, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=2), "rate": 100_000},
-            {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1), "rate": 0.00001}
+            {"id": 1, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=2),
+             "rate": 100_000},
+            {"id": 2, "asset_1": Asset.objects.get(id=2), "asset_2": Asset.objects.get(id=1),
+             "rate": 0.00001},
+            {"id": 3, "asset_1": Asset.objects.get(id=1), "asset_2": Asset.objects.get(id=3),
+             "rate": 0.333333333333, "fee_percentage": None},
+            {"id": 4, "asset_1": Asset.objects.get(id=3), "asset_2": Asset.objects.get(id=1),
+             "rate": 6, "fee_percentage": None}
         ]
         for data in pairs:
             ExchangePair.objects.update_or_create(id=data['id'], defaults=data)

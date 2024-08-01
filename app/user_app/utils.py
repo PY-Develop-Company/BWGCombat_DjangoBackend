@@ -1,4 +1,4 @@
-GNOME_INCOME = 100
+GNOME_INCOME = 0.025
 
 
 def get_gnome_reward():
