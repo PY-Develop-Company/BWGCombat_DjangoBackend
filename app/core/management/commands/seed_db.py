@@ -459,7 +459,7 @@ class Command(BaseCommand):
     def seed_ads(self):
         ads = [
             {"id": 1, "name": "Azino 777", "description": "Vygravaytie 100000000000000000000 rubley",
-             "link": Link.objects.get(id=1), "image_path": "azino777.jfif"}
+             "link": Link.objects.get(id=1), "file_path": "azino777.jfif"}
         ]
         for data in ads:
             Advert.objects.update_or_create(id=data['id'], defaults=data)

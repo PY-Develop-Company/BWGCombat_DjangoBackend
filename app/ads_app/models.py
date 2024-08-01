@@ -26,6 +26,10 @@ class Advert(models.Model):
     is_video = models.BooleanField(default=False)
     file_path = models.FilePathField(path='./media/ads/', unique=True, null=False, blank=False, default='ad1')
 
+    def is_fullscreen(self):
+        return True if self.show_place in (self.ShowPlace.FAIRY,
+                                           self.ShowPlace.CHEST) else False
+
 
 class AdView(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)

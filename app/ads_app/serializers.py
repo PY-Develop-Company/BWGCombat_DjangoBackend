@@ -11,4 +11,4 @@ class AdvertSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Advert
-        fields = ("id", "name", "url", "image_path")
+        fields = ("id", "name", "url", "file_path")
