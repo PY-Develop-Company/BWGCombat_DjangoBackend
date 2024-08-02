@@ -105,7 +105,7 @@ def execute_swap(request):
 
     return JsonResponse({"result": "ok",
                          "new_user_gold_balance": user_data.gold_balance,
-                         "new_user_g-token_balance": user_data.g_token,
+                         "new_user_g_token_balance": user_data.g_token,
                          "new_user_gnome_balance": user_data.gnome_amount})
 
 
