@@ -103,7 +103,10 @@ def execute_swap(request):
         raise
         # transaction rollback
 
-    return JsonResponse({"result": "ok"})
+    return JsonResponse({"result": "ok",
+                         "new_user_gold_balance": user_data.gold_balance,
+                         "new_user_g-token_balance": user_data.g_token,
+                         "new_user_gnome_balance": user_data.gnome_amount})
 
 
 @csrf_exempt
@@ -161,7 +164,18 @@ def execute_transfer(request):
         raise
         # transaction rollback
 
-    return JsonResponse({"result": "ok"})
+    if asset_id == 1:
+        sender_balance = sender_data.g_token
+        receiver_balance = receiver_data.g_token
+    elif asset_id == 2:
+        sender_balance = sender_data.gold_balance
+        receiver_balance = receiver_data.gold_balance
+    else:
+        raise
+
+    return JsonResponse({"result": "ok",
+                         "new_sender_balance": sender_balance,
+                         "new_receiver_balance": receiver_balance})
 
 
 @api_view(["POST"])
