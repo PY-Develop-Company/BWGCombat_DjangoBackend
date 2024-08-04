@@ -1,6 +1,7 @@
 import asyncio
 
 import django.db
+from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.timezone import now
@@ -59,16 +60,21 @@ def get_user_info(request):
 
 
 @api_view(["POST"])
+@transaction.atomic
 @permission_classes([AllowAny])
 def add_coins_to_user(request):
     total_clicks = request.data.get("totalClicks")
     user_id = request.data.get("userId")
-    curr_energy = request.data.get("currentEnergy")
-    warning = request.data.get("warning")
+    current_energy = request.data.get("currentEnergy")
+    suspicious_activity = request.data.get("suspiciousActivity")
+
+    if suspicious_activity:
+        return JsonResponse({"result": "fail", "message": "suspicious activity has been detected"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
     user_data = get_object_or_404(UserData, user_id=user_id)
     user_data.add_gold_coins(total_clicks*user_data.multiclick_amount)
-    user_data.current_energy = curr_energy
+    user_data.current_energy = current_energy
     user_data.last_visited = now()
 
     user_data.save()
