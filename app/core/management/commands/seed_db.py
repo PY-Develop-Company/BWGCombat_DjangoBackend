@@ -1,9 +1,10 @@
 import os
 
-from ads_app.models import Advert
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.timezone import now
+
+from ads_app.models import BannerAdvert, FullscreenAdvert
 from exchanger_app.models import Asset, ExchangePair
 from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, \
     PassiveIncomeLevel, SocialMedia, CompletedSocialTasks, StageTemplate, Stage
@@ -82,6 +83,8 @@ class Command(BaseCommand):
             {"id": 19, "name": "MULTICLICK_1", "amount": 1, "reward_type": Reward.RewardType.MULTIPLIER},
             {"id": 17, "name": "MULTICLICK_2", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
             {"id": 18, "name": "MULTICLICK_10", "amount": 10, "reward_type": Reward.RewardType.MULTIPLIER},
+
+            {"id": 21, "name": "Ad_View_GOLD", "amount": 1000, "reward_type": Reward.RewardType.GOLD},
             # Add more rewards as needed
         ]
         for reward_data in rewards_data:
@@ -457,9 +460,17 @@ class Command(BaseCommand):
             CompletedSocialTasks.objects.update_or_create(data)
 
     def seed_ads(self):
-        ads = [
+        banner_ads = [
             {"id": 1, "name": "Azino 777", "description": "Vygravaytie 100000000000000000000 rubley",
              "link": Link.objects.get(id=1), "file_path": "azino777.jfif"}
         ]
-        for data in ads:
-            Advert.objects.update_or_create(id=data['id'], defaults=data)
+        fullscreen_ads = [
+            {"id": 1, "name": "Azino 777", "description": "Vygravaytie 100000000000000000000 rubley",
+             "link": Link.objects.get(id=1), "file_path": "azino777.jfif",
+             "view_gold_reward": Reward.objects.get(name="Ad_View_GOLD"),
+             "view_gnome_reward": Reward.objects.get(name="GNOME_1")}
+        ]
+        for data in banner_ads:
+            BannerAdvert.objects.update_or_create(id=data['id'], defaults=data)
+        for data in fullscreen_ads:
+            FullscreenAdvert.objects.update_or_create(id=data['id'], defaults=data)

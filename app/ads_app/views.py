@@ -6,19 +6,19 @@ import random
 from django.http import JsonResponse
 from django.db.models import Q
 
-from .models import Advert
+from .models import BannerAdvert, FullscreenAdvert
 from .serializers import AdvertSerializer
 
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
-def get_advert(request):
+def get_banner_advert(request):
     advert_id = request.data.get("adId")
 
     try:
-        advert = Advert.objects.get(id=advert_id)
-    except Advert.DoesNotExist:
-        return JsonResponse({"result": "advert with such id does not exist"})
+        advert = BannerAdvert.objects.get(id=advert_id)
+    except BannerAdvert.DoesNotExist:
+        return JsonResponse({"result": "advert with such id does not exist or it is not a banner advert"})
 
     advert_data = AdvertSerializer(advert).data
 
@@ -31,12 +31,12 @@ def get_fullscreen_advert(request):
     advert_id = request.data.get("adId")
 
     try:
-        advert = Advert.objects.get(id=advert_id)
-    except Advert.DoesNotExist:
-        return JsonResponse({"result": "advert with such id does not exist"})
+        advert = FullscreenAdvert.objects.get(id=advert_id)
+    except FullscreenAdvert.DoesNotExist:
+        return JsonResponse({"result": "advert with such id does not exist or it is not a fullscreen advert"})
 
-    if not advert.is_fullscreen():
-        return JsonResponse({"result": "requested advert is only for banners"})
+    # if not advert.is_fullscreen():
+    #     return JsonResponse({"result": "requested advert is only for banners"})
 
     advert_data = AdvertSerializer(advert).data
 
@@ -46,15 +46,15 @@ def get_fullscreen_advert(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_random_fullscreen_advert(request):
-    fullscreen_ads_ids = Advert.objects.filter(Q(show_place=Advert.ShowPlace.FAIRY) |
-                                               Q(show_place=Advert.ShowPlace.CHEST)).all().values_list('id', flat=True)
+    fullscreen_ads_ids = FullscreenAdvert.objects.filter(Q(show_place=FullscreenAdvert.ShowPlace.FAIRY) |
+                                                         Q(show_place=FullscreenAdvert.ShowPlace.CHEST)).all().values_list('id', flat=True)
 
     print('fullscreen_ads_ids:')
     print(fullscreen_ads_ids)
 
     try:
-        advert = Advert.objects.get(id=random.choice(fullscreen_ads_ids))
-    except Advert.DoesNotExist:
+        advert = FullscreenAdvert.objects.get(id=random.choice(fullscreen_ads_ids))
+    except FullscreenAdvert.DoesNotExist:
         return JsonResponse({"result": "unexpected absence of the advert"})
 
     advert_data = AdvertSerializer(advert).data
@@ -65,7 +65,16 @@ def get_random_fullscreen_advert(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_all_banner_adverts(request):
-    adverts = Advert.objects.all()
+    adverts = BannerAdvert.objects.all()
     adverts_data = AdvertSerializer(adverts, many=True).data
 
-    return JsonResponse({"adverts": adverts_data})
+    return JsonResponse({"banner_adverts": adverts_data})
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_all_fullscreen_adverts(request):
+    adverts = FullscreenAdvert.objects.all()
+    adverts_data = AdvertSerializer(adverts, many=True).data
+
+    return JsonResponse({"banner_adverts": adverts_data})
