@@ -6,7 +6,7 @@ import random
 from django.http import JsonResponse
 from django.db.models import Q
 
-from .models import BannerAdvert, FullscreenAdvert
+from .models import BannerAdvert, FullscreenAdvert, AdView
 from .serializers import AdvertSerializer
 
 
@@ -78,3 +78,14 @@ def get_all_fullscreen_adverts(request):
     adverts_data = AdvertSerializer(adverts, many=True).data
 
     return JsonResponse({"banner_adverts": adverts_data})
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def register_adview(request):
+    user_id = request.data.get("userId")
+    advert_id = request.data.get("adId")
+
+    AdView.objects.create(user_id=user_id, advert_id=advert_id)
+
+    return JsonResponse({"result": "ok"})
