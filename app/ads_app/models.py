@@ -51,3 +51,7 @@ class AdView(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     advert = models.ForeignKey(FullscreenAdvert, on_delete=models.CASCADE)
     time = models.DateTimeField(default=timezone.now)
+
+    is_clicked = models.BooleanField(default=False)
+    seconds_before_click = models.FloatField(null=True, blank=True, default=None)
+    is_fairy = models.BooleanField(default=False)
