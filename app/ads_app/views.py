@@ -46,8 +46,7 @@ def get_fullscreen_advert(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_random_fullscreen_advert(request):
-    fullscreen_ads_ids = FullscreenAdvert.objects.filter(Q(show_place=FullscreenAdvert.ShowPlace.FAIRY) |
-                                                         Q(show_place=FullscreenAdvert.ShowPlace.CHEST)).all().values_list('id', flat=True)
+    fullscreen_ads_ids = FullscreenAdvert.objects.all().values_list('id', flat=True)
 
     print('fullscreen_ads_ids:')
     print(fullscreen_ads_ids)
