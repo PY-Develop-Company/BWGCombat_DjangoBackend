@@ -84,7 +84,8 @@ class Command(BaseCommand):
             {"id": 17, "name": "MULTICLICK_2", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
             {"id": 18, "name": "MULTICLICK_10", "amount": 10, "reward_type": Reward.RewardType.MULTIPLIER},
 
-            {"id": 21, "name": "Ad_View_GOLD", "amount": 1000, "reward_type": Reward.RewardType.GOLD},
+            {"id": 21, "name": "Ad_View_MAX_GOLD", "amount": 2000, "reward_type": Reward.RewardType.GOLD},
+            {"id": 22, "name": "Ad_View_MIN_GOLD", "amount": 500, "reward_type": Reward.RewardType.GOLD},
             # Add more rewards as needed
         ]
         for reward_data in rewards_data:
@@ -467,7 +468,8 @@ class Command(BaseCommand):
         fullscreen_ads = [
             {"id": 1, "name": "Azino 777", "description": "Vygravaytie 100000000000000000000 rubley",
              "link": Link.objects.get(id=1), "file_path": "azino777.jfif",
-             "view_gold_reward": Reward.objects.get(name="Ad_View_GOLD"),
+             "view_max_gold_reward": Reward.objects.get(name="Ad_View_MAX_GOLD"),
+             "view_min_gold_reward": Reward.objects.get(name="Ad_View_MIN_GOLD"),
              "view_gnome_reward": Reward.objects.get(name="GNOME_1")}
         ]
         for data in banner_ads:

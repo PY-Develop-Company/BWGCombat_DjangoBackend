@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 
 from .models import BannerAdvert, FullscreenAdvert, AdView
-from .serializers import AdvertSerializer
+from .serializers import BannerAdvertSerializer, FullscreenAdvertSerializer
 
 
 @api_view(["GET"])
@@ -20,7 +20,7 @@ def get_banner_advert(request):
     except BannerAdvert.DoesNotExist:
         return JsonResponse({"result": "advert with such id does not exist or it is not a banner advert"})
 
-    advert_data = AdvertSerializer(advert).data
+    advert_data = BannerAdvertSerializer(advert).data
 
     return JsonResponse(advert_data)
 
@@ -38,7 +38,7 @@ def get_fullscreen_advert(request):
     # if not advert.is_fullscreen():
     #     return JsonResponse({"result": "requested advert is only for banners"})
 
-    advert_data = AdvertSerializer(advert).data
+    advert_data = FullscreenAdvertSerializer(advert).data
 
     return JsonResponse(advert_data)
 
@@ -57,7 +57,7 @@ def get_random_fullscreen_advert(request):
     except FullscreenAdvert.DoesNotExist:
         return JsonResponse({"result": "unexpected absence of the advert"})
 
-    advert_data = AdvertSerializer(advert).data
+    advert_data = FullscreenAdvertSerializer(advert).data
 
     return JsonResponse(advert_data)
 
@@ -66,7 +66,7 @@ def get_random_fullscreen_advert(request):
 @permission_classes([AllowAny])
 def get_all_banner_adverts(request):
     adverts = BannerAdvert.objects.all()
-    adverts_data = AdvertSerializer(adverts, many=True).data
+    adverts_data = BannerAdvertSerializer(adverts, many=True).data
 
     return JsonResponse({"banner_adverts": adverts_data})
 
@@ -75,7 +75,7 @@ def get_all_banner_adverts(request):
 @permission_classes([AllowAny])
 def get_all_fullscreen_adverts(request):
     adverts = FullscreenAdvert.objects.all()
-    adverts_data = AdvertSerializer(adverts, many=True).data
+    adverts_data = FullscreenAdvertSerializer(adverts, many=True).data
 
     return JsonResponse({"banner_adverts": adverts_data})
 

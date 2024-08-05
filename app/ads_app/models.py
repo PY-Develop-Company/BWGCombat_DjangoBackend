@@ -39,8 +39,10 @@ class BannerAdvert(Advert):
 
 
 class FullscreenAdvert(Advert):
-    view_gold_reward = models.ForeignKey(Reward, null=True, blank=True, default=None, on_delete=models.SET_NULL,
-                                         related_name="ads_with_gold_reward")
+    view_max_gold_reward = models.ForeignKey(Reward, null=True, blank=True, default=None, on_delete=models.SET_NULL,
+                                             related_name="ads_with_max_gold_reward")
+    view_min_gold_reward = models.ForeignKey(Reward, null=True, blank=True, default=None, on_delete=models.SET_NULL,
+                                             related_name="ads_with_min_gold_reward")
     view_gnome_reward = models.ForeignKey(Reward, null=True, blank=True, default=None, on_delete=models.SET_NULL,
                                           related_name="ads_with_gnome_reward")
     gnome_probability = models.FloatField(null=False, blank=False, default=0.0002)
