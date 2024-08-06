@@ -8,6 +8,7 @@ from django.db.models import Q
 
 from .models import BannerAdvert, FullscreenAdvert, AdView
 from .serializers import BannerAdvertSerializer, FullscreenAdvertSerializer
+from .utils import get_random_gold_reward
 
 
 @api_view(["GET"])
@@ -39,6 +40,7 @@ def get_fullscreen_advert(request):
     #     return JsonResponse({"result": "requested advert is only for banners"})
 
     advert_data = FullscreenAdvertSerializer(advert).data
+    advert_data['random_gold_reward'] = get_random_gold_reward(advert)
 
     return JsonResponse(advert_data)
 
@@ -57,6 +59,7 @@ def get_random_fullscreen_advert(request):
         return JsonResponse({"result": "unexpected absence of the advert"})
 
     advert_data = FullscreenAdvertSerializer(advert).data
+    advert_data['random_gold_reward'] = get_random_gold_reward(advert)
 
     return JsonResponse(advert_data)
 
