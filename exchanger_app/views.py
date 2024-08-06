@@ -103,7 +103,10 @@ def execute_swap(request):
         raise
         # transaction rollback
 
-    return JsonResponse({"result": "ok"})
+    return JsonResponse({"result": "ok",
+                         "new_user_gold_balance": user_data.gold_balance,
+                         "new_user_g_token_balance": user_data.g_token,
+                         "new_user_gnome_balance": user_data.gnome_amount})
 
 
 @csrf_exempt
@@ -161,7 +164,18 @@ def execute_transfer(request):
         raise
         # transaction rollback
 
-    return JsonResponse({"result": "ok"})
+    if asset_id == 1:
+        sender_balance = sender_data.g_token
+        receiver_balance = receiver_data.g_token
+    elif asset_id == 2:
+        sender_balance = sender_data.gold_balance
+        receiver_balance = receiver_data.gold_balance
+    else:
+        raise
+
+    return JsonResponse({"result": "ok",
+                         "new_sender_balance": sender_balance,
+                         "new_receiver_balance": receiver_balance})
 
 
 @api_view(["POST"])
@@ -236,8 +250,7 @@ def buy_vip(request):
     if not user_id:
         return JsonResponse({"error": "user_id is required"}, status=400)
 
-    # vip price temp
-    vip_price = 10
+    vip_price = int(os.environ.get("VIP_PRICE"))
 
     try:
         user_data = UserData.objects.get(pk=user_id)
@@ -259,4 +272,5 @@ def buy_vip(request):
         raise
         # transaction rollback
 
-    return JsonResponse({"result": "ok"})
+    return JsonResponse({"result": "ok",
+                         "new_g_token_balance": user_data.g_token})

@@ -71,6 +71,7 @@ class UserDataSerializer(serializers.ModelSerializer):
             "username",
             "gold_balance",
             "g_token",
+            "is_vip",
             "last_visited",
             "rank",
             "current_stage",
