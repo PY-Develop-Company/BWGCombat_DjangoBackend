@@ -391,7 +391,7 @@ class Command(BaseCommand):
 
     def seed_user_data(self):
         user_data = [
-            {'user': User.objects.get(tg_id=123), 'character_gender': 0, 'gold_balance': 2_000_000, 'g_token': 20,
+            {'user': User.objects.get(tg_id=os.environ.get("ADMIN_TG_ID")), 'character_gender': 0, 'gold_balance': 2_000_000, 'g_token': 20,
              'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
              'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
              'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
