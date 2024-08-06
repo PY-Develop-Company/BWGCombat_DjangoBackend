@@ -92,6 +92,7 @@ class TasksSerializer(serializers.ModelSerializer):
     routes = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
 
     def get_name(self, obj: UsersTasks):
         return obj.task.template.name
@@ -112,10 +113,13 @@ class TasksSerializer(serializers.ModelSerializer):
         return obj.get_status_display()
 
     def get_routes(self, obj: UsersTasks):
-        if obj.status == UsersTasks.Status.COMPLETED:
+        if obj.status == UsersTasks.Status.CLAIMED:
             tsks = obj.task.get_subtasks()
             return TaskCoordinatesSerializer(tsks, many=True).data
 
+    def get_price(self, obj: UsersTasks):
+        return obj.task.template.price
+
     class Meta:
         model = UsersTasks
-        fields = ('id', 'name', 'x', 'y', 'type', 'status', 'rewards', 'routes')
+        fields = ('id', 'name', 'x', 'y', 'type', 'price', 'status', 'rewards', 'routes')

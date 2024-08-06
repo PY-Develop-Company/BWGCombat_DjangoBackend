@@ -267,7 +267,8 @@ class UsersTasks(models.Model):
     class Status(models.TextChoices):
         UNAVAILABLE = "0", _("Unavailable")
         IN_PROGRESS = "1", _("In progress")
-        COMPLETED = "2", _("Completed")
+        NOT_CLAIMED = "4", _("Not claimed")
+        CLAIMED = "2", _("Claimed")
         EXPIRED = "3", _("Expired")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

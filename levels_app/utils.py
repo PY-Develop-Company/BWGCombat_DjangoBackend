@@ -77,3 +77,15 @@ def place_items(user_data: UserData, rank:Rank):
     ts = UsersTasks.objects.get(user=user_data.user, task=rank.init_stage.initial_task)
     ts.status = UsersTasks.Status.IN_PROGRESS
     ts.save()
+
+
+def claim_task_rewards(rewards, userdata, user_task):
+    for reward in rewards:
+        userdata.receive_reward(reward)
+    user_task.status = UsersTasks.Status.CLAIMED
+    subtasks = user_task.get_user_subtasks(userdata.user)
+    for subtask in subtasks:
+        subtask.status = UsersTasks.Status.IN_PROGRESS
+        subtask.save()
+    userdata.save()
+    user_task.save()
