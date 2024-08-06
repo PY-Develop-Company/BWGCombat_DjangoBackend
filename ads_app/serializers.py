@@ -16,14 +16,24 @@ class BannerAdvertSerializer(serializers.ModelSerializer):
 
 class FullscreenAdvertSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
+    view_max_gold_reward = serializers.SerializerMethodField()
+    view_min_gold_reward = serializers.SerializerMethodField()
 
     def get_url(self, obj: FullscreenAdvert):
         return obj.link.url
+
+    def get_view_max_gold_reward(self, obj: FullscreenAdvert):
+        return int(obj.view_max_gold_reward.amount)
+
+    def get_view_min_gold_reward(self, obj: FullscreenAdvert):
+        return int(obj.view_min_gold_reward.amount)
+
 
     class Meta:
         model = FullscreenAdvert
         fields = ("id", "name", "url", "is_video", "relevant_region", "file_path",
                   "view_max_gold_reward", "view_min_gold_reward", "view_gnome_reward", "gnome_probability")
+
 
 class AdViewSerializer(serializers.ModelSerializer):
     class Meta:
