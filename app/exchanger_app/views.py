@@ -250,8 +250,7 @@ def buy_vip(request):
     if not user_id:
         return JsonResponse({"error": "user_id is required"}, status=400)
 
-    # vip price temp
-    vip_price = 10
+    vip_price = int(os.environ.get("VIP_PRICE"))
 
     try:
         user_data = UserData.objects.get(pk=user_id)
@@ -273,4 +272,5 @@ def buy_vip(request):
         raise
         # transaction rollback
 
-    return JsonResponse({"result": "ok"})
+    return JsonResponse({"result": "ok",
+                         "new_g_token_balance": user_data.g_token})
