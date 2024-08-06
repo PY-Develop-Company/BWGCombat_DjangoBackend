@@ -36,12 +36,13 @@ class Command(BaseCommand):
         self.seed_ranks()
 
         self.seed_users()
+        self.seed_superuser()
+        self.seed_user_data()
+
         self.seed_frens()
 
         self.seed_social_media()
         # self.seed_completed_social_tasks()
-
-        self.seed_superuser()
 
         self.seed_assets()
         self.seed_exchange_pairs()
@@ -386,27 +387,34 @@ class Command(BaseCommand):
 
     def seed_user_data(self):
         user_data = [
+            {'user': User.objects.get(tg_id=123), 'character_gender': 0, 'gold_balance': 2_000_000, 'g_token': 20,
+             'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
+             'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
+             'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
+             'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'gnome_amount': 3},
             {'user': User.objects.get(tg_id=123568), 'character_gender': 0, 'gold_balance': 0, 'g_token': 0,
              'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
              'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
              'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
              'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
              'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
-             'passive_income_level': PassiveIncomeLevel.objects.get(name="Passive Income Level 1")},
-            {'user': User.objects.get(tg_id=123456), 'character_gender': 1, 'gold_balance': 0, 'g_token': 0,
+             'gnome_amount': 0},
+            {'user': User.objects.get(tg_id=123456), 'character_gender': 1, 'gold_balance': 1_500_000, 'g_token': 35,
              'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
              'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
              'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
              'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
              'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
-             'passive_income_level': PassiveIncomeLevel.objects.get(name="Passive Income Level 1")},
+             'gnome_amount': 4},
             {'user': User.objects.get(tg_id=123457), 'character_gender': None, 'gold_balance': 0, 'g_token': 0,
              'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
              'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
              'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
              'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
              'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
-             'passive_income_level': PassiveIncomeLevel.objects.get(name="Passive Income Level 1")},
+             'gnome_amount': 0}
         ]
         for data in user_data:
             UserData.objects.update_or_create(user=data['user'], defaults=data)
