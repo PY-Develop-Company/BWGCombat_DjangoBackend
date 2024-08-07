@@ -21,7 +21,9 @@ def is_transfer_fee_correct(currency_amount, frontend_calculated_fee):
 
 
 def is_swap_fee_correct(amount_1, frontend_calculated_fee, exchange_pair: ExchangePair):
-    backend_calculated_fee = round(amount_1 * (exchange_pair.fee_percentage / 100), 6)
+    fee_percentage = exchange_pair.fee_percentage if exchange_pair.fee_percentage else 0
+
+    backend_calculated_fee = round(amount_1 * (fee_percentage / 100), 6)
 
     return False if round(float(frontend_calculated_fee), 6) != backend_calculated_fee else True
 
