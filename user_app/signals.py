@@ -12,8 +12,10 @@ def add_user_data_record(sender, instance, created, **kwargs):
         user_data = UserData.objects.create(user=instance,
                                             rank=initial_rank,
                                             current_stage=initial_rank.init_stage,
-                                            max_energy_amount=initial_rank.init_energy_balance.amount,
-                                            multiclick_amount=initial_rank.init_multiclick.amount)
+                                            energy_balance=initial_rank.init_energy_balance,
+                                            multiclick=initial_rank.init_multiclick,
+                                            energy_regeneration=initial_rank.init_energy_regeneration,
+                                            current_energy=initial_rank.init_energy_balance)
         user_data.save()
         place_items(user_data, user_data.rank)
         return user_data

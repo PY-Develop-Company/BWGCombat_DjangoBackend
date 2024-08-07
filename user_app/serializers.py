@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import UserData
-from levels_app.serializer import RankingSerializer
+from levels_app.serializer import RankingSerializer, StageSerializer
 from user_app.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from user_app.utils import get_gnome_reward
@@ -16,7 +16,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class UserDataSerializer(serializers.ModelSerializer):
     rank = serializers.SerializerMethodField()
-    # stage = serializers.SerializerMethodField()
+    stage = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
     click_multiplier = serializers.SerializerMethodField()
     energy = serializers.SerializerMethodField()
@@ -25,10 +25,10 @@ class UserDataSerializer(serializers.ModelSerializer):
     lang_code = serializers.SerializerMethodField()
 
     def get_click_multiplier(self, obj: UserData):
-        return obj.multiclick_amount
+        return obj.multiclick
 
     def get_energy(self, obj: UserData):
-        return obj.max_energy_amount
+        return obj.energy_balance
 
     def get_rank(self, obj: UserData):
         return RankingSerializer(obj.rank).data
@@ -45,6 +45,9 @@ class UserDataSerializer(serializers.ModelSerializer):
     def get_lang_code(self, obj: UserData):
         return obj.user.interface_lang.lang_code
 
+    def get_stage(self, obj: UserData):
+        return StageSerializer(obj.current_stage).data
+
     class Meta:
         model = UserData
         fields = (
@@ -57,7 +60,7 @@ class UserDataSerializer(serializers.ModelSerializer):
             "is_vip",
             "last_visited",
             "rank",
-            "current_stage",
+            "stage",
             "click_multiplier",
             "energy",
             "energy_regeneration",
@@ -95,13 +98,13 @@ class ClickSerializer(serializers.ModelSerializer):
     passive_income = serializers.SerializerMethodField()
 
     def get_click_multiplier(self, obj: UserData):
-        return obj.multiclick_amount
+        return obj.multiclick
 
     def get_passive_income(self, obj: UserData):
         return obj.gnome_amount
     
     def get_energy(self, obj: UserData):
-        return obj.max_energy_amount
+        return obj.energy_balance
 
     class Meta:
         model = UserData

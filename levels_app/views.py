@@ -6,7 +6,7 @@ from .models import Reward, Rank, PartnerSocialTasks, CompletedPartnersTasks, Ta
 from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoute, User
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
-from levels_app.serializer import RankInfoSerializer, TasksSerializer
+from levels_app.serializer import TasksSerializer
 from rest_framework import status
 from .serializer import SocialMediaTasksSerializer
 from django.shortcuts import get_object_or_404
@@ -115,23 +115,36 @@ def go_to_next_rank_func(user_id):
     except Rank.DoesNotExist:
         return JsonResponse({"result": "no next rank exists"})
 
-    if userdata.gold_balance >= current_rank.gold_required:
-        place_items(userdata, rank_to_go)
-        userdata.rank = rank_to_go
-        userdata.max_energy_amount = rank_to_go.init_energy_balance.amount
-        userdata.multiclick_amount = rank_to_go.init_multiclick.amount
-        userdata.energy_regeneration = rank_to_go.init_energy_regeneration
-        userdata.current_stage = rank_to_go.init_stage
-        initial = UsersTasks.objects.get(task=rank_to_go.init_stage.initial_task, user=userdata.user)
-        initial.status = UsersTasks.Status.IN_PROGRESS
+    if userdata.current_stage.next_stage:
+        return JsonResponse({"result": "You must be at last stage to move on the next rank"},
+                            status=status.HTTP_403_FORBIDDEN)
 
-        initial.save()
-        userdata.save()
+    if userdata.current_stage.has_keylock and not userdata.has_key:
+        return JsonResponse({"result": "You must have a key to move on the next rank"},
+                            status=status.HTTP_403_FORBIDDEN)
 
-        return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
-    else:
+    if userdata.gold_balance < current_rank.gold_required:
         return JsonResponse({"result": "You don't have enough money to move on the next rank"},
                             status=status.HTTP_403_FORBIDDEN)
+
+    if userdata.current_stage.has_keylock:
+        userdata.has_key = False
+        userdata.save()
+
+    place_items(userdata, rank_to_go)
+    print(current_rank, current_rank)
+    userdata.rank = rank_to_go
+    userdata.energy_balance = rank_to_go.init_energy_balance
+    userdata.multiclick = rank_to_go.init_multiclick
+    userdata.energy_regeneration = rank_to_go.init_energy_regeneration
+    userdata.current_stage = rank_to_go.init_stage
+    initial = UsersTasks.objects.get(task=rank_to_go.init_stage.initial_task, user=userdata.user)
+    initial.status = UsersTasks.Status.IN_PROGRESS
+
+    initial.save()
+    userdata.save()
+
+    return JsonResponse({"result": "moved to next rank"}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -144,8 +157,13 @@ def go_to_next_stage(request):
         return JsonResponse({"result": "You don't have key to go next stage"}, status=status.HTTP_403_FORBIDDEN)
 
     if userdata.current_stage.next_stage:
+        if userdata.current_stage.has_keylock:
+            userdata.has_key = False
+
+        print(userdata.current_stage, userdata.current_stage.next_stage)
         userdata.current_stage = userdata.current_stage.next_stage
-        return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
+        userdata.save()
+        return JsonResponse({"result": "moved to next stage"}, status=status.HTTP_200_OK)
     else:
         return go_to_next_rank_func(user_id)
 

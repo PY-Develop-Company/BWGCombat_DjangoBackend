@@ -31,6 +31,12 @@ class RankingSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class StageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stage
+        fields = ["id", "name", "instrument", "drink"]
+
+
 class TaskSerializer(serializers.ModelSerializer):
     rewards = serializers.SerializerMethodField()
 
@@ -63,14 +69,6 @@ class ClosedRankSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rank
         fields = ('id', 'name', 'description', 'gold_required')
-
-
-class RankInfoSerializer(serializers.ModelSerializer):
-    tasks = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Rank
-        fields = ['id', 'name', 'description']
 
 
 class UserTaskSerializer(serializers.ModelSerializer):

@@ -55,8 +55,8 @@ class Rank(models.Model):
     inviter_reward = models.ForeignKey("Reward", null=True, on_delete=models.SET_NULL)
     init_stage = models.ForeignKey('Stage', null=True, on_delete=models.SET_NULL)
 
-    init_energy_balance = models.ForeignKey(EnergyBalanceUpgradeLevel, on_delete=models.SET_DEFAULT, default=1)
-    init_multiclick = models.ForeignKey(MulticlickUpgradeLevel, on_delete=models.SET_DEFAULT, default=1)
+    init_energy_balance = models.IntegerField(default=1, validators=[MinValueValidator(1)])
+    init_multiclick = models.IntegerField(default=1, validators=[MinValueValidator(1)])
     init_energy_regeneration = models.IntegerField(default=1, validators=[MinValueValidator(1)])
 
     swap_limit = models.IntegerField(default=10)  # in G-tokens
@@ -127,6 +127,9 @@ class Stage(models.Model):
     has_keylock = models.BooleanField(default=True)
     tasks = models.ManyToManyField(TaskRoute, related_name='stage')
     stage_template = models.ForeignKey(StageTemplate, on_delete=models.CASCADE)
+
+    instrument = models.ForeignKey(MulticlickUpgradeLevel, null=True, on_delete=models.SET_NULL)
+    drink = models.ForeignKey(EnergyBalanceUpgradeLevel, null=True, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:
         return f'{self.name} -> {self.next_stage}'
