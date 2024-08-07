@@ -33,7 +33,7 @@ BOT_TOKEN=__token__
 TG_CHANNEL=https://t.me/justforcheckingone
 
 TRANSFER_FEE_PERCENTAGE=3
-VIP_PRICE=10
+VIP_PRICE=100
 ```
 You can get NGROK_AUTHTOKEN via link (https://dashboard.ngrok.com)
 
