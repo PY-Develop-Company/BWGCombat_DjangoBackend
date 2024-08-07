@@ -6,9 +6,10 @@ from django.utils.timezone import now
 
 from ads_app.models import BannerAdvert, FullscreenAdvert
 from exchanger_app.models import Asset, ExchangePair
-from levels_app.models import (Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, \
-    PassiveIncomeLevel, PartnersTasks, SocialTasks, CompletedSocialTasks, CompletedPartnersTasks, StageTemplate, \
-    Stage, PartnersButtonTypes)
+from levels_app.models import (Rank, TaskTemplate, TaskRoute, Reward, \
+                               PartnersTasks, SocialTasks, CompletedSocialTasks, CompletedPartnersTasks, StageTemplate, \
+                               Stage, PartnersButtonTypes)
+from clicker_app.models import EnergyBalanceUpgradeLevel, MulticlickUpgradeLevel
 from user_app.models import User, Language, UserData, Link, Fren
 
 
@@ -21,7 +22,6 @@ class Command(BaseCommand):
         self.stdout.write('Seeding data...')
         self.seed_energy_levels()
         self.seed_multiplier_levels()
-        self.seed_passive_income_levels()
 
         self.seed_lang()
 
@@ -85,9 +85,9 @@ class Command(BaseCommand):
             {"id": 16, "name": "ENERGY_50", "amount": 50, "reward_type": Reward.RewardType.ENERGY_BALANCE},
             {"id": 20, "name": "ENERGY_100", "amount": 100, "reward_type": Reward.RewardType.ENERGY_BALANCE},
 
-            {"id": 19, "name": "MULTICLICK_1", "amount": 1, "reward_type": Reward.RewardType.MULTIPLIER},
-            {"id": 17, "name": "MULTICLICK_2", "amount": 2, "reward_type": Reward.RewardType.MULTIPLIER},
-            {"id": 18, "name": "MULTICLICK_10", "amount": 10, "reward_type": Reward.RewardType.MULTIPLIER},
+            {"id": 19, "name": "MULTICLICK_1", "amount": 1, "reward_type": Reward.RewardType.MULTICKLICK},
+            {"id": 17, "name": "MULTICLICK_2", "amount": 2, "reward_type": Reward.RewardType.MULTICKLICK},
+            {"id": 18, "name": "MULTICLICK_10", "amount": 10, "reward_type": Reward.RewardType.MULTICKLICK},
 
             {"id": 21, "name": "Ad_View_MAX_GOLD", "amount": 2000, "reward_type": Reward.RewardType.GOLD},
             {"id": 22, "name": "Ad_View_MIN_GOLD", "amount": 500, "reward_type": Reward.RewardType.GOLD},
@@ -186,49 +186,49 @@ class Command(BaseCommand):
         desc = "Buy chest and get chance to get extra gnome"
         task_templates_data = [
             {"id": 1, "name": "Subscribe to Channel", "text": "Subscribe to our channel.",
-             "task_type": TaskTemplate.TaskType.ch_sub, "completion_number": 1, "price": 0,
+             "task_type": TaskTemplate.TaskType.SUBSCRIPTION, "completion_number": 1, "price": 0,
              "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=17)]},
             {"id": 2, "name": "Invite 1 friends", "text": "Invite a friend to join.",
-             "task_type": TaskTemplate.TaskType.inv_fren, "completion_number": 1, "price": 0,
+             "task_type": TaskTemplate.TaskType.INVITE_FREN, "completion_number": 1, "price": 0,
              "rewards": [Reward.objects.get(id=16), Reward.objects.get(id=18)]},
 
-            {"id": 3, "name": "chest_1000", "text": f"{desc}", "task_type": TaskTemplate.TaskType.buy_chest,
+            {"id": 3, "name": "chest_1000", "text": f"{desc}", "task_type": TaskTemplate.TaskType.BUY_CHEST,
              "completion_number": 1, "price": 1_000,
              "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
-            {"id": 7, "name": "chest_2000", "text": f"{desc}", "task_type": TaskTemplate.TaskType.buy_chest,
+            {"id": 7, "name": "chest_2000", "text": f"{desc}", "task_type": TaskTemplate.TaskType.BUY_CHEST,
              "completion_number": 1, "price": 2_000,
              "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
-            {"id": 11, "name": "chest_3000", "text": f"{desc}", "task_type": TaskTemplate.TaskType.buy_chest,
+            {"id": 11, "name": "chest_3000", "text": f"{desc}", "task_type": TaskTemplate.TaskType.BUY_CHEST,
              "completion_number": 1, "price": 3_000,
              "rewards": [Reward.objects.get(id=2), Reward.objects.get(id=14), Reward.objects.get(id=15)]},
 
             {"id": 4, "name": "Upgrade pickaxe +2", "text": "Earn more gold with 1 click",
-             "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 2_000,
+             "task_type": TaskTemplate.TaskType.BUY_MULTICLICK, "completion_number": 0, "price": 2_000,
              "rewards": [Reward.objects.get(id=17)]},
             {"id": 5, "name": "Upgrade energy", "text": "Buy more energy",
-             "task_type": TaskTemplate.TaskType.buy_energy, "completion_number": 0, "price": 2_000,
+             "task_type": TaskTemplate.TaskType.BUY_ENERGY_BALANCE, "completion_number": 0, "price": 2_000,
              "rewards": [Reward.objects.get(id=16)]},
             {"id": 6, "name": "Upgrade pickaxe +1", "text": "Earn more gold with 1 click",
-             "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 2_000,
+             "task_type": TaskTemplate.TaskType.BUY_MULTICLICK, "completion_number": 0, "price": 2_000,
              "rewards": [Reward.objects.get(id=19)]},
             {"id": 8, "name": "Upgrade energy", "text": "Buy more energy",
-             "task_type": TaskTemplate.TaskType.buy_energy, "completion_number": 0, "price": 5_000,
+             "task_type": TaskTemplate.TaskType.BUY_ENERGY_BALANCE, "completion_number": 0, "price": 5_000,
              "rewards": [Reward.objects.get(id=16)]},
             {"id": 9, "name": "Upgrade pickaxe +2", "text": "Earn more gold with 1 click",
-             "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 5_000,
+             "task_type": TaskTemplate.TaskType.BUY_MULTICLICK, "completion_number": 0, "price": 5_000,
              "rewards": [Reward.objects.get(id=17)]},
             {"id": 10, "name": "Upgrade energy +100", "text": "Buy more energy",
-             "task_type": TaskTemplate.TaskType.buy_energy, "completion_number": 0, "price": 2_000,
+             "task_type": TaskTemplate.TaskType.BUY_ENERGY_BALANCE, "completion_number": 0, "price": 2_000,
              "rewards": [Reward.objects.get(id=20)]},
 
             {"id": 12, "name": "Upgrade energy +100", "text": "Buy more energy",
-             "task_type": TaskTemplate.TaskType.buy_energy, "completion_number": 0, "price": 10_000,
+             "task_type": TaskTemplate.TaskType.BUY_ENERGY_BALANCE, "completion_number": 0, "price": 10_000,
              "rewards": [Reward.objects.get(id=20)]},
             {"id": 13, "name": "Upgrade energy +50", "text": "Buy more energy",
-             "task_type": TaskTemplate.TaskType.buy_energy, "completion_number": 0, "price": 10_000,
+             "task_type": TaskTemplate.TaskType.BUY_ENERGY_BALANCE, "completion_number": 0, "price": 10_000,
              "rewards": [Reward.objects.get(id=16)]},
             {"id": 14, "name": "Upgrade pickaxe +1", "text": "Earn more gold with 1 click",
-             "task_type": TaskTemplate.TaskType.buy_multiclick, "completion_number": 0, "price": 5_000,
+             "task_type": TaskTemplate.TaskType.BUY_MULTICLICK, "completion_number": 0, "price": 5_000,
              "rewards": [Reward.objects.get(id=19)]},
 
             # Add more task templates as needed
@@ -328,7 +328,7 @@ class Command(BaseCommand):
         ]
 
         for task_route_data in task_routes_data:
-            task_route, created = TaskRoutes.objects.update_or_create(
+            task_route, created = TaskRoute.objects.update_or_create(
                 id=task_route_data['id'],
                 defaults=task_route_data
             )
@@ -341,7 +341,7 @@ class Command(BaseCommand):
             # Add more energy levels as needed
         ]
         for energy_level_data in energy_levels_data:
-            MaxEnergyLevel.objects.update_or_create(name=energy_level_data['name'], defaults=energy_level_data)
+            EnergyBalanceUpgradeLevel.objects.update_or_create(name=energy_level_data['name'], defaults=energy_level_data)
 
     def seed_multiplier_levels(self):
         multiplier_levels_data = [
@@ -350,17 +350,7 @@ class Command(BaseCommand):
             # Add more multiplier levels as needed
         ]
         for multiplier_level_data in multiplier_levels_data:
-            MulticlickLevel.objects.update_or_create(name=multiplier_level_data['name'], defaults=multiplier_level_data)
-
-    def seed_passive_income_levels(self):
-        passive_income_levels_data = [
-            {"name": "Passive Income Level 1", "level": 1, "amount": 100},
-            {"name": "Passive Income Level 2", "level": 2, "amount": 200},
-            # Add more passive income levels as needed
-        ]
-        for passive_income_level_data in passive_income_levels_data:
-            PassiveIncomeLevel.objects.update_or_create(name=passive_income_level_data['name'],
-                                                        defaults=passive_income_level_data)
+            MulticlickUpgradeLevel.objects.update_or_create(name=multiplier_level_data['name'], defaults=multiplier_level_data)
 
     def seed_links(self):
         links = [
@@ -393,31 +383,31 @@ class Command(BaseCommand):
         user_data = [
             {'user': User.objects.get(tg_id=os.environ.get("ADMIN_TG_ID")), 'character_gender': 0, 'gold_balance': 2_000_000, 'g_token': 20,
              'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
-             'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
+             'multiclick_amount': MulticlickUpgradeLevel.objects.get(name="Multiplier Level 1").amount,
              'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
-             'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
-             'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'max_energy_amount': EnergyBalanceUpgradeLevel.objects.get(name="Energy Level 1").amount,
+             'current_energy': EnergyBalanceUpgradeLevel.objects.get(name="Energy Level 1").amount,
              'gnome_amount': 3},
             {'user': User.objects.get(tg_id=123568), 'character_gender': 0, 'gold_balance': 0, 'g_token': 0,
              'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
-             'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
+             'multiclick_amount': MulticlickUpgradeLevel.objects.get(name="Multiplier Level 1").amount,
              'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
-             'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
-             'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'max_energy_amount': EnergyBalanceUpgradeLevel.objects.get(name="Energy Level 1").amount,
+             'current_energy': EnergyBalanceUpgradeLevel.objects.get(name="Energy Level 1").amount,
              'gnome_amount': 0},
             {'user': User.objects.get(tg_id=123456), 'character_gender': 1, 'gold_balance': 1_500_000, 'g_token': 35,
              'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
-             'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
+             'multiclick_amount': MulticlickUpgradeLevel.objects.get(name="Multiplier Level 1").amount,
              'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
-             'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
-             'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'max_energy_amount': EnergyBalanceUpgradeLevel.objects.get(name="Energy Level 1").amount,
+             'current_energy': EnergyBalanceUpgradeLevel.objects.get(name="Energy Level 1").amount,
              'gnome_amount': 4},
             {'user': User.objects.get(tg_id=123457), 'character_gender': None, 'gold_balance': 0, 'g_token': 0,
              'last_visited': now(), 'rank': Rank.objects.get(name="Ельфійський ліс"),
-             'multiclick_amount': MulticlickLevel.objects.get(name="Multiplier Level 1").amount,
+             'multiclick_amount': MulticlickUpgradeLevel.objects.get(name="Multiplier Level 1").amount,
              'energy_regeneration': Rank.objects.get(name="Ельфійський ліс").init_energy_regeneration,
-             'max_energy_amount': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
-             'current_energy': MaxEnergyLevel.objects.get(name="Energy Level 1").amount,
+             'max_energy_amount': EnergyBalanceUpgradeLevel.objects.get(name="Energy Level 1").amount,
+             'current_energy': EnergyBalanceUpgradeLevel.objects.get(name="Energy Level 1").amount,
              'gnome_amount': 0}
         ]
         for data in user_data:

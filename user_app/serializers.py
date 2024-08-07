@@ -1,34 +1,17 @@
 from rest_framework import serializers
 from .models import UserData
-from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel
-from levels_app.serializer import RankInfoSerializer, RankingSerializer, RewardSerializer, TaskSerializer
+from levels_app.serializer import RankingSerializer
 from user_app.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from user_app.utils import get_gnome_reward
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """Customizes JWT default Serializer to add more information about user"""
-
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
 
         return token
-
-
-class EnergySerializer(serializers.ModelSerializer):
-
-    class Meta: 
-        model = MaxEnergyLevel
-        fields = ('id', 'amount')
-
-
-class MultiplierSerializer(serializers.ModelSerializer):
-
-    class Meta: 
-        model = MaxEnergyLevel
-        fields = ('id', 'amount')
 
 
 class UserDataSerializer(serializers.ModelSerializer):

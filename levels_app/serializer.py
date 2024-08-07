@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from user_app.models import UsersTasks
 
-from .models import Rank, TaskTemplate, TaskRoutes, Reward, PartnerSocialTasks, Stage
+from .models import Rank, TaskTemplate, TaskRoute, Reward, PartnerSocialTasks, Stage
 
 
 class SocialMediaTasksSerializer(serializers.ModelSerializer):
@@ -75,12 +75,12 @@ class RankInfoSerializer(serializers.ModelSerializer):
 
 class UserTaskSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TaskRoutes
+        model = TaskRoute
 
 
 class TaskCoordinatesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TaskRoutes
+        model = TaskRoute
         fields = ('coord_x', 'coord_y')
 
 

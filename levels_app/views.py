@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from .models import Reward, Rank, PartnerSocialTasks, CompletedPartnersTasks, TaskTemplate
-from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoutes, User
+from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoute, User
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
 from levels_app.serializer import RankInfoSerializer, TasksSerializer
@@ -47,7 +47,7 @@ def buy_task_view(request):
 
     match user_task.task.template.task_type:
         case 1:
-            link = Link.objects.get(task=TaskRoutes)
+            link = Link.objects.get(task=TaskRoute)
             if check_if_link_is_telegram(link):
                 pass  # there will be subscription checking
             else:
@@ -118,8 +118,8 @@ def go_to_next_rank_func(user_id):
     if userdata.gold_balance >= current_rank.gold_required:
         place_items(userdata, rank_to_go)
         userdata.rank = rank_to_go
-        userdata.max_energy_amount = rank_to_go.init_energy.amount
-        userdata.multiclick_amount = rank_to_go.init_multiplier.amount
+        userdata.max_energy_amount = rank_to_go.init_energy_balance.amount
+        userdata.multiclick_amount = rank_to_go.init_multiclick.amount
         userdata.energy_regeneration = rank_to_go.init_energy_regeneration
         userdata.current_stage = rank_to_go.init_stage
         initial = UsersTasks.objects.get(task=rank_to_go.init_stage.initial_task, user=userdata.user)

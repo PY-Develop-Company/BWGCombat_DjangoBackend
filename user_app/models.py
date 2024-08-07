@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
-from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MulticlickLevel, MaxEnergyLevel, PassiveIncomeLevel, Stage
+from levels_app.models import Rank, TaskTemplate, TaskRoute, Reward, Stage
 import tg_connection
 
 
@@ -272,7 +272,7 @@ class UsersTasks(models.Model):
         EXPIRED = "3", _("Expired")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    task = models.ForeignKey(TaskRoutes, on_delete=models.CASCADE)
+    task = models.ForeignKey(TaskRoute, on_delete=models.CASCADE)
     rewards = models.ManyToManyField(Reward, blank=True)
     completion_time = models.DateTimeField(null=True, blank=True, default=None)
 
