@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     "user_app",
     "levels_app",
     "exchanger_app",
-    "ads_app"
+    "ads_app",
+    "mini_games_app"
 ]
 
 MIDDLEWARE = [
