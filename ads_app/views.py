@@ -11,7 +11,8 @@ from django.db.models import Q
 
 from .models import BannerAdvert, FullscreenAdvert, AdView, BannerAdLinkClick, FullscreenAdLinkClick, AdSet
 from .serializers import BannerAdvertSerializer, FullscreenAdvertSerializer
-from .utils import get_random_gold_reward
+from .utils import get_random_gold_reward, is_advert_displayable_for_user
+from user_app.models import User
 
 
 @api_view(["GET"])
@@ -53,13 +54,39 @@ def get_fullscreen_advert(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_random_fullscreen_advert(request):
-    fullscreen_ads_ids = FullscreenAdvert.objects.filter().all().values_list('id', flat=True)
+    active_ads = FullscreenAdvert.objects.filter(adset__is_active=True).all()
+    if not active_ads:
+        return JsonResponse({"result": "no fullscreen adverts in active ad sets"})
 
+    advert = random.choice(active_ads)
+
+    advert_data = FullscreenAdvertSerializer(advert).data
+    advert_data['random_gold_reward'] = get_random_gold_reward(advert)
+
+    return JsonResponse(advert_data)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_relevant_random_fullscreen_advert(request):
+    user_id = request.data.get('userId')
+    if not user_id:
+        return JsonResponse({"error": "user_id is required."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        advert = FullscreenAdvert.objects.get(id=random.choice(fullscreen_ads_ids))
-    except FullscreenAdvert.DoesNotExist:
-        return JsonResponse({"result": "unexpected absence of the advert"})
+        user = User.objects.get(tg_id=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({"result": "user with such id does not exist"}, status=404)
+
+    eligible_ads = [
+        advert for advert in FullscreenAdvert.objects.all()
+        if is_advert_displayable_for_user(user, advert)
+    ]
+
+    if not eligible_ads:
+        return JsonResponse({"result": "no eligible adverts to show"})
+
+    advert = random.choice(eligible_ads)
 
     advert_data = FullscreenAdvertSerializer(advert).data
     advert_data['random_gold_reward'] = get_random_gold_reward(advert)

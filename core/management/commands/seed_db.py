@@ -527,7 +527,8 @@ class Command(BaseCommand):
 
     def seed_ad_sets(self):
         ad_sets = [
-            {"banner": BannerAdvert.objects.get(id=1), "fullscreen": FullscreenAdvert.objects.get(id=1)},
+            {"banner": BannerAdvert.objects.get(id=1), "fullscreen": FullscreenAdvert.objects.get(id=1),
+             "current_clicks_number": 990},
         ]
         for data in ad_sets:
             AdSet.objects.update_or_create(defaults=data)

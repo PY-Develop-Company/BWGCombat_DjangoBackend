@@ -217,7 +217,7 @@ class UserData(models.Model):
         # await tg_connection.is_subscribed_to_channel(...)
 
     def check_link_click(self, link):
-        user = User.objects.get(user_id=self.user_id)
+        user = User.objects.get(tg_id=self.user_id)
         return LinkClick.objects.filter(user=user, link=link).exists()
 
     def make_vip(self):

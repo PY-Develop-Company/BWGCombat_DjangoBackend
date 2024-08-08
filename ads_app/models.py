@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.db.models import Q, UniqueConstraint
 from django.utils import timezone
@@ -49,6 +51,7 @@ class FullscreenAdvert(Advert):
                                           related_name="ads_with_gnome_reward")
     gnome_probability = models.FloatField(null=False, blank=False, default=0.0002)
     is_video = models.BooleanField(default=False)
+    display_period = models.DurationField(default=datetime.timedelta(days=1))
 
 
 class AdView(models.Model):
@@ -62,12 +65,12 @@ class AdView(models.Model):
 
 
 class FullscreenAdLinkClick(BasicLinkClick):
-    link = None  # the link is accessible via  advert
+    link = None  # the link is accessible via advert
     advert = models.ForeignKey(FullscreenAdvert, on_delete=models.CASCADE, null=False, blank=False)
 
 
 class BannerAdLinkClick(BasicLinkClick):
-    link = None  # the link is accessible via  advert
+    link = None  # the link is accessible via advert
     advert = models.ForeignKey(BannerAdvert, on_delete=models.CASCADE, null=False, blank=False)
 
 
