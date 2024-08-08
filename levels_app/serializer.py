@@ -33,7 +33,7 @@ class SocialTasksSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SocialTasks
-        fields = ('name', 'link', 'amount', 'is_completed')
+        fields = ('id', 'name', 'link', 'amount', 'is_completed')
 
 
 class PartnersTasksSerializer(serializers.ModelSerializer):
@@ -65,7 +65,7 @@ class PartnersTasksSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PartnersTasks
-        fields = ('name', 'button_type', 'link', 'amount', 'is_completed')
+        fields = ('id', 'name', 'button_type', 'link', 'amount', 'is_completed')
 
 
 class RewardSerializer(serializers.ModelSerializer):

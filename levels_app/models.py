@@ -240,10 +240,10 @@ class SocialTasks(models.Model):
 
 
 class CompletedSocialTasks(models.Model):
-    user = models.ForeignKey("user_app.User", null=False, on_delete=models.CASCADE)
-    task = models.ForeignKey(SocialTasks, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey("user_app.User", on_delete=models.CASCADE)
+    task = models.ForeignKey(SocialTasks, on_delete=models.CASCADE)
 
 
 class CompletedPartnersTasks(models.Model):
-    user = models.ForeignKey("user_app.User", null=False, on_delete=models.CASCADE)
-    task = models.ForeignKey(PartnersTasks, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey("user_app.User", on_delete=models.CASCADE)
+    task = models.ForeignKey(PartnersTasks, on_delete=models.CASCADE)

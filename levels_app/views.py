@@ -167,16 +167,18 @@ def complete_partner_task(request):
     
     task = PartnersTasks.objects.get(id=task_id)
     user = UserData.objects.get(user=user_id)
-    #check for completion
     completed = True
 
-    if completed:
-        if not CompletedPartnersTasks.objects.filter(task=task, user=user.user).exists():
-            user.gold_balance += task.reward_amount
-            CompletedPartnersTasks.objects.update_or_create(task=task, user=user.user)
-            user.save()
-    else:
-        return JsonResponse({"result": "not ok"}, status=status.HTTP_403_FORBIDDEN)
+    if CompletedPartnersTasks.objects.filter(task=task, user=user.user).exists():
+        return JsonResponse({"result": "already completed task"}, status=status.HTTP_403_FORBIDDEN)
+
+    if not completed:
+        return JsonResponse({"result": "task is not completed"}, status=status.HTTP_403_FORBIDDEN)
+
+    user.gold_balance += task.reward_amount
+    CompletedPartnersTasks.objects.update_or_create(task=task, user=user.user)
+    user.save()
+
     return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
 
 
@@ -187,14 +189,16 @@ def complete_social_task(request):
 
     task = SocialTasks.objects.get(id=task_id)
     user = UserData.objects.get(user=user_id)
-    # check for completion
     completed = True
 
-    if completed:
-        if not CompletedSocialTasks.objects.filter(task=task, user=user.user).exists():
-            user.gold_balance += task.reward_amount
-            CompletedSocialTasks.objects.update_or_create(task=task, user=user.user)
-            user.save()
-    else:
-        return JsonResponse({"result": "not ok"}, status=status.HTTP_403_FORBIDDEN)
+    if CompletedSocialTasks.objects.filter(task=task, user=user.user).exists():
+        return JsonResponse({"result": "already completed task"}, status=status.HTTP_403_FORBIDDEN)
+
+    if not completed:
+        return JsonResponse({"result": "task is not completed"}, status=status.HTTP_403_FORBIDDEN)
+
+    user.gold_balance += task.reward_amount
+    CompletedSocialTasks.objects.update_or_create(task=task, user=user.user)
+    user.save()
+
     return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
