@@ -16,7 +16,7 @@ class BasicLinkClick(models.Model):
         abstract = True
 
     user = models.ForeignKey("user_app.User", on_delete=models.CASCADE)
-    link = models.ForeignKey(Link, to_field='url', on_delete=models.CASCADE)
+    link = models.ForeignKey(Link, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
