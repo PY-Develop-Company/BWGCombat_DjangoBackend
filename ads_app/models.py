@@ -97,11 +97,12 @@ class AdSet(models.Model):
         return f"AdSet(banner={self.banner}, fullscreen={self.fullscreen})"
 
     def disable_if_goal_reached(self):
-        if not self.clicks_goal:
+        if not self.is_active or not self.clicks_goal:
             return False
         if self.current_clicks_number >= self.clicks_goal:
             self.is_goal_reached = True
             self.is_active = False
+            self.save()
             return True
         else:
             return False
