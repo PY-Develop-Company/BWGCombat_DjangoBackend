@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.db.models import Q
 
-from .models import BannerAdvert, FullscreenAdvert, AdView, BannerAdLinkClick, FullscreenAdLinkClick
+from .models import BannerAdvert, FullscreenAdvert, AdView, BannerAdLinkClick, FullscreenAdLinkClick, AdSet
 from .serializers import BannerAdvertSerializer, FullscreenAdvertSerializer
 from .utils import get_random_gold_reward
 
@@ -39,8 +39,10 @@ def get_fullscreen_advert(request):
     except FullscreenAdvert.DoesNotExist:
         return JsonResponse({"result": "advert with such id does not exist or it is not a fullscreen advert"})
 
-    # if not advert.is_fullscreen():
-    #     return JsonResponse({"result": "requested advert is only for banners"})
+    ad_set = AdSet.objects.get(fullscreen=advert)
+    if not ad_set.is_active:
+        return JsonResponse({"result": "the ad set which the requested ad belongs to is disabled, "
+                                       "most commonly because of reaching clicks goal"})
 
     advert_data = FullscreenAdvertSerializer(advert).data
     advert_data['random_gold_reward'] = get_random_gold_reward(advert)
@@ -51,7 +53,8 @@ def get_fullscreen_advert(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_random_fullscreen_advert(request):
-    fullscreen_ads_ids = FullscreenAdvert.objects.all().values_list('id', flat=True)
+    fullscreen_ads_ids = FullscreenAdvert.objects.filter().all().values_list('id', flat=True)
+
 
     try:
         advert = FullscreenAdvert.objects.get(id=random.choice(fullscreen_ads_ids))
@@ -104,6 +107,11 @@ def register_fullscreen_adclick(request, ad_id):
     fullscreen_advert = FullscreenAdvert.objects.get(id=ad_id)
     FullscreenAdLinkClick.objects.create(user_id=user_id, advert=fullscreen_advert)
 
+    ad_set = AdSet.objects.get(fullscreen=fullscreen_advert)
+    ad_set.current_clicks_number += 1
+    ad_set.save()
+    ad_set.disable_if_goal_reached()
+
     return redirect(fullscreen_advert.link.url)
 
 
@@ -117,5 +125,10 @@ def register_banner_adclick(request, ad_id):
 
     banner_advert = BannerAdvert.objects.get(id=ad_id)
     BannerAdLinkClick.objects.create(user_id=user_id, advert=banner_advert)
+
+    ad_set = AdSet.objects.get(banner=banner_advert)
+    ad_set.current_clicks_number += 1
+    ad_set.save()
+    ad_set.disable_if_goal_reached()
 
     return redirect(banner_advert.link.url)

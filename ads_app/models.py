@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q, UniqueConstraint
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 # from user_app.models import User
@@ -68,3 +69,40 @@ class FullscreenAdLinkClick(BasicLinkClick):
 class BannerAdLinkClick(BasicLinkClick):
     link = None  # the link is accessible via  advert
     advert = models.ForeignKey(BannerAdvert, on_delete=models.CASCADE, null=False, blank=False)
+
+
+class AdSet(models.Model):
+    banner = models.ForeignKey(BannerAdvert, on_delete=models.SET_NULL, null=True, blank=True)
+    fullscreen = models.ForeignKey(FullscreenAdvert, on_delete=models.SET_NULL, null=True, blank=True)
+    current_clicks_number = models.BigIntegerField(default=0, null=False, blank=False)
+    clicks_goal = models.BigIntegerField(default=1000, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_goal_reached = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=['banner'],
+                condition=Q(banner__isnull=False),
+                name='unique_banner'
+            ),
+            UniqueConstraint(
+                fields=['fullscreen'],
+                condition=Q(fullscreen__isnull=False),
+                name='unique_fullscreen'
+            ),
+        ]
+
+    def __str__(self):
+        return f"AdSet(banner={self.banner}, fullscreen={self.fullscreen})"
+
+    def disable_if_goal_reached(self):
+        if not self.clicks_goal:
+            return False
+        if self.current_clicks_number >= self.clicks_goal:
+            self.is_goal_reached = True
+            self.is_active = False
+            return True
+        else:
+            return False
+

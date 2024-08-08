@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.timezone import now
 
-from ads_app.models import BannerAdvert, FullscreenAdvert
+from ads_app.models import BannerAdvert, FullscreenAdvert, AdSet
 from exchanger_app.models import Asset, ExchangePair
 from levels_app.models import (Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, \
     PassiveIncomeLevel, PartnersTasks, SocialTasks, CompletedSocialTasks, CompletedPartnersTasks, StageTemplate, \
@@ -522,3 +522,10 @@ class Command(BaseCommand):
             BannerAdvert.objects.update_or_create(id=data['id'], defaults=data)
         for data in fullscreen_ads:
             FullscreenAdvert.objects.update_or_create(id=data['id'], defaults=data)
+
+    def seed_ad_sets(self):
+        ad_sets = [
+            {"banner": BannerAdvert.objects.get(id=1), "fullscreen": FullscreenAdvert.objects.get(id=1)},
+        ]
+        for data in ad_sets:
+            AdSet.objects.update_or_create(id=data['id'], defaults=data)
