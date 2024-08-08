@@ -1,12 +1,15 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
 
 import random
 
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.db.models import Q
 
-from .models import BannerAdvert, FullscreenAdvert, AdView
+from .models import BannerAdvert, FullscreenAdvert, AdView, BannerAdLinkClick, FullscreenAdLinkClick
 from .serializers import BannerAdvertSerializer, FullscreenAdvertSerializer
 from .utils import get_random_gold_reward
 
@@ -50,9 +53,6 @@ def get_fullscreen_advert(request):
 def get_random_fullscreen_advert(request):
     fullscreen_ads_ids = FullscreenAdvert.objects.all().values_list('id', flat=True)
 
-    print('fullscreen_ads_ids:')
-    print(fullscreen_ads_ids)
-
     try:
         advert = FullscreenAdvert.objects.get(id=random.choice(fullscreen_ads_ids))
     except FullscreenAdvert.DoesNotExist:
@@ -91,3 +91,31 @@ def register_adview(request):
     AdView.objects.create(user_id=user_id, advert_id=advert_id)
 
     return JsonResponse({"result": "ok"})
+
+
+@csrf_exempt
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def register_fullscreen_adclick(request, ad_id):
+    user_id = request.data.get("userId")
+    if not user_id:
+        return JsonResponse({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    fullscreen_advert = FullscreenAdvert.objects.get(id=ad_id)
+    FullscreenAdLinkClick.objects.create(user_id=user_id, advert=fullscreen_advert)
+
+    return redirect(fullscreen_advert.link.url)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def register_banner_adclick(request, ad_id):
+    user_id = request.data.get("userId")
+    if not user_id:
+        return JsonResponse({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    banner_advert = BannerAdvert.objects.get(id=ad_id)
+    BannerAdLinkClick.objects.create(user_id=user_id, advert=banner_advert)
+
+    return redirect(banner_advert.link.url)

@@ -3,9 +3,8 @@ import asyncio
 import django.db
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from django.forms.models import model_to_dict
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -17,9 +16,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from adrf.decorators import api_view as async_api_view
 
 from .utils import get_gnome_reward
-from .models import User, UserData, Fren, Link, LinkClick, Language
+from .models import User, UserData, Fren, Language
 
-from levels_app.models import Rank
 import json
 from .serializers import UserDataSerializer, ClickSerializer, ReferralsSerializer, UserSettingsSerializer
 from user_app.serializers import CustomTokenObtainPairSerializer
@@ -188,15 +186,6 @@ def get_user_referrals(request):
     serializer = ReferralsSerializer(referrals, many=True).data
 
     return JsonResponse({'referrals':serializer}, status=status.HTTP_200_OK)
-
-
-def track_link_click(request, link_id):
-    link = get_object_or_404(Link, id=link_id)
-    user_id = request.data.get("userId")
-    user = User.objects.get(tg_id=user_id)
-    LinkClick.objects.create(user=user, link=link)
-
-    return redirect(link.url)
 
 
 @permission_classes([AllowAny])

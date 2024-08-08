@@ -1,4 +1,4 @@
-from django.db import models, transaction
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from datetime import datetime
 
@@ -11,8 +11,11 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
-from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MulticlickLevel, MaxEnergyLevel, PassiveIncomeLevel, Stage
-import tg_connection
+from levels_app.models import Rank, TaskRoutes, Reward, Stage
+from links_app.models import LinkClick
+
+
+# import tg_connection
 
 
 class CustomUserManager(BaseUserManager):
@@ -312,12 +315,3 @@ class Fren(models.Model):
         super(Fren, self).save(*args, **kwargs)
 
 
-class Link(models.Model):
-    url = models.URLField(unique=True)
-    task = models.ForeignKey(TaskTemplate, null=True, on_delete=models.SET_NULL, default=None)
-
-
-class LinkClick(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    link = models.ForeignKey(Link, to_field='url', on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True)

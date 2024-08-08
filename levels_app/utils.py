@@ -1,7 +1,8 @@
 import asyncio
 import random
 
-from user_app.models import UserData, Fren, Link, UsersTasks
+from user_app.models import UserData, Fren, UsersTasks
+from links_app.models import Link
 from .models import Rank, Stage, Reward, TaskRoutes
 from django.shortcuts import get_object_or_404
 from .models import Reward

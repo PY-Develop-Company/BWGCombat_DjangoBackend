@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from user_app.models import Link, User
+# from user_app.models import User
+from links_app.models import Link, BasicLinkClick
 from levels_app.models import Reward
 
 
@@ -50,10 +51,20 @@ class FullscreenAdvert(Advert):
 
 
 class AdView(models.Model):
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey("user_app.User", on_delete=models.DO_NOTHING)
     advert = models.ForeignKey(FullscreenAdvert, on_delete=models.CASCADE)
     time = models.DateTimeField(default=timezone.now)
 
     is_clicked = models.BooleanField(default=False)
     seconds_before_click = models.FloatField(null=True, blank=True, default=None)
     is_fairy = models.BooleanField(default=False)
+
+
+class FullscreenAdLinkClick(BasicLinkClick):
+    link = None  # the link is accessible via  advert
+    advert = models.ForeignKey(FullscreenAdvert, on_delete=models.CASCADE, null=False, blank=False)
+
+
+class BannerAdLinkClick(BasicLinkClick):
+    link = None  # the link is accessible via  advert
+    advert = models.ForeignKey(BannerAdvert, on_delete=models.CASCADE, null=False, blank=False)

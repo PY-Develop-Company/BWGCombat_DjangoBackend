@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure-o2e3xt!_)wd1vk592zr9-#ml@^xlzw-*0*@c54v$if4u7d=nvh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ") if os.getenv("DJANGO_ALLOWED_HOSTS") else []
 
 
 # Application definition
@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     "user_app",
     "levels_app",
     "exchanger_app",
-    "ads_app"
+    "ads_app",
+    "links_app"
 ]
 
 MIDDLEWARE = [

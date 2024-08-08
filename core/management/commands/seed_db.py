@@ -9,7 +9,8 @@ from exchanger_app.models import Asset, ExchangePair
 from levels_app.models import (Rank, TaskTemplate, TaskRoutes, Reward, MaxEnergyLevel, MulticlickLevel, \
     PassiveIncomeLevel, PartnersTasks, SocialTasks, CompletedSocialTasks, CompletedPartnersTasks, StageTemplate, \
     Stage, PartnersButtonTypes)
-from user_app.models import User, Language, UserData, Link, Fren
+from user_app.models import User, Language, UserData, Fren
+from links_app.models import Link
 
 
 class Command(BaseCommand):
