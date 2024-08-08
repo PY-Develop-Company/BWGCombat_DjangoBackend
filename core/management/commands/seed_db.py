@@ -10,7 +10,8 @@ from levels_app.models import (Rank, TaskTemplate, TaskRoute, Reward, \
                                PartnersTask, SocialTask, CompletedSocialTask, CompletedPartnersTask, StageTemplate, \
                                Stage, PartnersButtonTypes)
 from clicker_app.models import EnergyBalanceUpgradeLevel, MulticlickUpgradeLevel
-from user_app.models import User, Language, UserData, Link, Fren
+from user_app.models import User, Language, UserData, Link , Fren
+from levels_app.models import LinkModel, UserLinkModel
 
 
 class Command(BaseCommand):
@@ -22,6 +23,8 @@ class Command(BaseCommand):
         self.stdout.write('Seeding data...')
         self.seed_energy_balance_levels()
         self.seed_multiclick_levels()
+
+        self.seed_links_model()
 
         self.seed_lang()
 
@@ -554,7 +557,7 @@ class Command(BaseCommand):
              "name_uk": "Грати", "name_zh": "游戏"},
             {"id": 2, "name_en": "Register", "name_de": "Register", "name_fr": "Registre", "name_ru": "Регистрация",
              "name_uk": "Зареєструйся", "name_zh": "注册"},
-            {"id": 2, "name_en": "Subscribe", "name_de": "Abonnieren", "name_fr": "S'abonner", "name_ru": "Подписаться",
+            {"id": 3, "name_en": "Subscribe", "name_de": "Abonnieren", "name_fr": "S'abonner", "name_ru": "Подписаться",
              "name_uk": "Підписатись", "name_zh": "订阅"},
         ]
         for data in social_medias:
@@ -562,15 +565,18 @@ class Command(BaseCommand):
 
     def seed_social_tasks(self):
         social_tasks = [
-            {"id": 1, "link": "https://www.facebook.com", "reward_amount": 5000,
+            {"id": 1, "link_id": 3, "reward_amount": 5000,
              "name_en": "Facebook english", "name_de": "Facebook deutsch", "name_fr": "Facebook franc",
              "name_ru": "Facebook ru", "name_uk": "Facebook uk", "name_zh": "Facebook zh"},
-            {"id": 2, "link": "https://www.twitter.com", "reward_amount": 3000,
+            {"id": 2, "link_id": 4, "reward_amount": 3000,
              "name_en": "Twitter english", "name_de": "Twitter deutsch", "name_fr": "Twitter franc",
              "name_ru": "Twitter ru", "name_uk": "Twitter uk", "name_zh": "Twitter zh"},
-            {"id": 3, "link": "https://www.instagram.com", "reward_amount": 4000,
+            {"id": 3, "link_id": 5, "reward_amount": 4000,
              "name_en": "Instagram english", "name_de": "Instagram deutsch", "name_fr": "Instagram franc",
-             "name_ru": "Instagram ru", "name_uk": "Instagram uk", "name_zh": "Instagram zh"}
+             "name_ru": "Instagram ru", "name_uk": "Instagram uk", "name_zh": "Instagram zh"},
+            {"id": 4, "link_id": 6, "reward_amount": 10000,
+             "name_en": "Telegram english", "name_de": "Telegram deutsch", "name_fr": "Telegram franc",
+             "name_ru": "Telegram ru", "name_uk": "Telegram uk", "name_zh": "Telegram zh"}
         ]
         for data in social_tasks:
             SocialTask.objects.update_or_create(id=data['id'], defaults=data)
@@ -586,8 +592,10 @@ class Command(BaseCommand):
 
     def seed_partners_tasks(self):
         partners_tasks = [
-            {"id": 1, "name": "BWG", "button_type": PartnersButtonTypes.objects.get(id=2), "link": "https://t.me/BWGOLDEN_Bot", "reward_amount": 5000},
-            {"id": 2, "name": "Catizen", "button_type": PartnersButtonTypes.objects.get(id=1), "link": "https://t.me/catizenbot", "reward_amount": 3000},
+            {"id": 1, "name": "BWG", "button_type": PartnersButtonTypes.objects.get(id=2), "link_id": 1, "reward_amount": 5000},
+            {"id": 2, "name": "Catizen", "button_type": PartnersButtonTypes.objects.get(id=1), "link_id": 2, "reward_amount": 3000},
+            {"id": 3, "name": "Test Telegram Chanel Subscription",
+             "button_type": PartnersButtonTypes.objects.get(id=3), "link_id": 0, "reward_amount": 3000},
         ]
         for data in partners_tasks:
             PartnersTask.objects.update_or_create(id=data['id'], defaults=data)
@@ -616,3 +624,18 @@ class Command(BaseCommand):
             BannerAdvert.objects.update_or_create(id=data['id'], defaults=data)
         for data in fullscreen_ads:
             FullscreenAdvert.objects.update_or_create(id=data['id'], defaults=data)
+
+    def seed_links_model(self):
+        links = [
+            {"id": 0, "url": "https://t.me/test_chanel1234534521352", "link_type": LinkModel.LinkType.TELEGRAM_CHANEL, "data": -1002207219176},
+            {"id": 1, "url": "https://t.me/BWGOLDEN_Bot", "link_type": LinkModel.LinkType.TELEGRAM_OTHER},
+            {"id": 2, "url": "https://t.me/catizenbot", "link_type": LinkModel.LinkType.TELEGRAM_OTHER},
+            {"id": 3, "url": "https://www.facebook.com", "link_type": LinkModel.LinkType.OTHER},
+            {"id": 4, "url": "https://www.twitter.com", "link_type": LinkModel.LinkType.OTHER},
+            {"id": 5, "url": "https://www.instagram.com", "link_type": LinkModel.LinkType.OTHER},
+            {"id": 6, "url": "https://t.me/test_chanel1234534521352", "link_type": LinkModel.LinkType.TELEGRAM_CHANEL,
+             "data": -1002207219176},
+
+        ]
+        for data in links:
+            LinkModel.objects.update_or_create(id=data['id'], defaults=data)

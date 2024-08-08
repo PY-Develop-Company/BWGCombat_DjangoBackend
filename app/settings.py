@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "exchanger_app",
     "ads_app",
     "clicker_app",
+    "links_app",
 ]
 
 MIDDLEWARE = [
@@ -84,7 +85,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "app.wsgi.application"
-# ASGI_APPLICATION = "app.routing.application"
+ASGI_APPLICATION = "app.routing.application"
 
 
 # Database

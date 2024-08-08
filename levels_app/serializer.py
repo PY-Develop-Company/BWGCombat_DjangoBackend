@@ -2,13 +2,14 @@ from rest_framework import serializers
 from user_app.models import UsersTasks
 
 from .models import Rank, TaskTemplate, TaskRoute, Reward, PartnersTask, SocialTask, Stage
-
+from links_app.serializer import LinkModelSerializer
 
 
 class SocialTasksSerializer(serializers.ModelSerializer):
     amount = serializers.SerializerMethodField()
     is_completed = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
+    link = serializers.SerializerMethodField()
 
     def get_name(self, obj: SocialTask):
         user_language = self.context.get('user_language')
@@ -32,6 +33,9 @@ class SocialTasksSerializer(serializers.ModelSerializer):
     def get_amount(self, obj: SocialTask):
         return obj.reward_amount
 
+    def get_link(self, obj: SocialTask):
+        return LinkModelSerializer(obj.link).data
+
     class Meta:
         model = SocialTask
         fields = ('id', 'name', 'link', 'amount', 'is_completed')
@@ -41,6 +45,7 @@ class PartnersTasksSerializer(serializers.ModelSerializer):
     amount = serializers.SerializerMethodField()
     is_completed = serializers.SerializerMethodField()
     button_type = serializers.SerializerMethodField()
+    link = serializers.SerializerMethodField()
 
     def get_is_completed(self, obj: PartnersTask):
         return obj.id in self.context.get('completed_tasks')
@@ -63,6 +68,9 @@ class PartnersTasksSerializer(serializers.ModelSerializer):
         elif user_language == 'zh':
             return obj.button_type.name_zh
         raise TypeError("Unknown language: %s" % user_language)
+
+    def get_link(self, obj: SocialTask):
+        return LinkModelSerializer(obj.link).data
 
     class Meta:
         model = PartnersTask

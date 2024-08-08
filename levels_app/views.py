@@ -13,6 +13,10 @@ from django.shortcuts import get_object_or_404
 from .utils import place_items, claim_task_rewards
 from django.utils.timezone import now
 from django.db import transaction
+import asyncio
+
+from adrf.decorators import api_view as async_api_view
+from asgiref.sync import sync_to_async
 
 
 def levels_home(request):
@@ -207,45 +211,52 @@ def get_partner_tasks(request):
     return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
 
 
-@api_view(["POST"])
-def complete_partner_task(request):
+@async_api_view(["POST"])
+@permission_classes([AllowAny])
+async def complete_partner_task(request):
     user_id = request.data.get('userId')
     task_id = request.data.get('taskId')
     
-    task = PartnersTask.objects.get(id=task_id)
-    user = UserData.objects.get(user=user_id)
-    completed = True
+    task = await sync_to_async(PartnersTask.objects.get)(id=task_id)
+    user = await sync_to_async(User.objects.get)(tg_id=user_id)
+    userdata = await sync_to_async(UserData.objects.get)(user=user_id)
 
-    if CompletedPartnersTask.objects.filter(task=task, user=user.user).exists():
+    task_link = await sync_to_async(lambda: task.link)()
+    completed = await task_link.check_completion(user)
+
+    if await sync_to_async(CompletedPartnersTask.objects.filter(task=task, user=user).exists)():
         return JsonResponse({"result": "already completed task"}, status=status.HTTP_403_FORBIDDEN)
 
     if not completed:
         return JsonResponse({"result": "task is not completed"}, status=status.HTTP_403_FORBIDDEN)
 
-    user.gold_balance += task.reward_amount
-    CompletedPartnersTask.objects.update_or_create(task=task, user=user.user)
-    user.save()
+    userdata.gold_balance += task.reward_amount
+    await sync_to_async(CompletedPartnersTask.objects.update_or_create)(task=task, user=user)
+    await sync_to_async(userdata.save)()
 
     return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
 
 
-@api_view(["POST"])
-def complete_social_task(request):
+@async_api_view(["POST"])
+@permission_classes([AllowAny])
+async def complete_social_task(request):
     user_id = request.data.get('userId')
     task_id = request.data.get('taskId')
 
-    task = SocialTask.objects.get(id=task_id)
-    user = UserData.objects.get(user=user_id)
-    completed = True
+    task = await sync_to_async(SocialTask.objects.get)(id=task_id)
+    user = await sync_to_async(User.objects.get)(tg_id=user_id)
+    userdata = await sync_to_async(UserData.objects.get)(user=user_id)
 
-    if CompletedSocialTask.objects.filter(task=task, user=user.user).exists():
+    task_link = await sync_to_async(lambda: task.link)()
+    completed = await task_link.check_completion(user)
+
+    if await sync_to_async(CompletedSocialTask.objects.filter(task=task, user=user).exists)():
         return JsonResponse({"result": "already completed task"}, status=status.HTTP_403_FORBIDDEN)
 
     if not completed:
         return JsonResponse({"result": "task is not completed"}, status=status.HTTP_403_FORBIDDEN)
 
-    user.gold_balance += task.reward_amount
-    CompletedSocialTask.objects.update_or_create(task=task, user=user.user)
-    user.save()
+    await sync_to_async(CompletedSocialTask.objects.update_or_create)(task=task, user=user)
+    await sync_to_async(userdata.save)()
 
     return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)

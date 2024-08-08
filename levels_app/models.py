@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 
 from clicker_app.models import EnergyBalanceUpgradeLevel, MulticlickUpgradeLevel
+from links_app.models import LinkModel, UserLinkModel
 
 
 class TaskTemplate(models.Model):
@@ -191,7 +192,7 @@ class PartnersButtonTypes(models.Model):
 class PartnersTask(models.Model):
     name = models.CharField(max_length=64)
     button_type = models.ForeignKey(PartnersButtonTypes, on_delete=models.SET_DEFAULT, default=0)
-    link = models.CharField(max_length=1024)
+    link = models.ForeignKey(LinkModel, on_delete=models.CASCADE)
     reward_amount = models.BigIntegerField()
 
 
@@ -202,8 +203,8 @@ class SocialTask(models.Model):
     name_ru = models.CharField(max_length=64, blank=False)
     name_uk = models.CharField(max_length=64, blank=False)
     name_zh = models.CharField(max_length=64, blank=False)
-    link = models.CharField(max_length=1024, null=False, blank=False)
-    reward_amount = models.BigIntegerField(null=False, blank=False)
+    link = models.ForeignKey(LinkModel, on_delete=models.CASCADE)
+    reward_amount = models.BigIntegerField()
 
 
 class CompletedSocialTask(models.Model):
