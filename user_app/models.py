@@ -87,6 +87,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="en",
         on_delete=models.SET_DEFAULT,
     )
+    country_code = models.CharField(null=True, blank=True, default=None, max_length=2)
     email = None
 
     is_active = models.BooleanField(default=True)

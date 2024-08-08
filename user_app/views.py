@@ -35,6 +35,19 @@ def user_home(request):
     return HttpResponse("user home")
 
 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def save_user_country(request):
+    user_country = request.data.get("countryCode")
+    user_id = request.data.get("userId")
+
+    user = User.objects.get(tg_id=user_id)
+    user.country_code = user_country
+    user.save()
+
+    return JsonResponse({"result": "ok"})
+
+
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_user_info(request):

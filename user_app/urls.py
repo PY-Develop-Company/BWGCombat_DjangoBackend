@@ -18,6 +18,7 @@ urlpatterns = [
     path('change_language/', views.change_language, name='pick_character'),
     path('user_settings/', views.get_user_settings, name='get_user_settings'),
     path('update_settings/', views.update_user_settings, name='update_user_settings'),
-    path('fren_link/', views.async_get_fren_link, name='async_get_fren_link')
+    path('fren_link/', views.async_get_fren_link, name='async_get_fren_link'),
+    path('save_user_country/', views.save_user_country, name='save_user_country')
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
