@@ -365,7 +365,9 @@ class Command(BaseCommand):
 
     def seed_links(self):
         links = [
-            {"url": os.environ.get("TG_CHANNEL"), "task": TaskTemplate.objects.get(name="Subscribe to Channel")}
+            {"id": 1, "url": os.environ.get("TG_CHANNEL"), "task": TaskTemplate.objects.get(name="Subscribe to Channel")},
+            {"id": 2, "url": "https://www.google.com.ua"},
+            {"id": 3, "url": "https://777.ua"},
         ]
         for data in links:
             Link.objects.update_or_create(url=data['url'], defaults=data)
@@ -507,11 +509,11 @@ class Command(BaseCommand):
     def seed_ads(self):
         banner_ads = [
             {"id": 1, "name": "Azino 777", "description": "Vygravaytie 100000000000000000000 rubley",
-             "link": Link.objects.get(id=1), "file_path": "azino777.jfif"}
+             "link": Link.objects.get(id=3), "file_path": "azino777.jfif"}
         ]
         fullscreen_ads = [
             {"id": 1, "name": "Azino 777", "description": "Vygravaytie 100000000000000000000 rubley",
-             "link": Link.objects.get(id=1), "file_path": "azino777.jfif",
+             "link": Link.objects.get(id=3), "file_path": "azino777.jfif",
              "view_max_gold_reward": Reward.objects.get(name="Ad_View_MAX_GOLD"),
              "view_min_gold_reward": Reward.objects.get(name="Ad_View_MIN_GOLD"),
              "view_gnome_reward": Reward.objects.get(name="GNOME_1")}
