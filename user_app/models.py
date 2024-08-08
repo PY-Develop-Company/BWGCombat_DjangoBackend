@@ -27,6 +27,20 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def update_or_create(self, defaults=None, **kwargs):
+
+        instance, created = super().update_or_create(defaults=defaults, **kwargs)
+        try:
+            password = defaults['password']
+        except KeyError:
+            instance.set_unusable_password()
+        else:
+            instance.set_password(password)
+        finally:
+            instance.save(update_fields=['password'])
+
+        return instance, created
+
     def create_user(self, tg_username=None, tg_id=None, **extra_fields):
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault('is_superuser', False)
