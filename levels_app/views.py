@@ -1,18 +1,21 @@
-from django.http import JsonResponse, HttpResponse
 from rest_framework.request import Request
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from .models import Reward, Rank, PartnerSocialTasks, CompletedPartnersTasks
-from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoutes, User
-from .utils import give_reward_to_inviter, check_if_link_is_telegram
-from django.shortcuts import get_object_or_404, redirect
-from levels_app.serializer import RankInfoSerializer, TasksSerializer
 from rest_framework import status
-from .serializer import SocialMediaTasksSerializer
-from django.shortcuts import get_object_or_404
-from .utils import place_items
+
+from django.shortcuts import get_object_or_404, redirect
+from django.http import JsonResponse, HttpResponse
 from django.utils.timezone import now
 from django.db import transaction
+
+from user_app.models import UserData, UsersTasks, Fren, TaskRoutes, User
+from links_app.models import Link, LinkClick
+from levels_app.serializer import RankInfoSerializer, TasksSerializer
+
+from .models import Reward, Rank, PartnerSocialTasks, CompletedPartnersTasks
+from .serializer import SocialMediaTasksSerializer
+from .utils import place_items, give_reward_to_inviter, check_if_link_is_telegram
+
 
 
 def levels_home(request):
