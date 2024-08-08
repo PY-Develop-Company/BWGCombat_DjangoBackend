@@ -51,7 +51,9 @@ class Command(BaseCommand):
 
         self.seed_assets()
         self.seed_exchange_pairs()
+
         self.seed_ads()
+        self.seed_ad_sets()
 
         self.stdout.write('Data seeded successfully.')
 
@@ -528,4 +530,4 @@ class Command(BaseCommand):
             {"banner": BannerAdvert.objects.get(id=1), "fullscreen": FullscreenAdvert.objects.get(id=1)},
         ]
         for data in ad_sets:
-            AdSet.objects.update_or_create(id=data['id'], defaults=data)
+            AdSet.objects.update_or_create(defaults=data)

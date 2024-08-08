@@ -78,11 +78,27 @@ def get_all_banner_adverts(request):
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
+def get_all_active_banner_adverts(request):
+    active_adverts = BannerAdvert.objects.filter(adset__is_active=True)
+    active_adverts_data = BannerAdvertSerializer(active_adverts, many=True).data
+    return JsonResponse({"active_banner_adverts": active_adverts_data})
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
 def get_all_fullscreen_adverts(request):
     adverts = FullscreenAdvert.objects.all()
     adverts_data = FullscreenAdvertSerializer(adverts, many=True).data
 
     return JsonResponse({"banner_adverts": adverts_data})
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_all_active_fullscreen_adverts(request):
+    active_adverts = FullscreenAdvert.objects.filter(adset__is_active=True)
+    active_adverts_data = FullscreenAdvertSerializer(active_adverts, many=True).data
+    return JsonResponse({"active_banner_adverts": active_adverts_data})
 
 
 @api_view(["POST"])
