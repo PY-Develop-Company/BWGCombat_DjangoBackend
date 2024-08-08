@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 
-from levels_app.models import Rank, TaskTemplate, TaskRoutes, Reward, MulticlickLevel, MaxEnergyLevel, PassiveIncomeLevel, Stage
+from levels_app.models import Rank, TaskTemplate, TaskRoute, Reward, Stage
 import tg_connection
 
 
@@ -130,13 +130,13 @@ class UserData(models.Model):
     last_visited = models.DateTimeField(default=now)
 
     rank = models.ForeignKey(Rank, null=True, on_delete=models.SET_NULL, default=1)
-    current_stage = models.ForeignKey(Stage, null = True, default=1, on_delete=models.SET_NULL)
+    current_stage = models.ForeignKey(Stage, null=True, default=1, on_delete=models.SET_NULL)
 
-    multiclick_amount = models.IntegerField(null=True, blank=True, default=2)
+    multiclick = models.IntegerField(default=2)
     energy_regeneration = models.IntegerField(default=1)
-    max_energy_amount = models.IntegerField(null=True, blank=True, default=100)
+    energy_balance = models.IntegerField(default=100)
     current_energy = models.IntegerField(default=0)
-    gnome_amount = models.IntegerField(default=0, null=True, blank=True)
+    gnome_amount = models.IntegerField(default=0)
 
     is_vip = models.BooleanField(default=False)
 
@@ -177,16 +177,16 @@ class UserData(models.Model):
         self.g_token = round(self.g_token, 12)
 
     def set_multiplier(self, multiplier: int):
-        self.multiclick_amount = multiplier
+        self.multiclick = multiplier
 
     def add_multiplier(self, multiplier: int):
-        self.multiclick_amount += multiplier
+        self.multiclick += multiplier
 
     def add_energy(self, energy: int):
-        self.max_energy_amount += energy
+        self.energy_balance += energy
 
     def set_energy(self, energy: int):
-        self.max_energy_amount = energy
+        self.energy_balance = energy
         
     def add_gnomes(self, amount: int = 1):
         self.gnome_amount += amount
@@ -226,34 +226,24 @@ class UserData(models.Model):
         self.save()
 
     def receive_reward(self, reward: Reward):
-        """
-        GOLD = "1", _("Add gold")
-        MULTIPLIER = "2", _("Increase gold multiplier")
-        G_TOKEN = "3", _("Add G token")
-        ENERGY_BALANCE = "4", _("Replenish energy")
-        KEY = '5', _('Key')
-        GNOME = '6', _('Gnome')
-        JAIL = '7', _('Jail')
-
-        """
-        reward_type = int(reward.reward_type)
-        print(reward_type)
         reward_amount = int(reward.amount)
 
-        match reward_type:
-            case 1:
+        match reward.reward_type:
+            case Reward.RewardType.GOLD:
                 self.add_gold_coins(reward_amount)
-            case 2:
-                self.add_multiplier(reward_amount)
-            case 3:
+            case Reward.RewardType.G_TOKEN:
                 self.add_g_token_coins(reward_amount)
-            case 4:
+
+            case Reward.RewardType.MULTICKLICK:
+                self.add_multiplier(reward_amount)
+            case Reward.RewardType.ENERGY_BALANCE:
                 self.add_energy(reward_amount)
-            case 5:
+
+            case Reward.RewardType.KEY:
                 self.set_key()
-            case 6:
+            case Reward.RewardType.GNOME:
                 self.add_gnomes(reward_amount)
-            case 7:
+            case Reward.RewardType.JAIL:
                 self.set_prisoning(reward_amount)
             
             case _:
@@ -267,11 +257,12 @@ class UsersTasks(models.Model):
     class Status(models.TextChoices):
         UNAVAILABLE = "0", _("Unavailable")
         IN_PROGRESS = "1", _("In progress")
-        COMPLETED = "2", _("Completed")
+        NOT_CLAIMED = "4", _("Not claimed")
+        CLAIMED = "2", _("Claimed")
         EXPIRED = "3", _("Expired")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    task = models.ForeignKey(TaskRoutes, on_delete=models.CASCADE)
+    task = models.ForeignKey(TaskRoute, on_delete=models.CASCADE)
     rewards = models.ManyToManyField(Reward, blank=True)
     completion_time = models.DateTimeField(null=True, blank=True, default=None)
 

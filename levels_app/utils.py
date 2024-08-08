@@ -2,7 +2,7 @@ import asyncio
 import random
 
 from user_app.models import UserData, Fren, Link, UsersTasks
-from .models import Rank, Stage, Reward, TaskRoutes
+from .models import Rank, Stage, Reward, TaskRoute
 from django.shortcuts import get_object_or_404
 from .models import Reward
 from django.db.models import Q
@@ -42,7 +42,7 @@ def place_key(user_data: UserData, stage: Stage):
     key.save()
 
 
-def place_rewards_for_chests(user_data, chests:list[TaskRoutes]):
+def place_rewards_for_chests(user_data, chests:list[TaskRoute]):
     for chest in chests:
         available_rewards = list(chest.template.rewards.exclude(Q(name='Key') | Q(name='Jail')))
         ts = UsersTasks.objects.create(user=user_data.user, task = chest)
@@ -50,7 +50,7 @@ def place_rewards_for_chests(user_data, chests:list[TaskRoutes]):
         ts.save()
 
 
-def place_another_tasks(user_data:UserData, tasks:list[TaskRoutes]):
+def place_another_tasks(user_data:UserData, tasks:list[TaskRoute]):
     for task in tasks:
         ts = UsersTasks.objects.create(user=user_data.user, task=task)
         ts.rewards.add(*task.template.rewards.all())
@@ -77,3 +77,15 @@ def place_items(user_data: UserData, rank:Rank):
     ts = UsersTasks.objects.get(user=user_data.user, task=rank.init_stage.initial_task)
     ts.status = UsersTasks.Status.IN_PROGRESS
     ts.save()
+
+
+def claim_task_rewards(rewards, userdata, user_task):
+    for reward in rewards:
+        userdata.receive_reward(reward)
+    user_task.status = UsersTasks.Status.CLAIMED
+    subtasks = user_task.get_user_subtasks(userdata.user)
+    for subtask in subtasks:
+        subtask.status = UsersTasks.Status.IN_PROGRESS
+        subtask.save()
+    userdata.save()
+    user_task.save()

@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from user_app.models import UsersTasks
 
-from .models import Rank, TaskTemplate, TaskRoutes, Reward, PartnersTasks, SocialTasks, Stage
+from .models import Rank, TaskTemplate, TaskRoute, Reward, PartnersTasks, SocialTasks, Stage
+
 
 
 class SocialTasksSerializer(serializers.ModelSerializer):
@@ -80,6 +81,12 @@ class RankingSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class StageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stage
+        fields = ["id", "name", "instrument", "drink"]
+
+
 class TaskSerializer(serializers.ModelSerializer):
     rewards = serializers.SerializerMethodField()
 
@@ -114,22 +121,14 @@ class ClosedRankSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'gold_required')
 
 
-class RankInfoSerializer(serializers.ModelSerializer):
-    tasks = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Rank
-        fields = ['id', 'name', 'description']
-
-
 class UserTaskSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TaskRoutes
+        model = TaskRoute
 
 
 class TaskCoordinatesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TaskRoutes
+        model = TaskRoute
         fields = ('coord_x', 'coord_y')
 
 
@@ -141,6 +140,7 @@ class TasksSerializer(serializers.ModelSerializer):
     routes = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
 
     def get_name(self, obj: UsersTasks):
         return obj.task.template.name
@@ -161,10 +161,13 @@ class TasksSerializer(serializers.ModelSerializer):
         return obj.get_status_display()
 
     def get_routes(self, obj: UsersTasks):
-        if obj.status == UsersTasks.Status.COMPLETED:
+        if obj.status == UsersTasks.Status.CLAIMED:
             tsks = obj.task.get_subtasks()
             return TaskCoordinatesSerializer(tsks, many=True).data
 
+    def get_price(self, obj: UsersTasks):
+        return obj.task.template.price
+
     class Meta:
         model = UsersTasks
-        fields = ('id', 'name', 'x', 'y', 'type', 'status', 'rewards', 'routes')
+        fields = ('id', 'name', 'x', 'y', 'type', 'price', 'status', 'rewards', 'routes')

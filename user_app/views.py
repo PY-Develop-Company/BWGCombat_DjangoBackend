@@ -73,7 +73,7 @@ def add_coins_to_user(request):
                             status=status.HTTP_400_BAD_REQUEST)
 
     user_data = get_object_or_404(UserData, user_id=user_id)
-    user_data.add_gold_coins(total_clicks*user_data.multiclick_amount)
+    user_data.add_gold_coins(total_clicks * user_data.multiclick)
     user_data.current_energy = current_energy
     user_data.last_visited = now()
 
