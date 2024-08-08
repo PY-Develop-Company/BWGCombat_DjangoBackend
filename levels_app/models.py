@@ -188,14 +188,14 @@ class PartnersButtonTypes(models.Model):
     name_zh = models.CharField(max_length=64, blank=False, default="Register")
 
 
-class PartnersTasks(models.Model):
+class PartnersTask(models.Model):
     name = models.CharField(max_length=64)
     button_type = models.ForeignKey(PartnersButtonTypes, on_delete=models.SET_DEFAULT, default=0)
     link = models.CharField(max_length=1024)
     reward_amount = models.BigIntegerField()
 
 
-class SocialTasks(models.Model):
+class SocialTask(models.Model):
     name_en = models.CharField(max_length=64, blank=False)
     name_de = models.CharField(max_length=64, blank=False)
     name_fr = models.CharField(max_length=64, blank=False)
@@ -206,11 +206,11 @@ class SocialTasks(models.Model):
     reward_amount = models.BigIntegerField(null=False, blank=False)
 
 
-class CompletedSocialTasks(models.Model):
+class CompletedSocialTask(models.Model):
     user = models.ForeignKey("user_app.User", on_delete=models.CASCADE)
-    task = models.ForeignKey(SocialTasks, on_delete=models.CASCADE)
+    task = models.ForeignKey(SocialTask, on_delete=models.CASCADE)
 
 
-class CompletedPartnersTasks(models.Model):
+class CompletedPartnersTask(models.Model):
     user = models.ForeignKey("user_app.User", on_delete=models.CASCADE)
-    task = models.ForeignKey(PartnersTasks, on_delete=models.CASCADE)
+    task = models.ForeignKey(PartnersTask, on_delete=models.CASCADE)

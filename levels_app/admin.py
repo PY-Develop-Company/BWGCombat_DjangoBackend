@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import (Rank, Reward, TaskTemplate, TaskRoute,
-                     PartnersTasks, CompletedPartnersTasks, SocialTasks, CompletedSocialTasks,
+                     PartnersTask, CompletedPartnersTask, SocialTask, CompletedSocialTask,
                      Stage, StageTemplate)
 
 
@@ -28,7 +28,7 @@ admin.site.register(Reward, RewardAdmin)
 admin.site.register(TaskTemplate)
 admin.site.register(TaskRoute)
 
-admin.site.register(PartnersTasks)
-admin.site.register(CompletedPartnersTasks)
-admin.site.register(SocialTasks)
-admin.site.register(CompletedSocialTasks)
+admin.site.register(PartnersTask)
+admin.site.register(CompletedPartnersTask)
+admin.site.register(SocialTask)
+admin.site.register(CompletedSocialTask)

@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from rest_framework.request import Request
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from .models import Reward, Rank, CompletedPartnersTasks, SocialTasks, CompletedSocialTasks, PartnersTasks
+from .models import Reward, Rank, CompletedPartnersTask, SocialTask, CompletedSocialTask, PartnersTask
 from user_app.models import UserData, UsersTasks, Fren, Link, LinkClick, TaskRoute, User
 from .utils import give_reward_to_inviter, check_if_link_is_telegram
 from django.shortcuts import get_object_or_404, redirect
@@ -189,8 +189,8 @@ def get_social_tasks(request):
     user_id = request.data.get('userId')
     user = User.objects.filter(tg_id=user_id).first()
 
-    tasks = SocialTasks.objects.filter()
-    completed = CompletedSocialTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
+    tasks = SocialTask.objects.filter()
+    completed = CompletedSocialTask.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
 
     serializer = SocialTasksSerializer(tasks, context={'completed_tasks': completed, 'user_language': user.interface_lang.lang_code}, many=True)
     return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
@@ -200,8 +200,8 @@ def get_social_tasks(request):
 def get_partner_tasks(request):
     user_id = request.data.get('userId')
     user = User.objects.filter(tg_id=user_id).first()
-    tasks = PartnersTasks.objects.all()
-    completed = CompletedPartnersTasks.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
+    tasks = PartnersTask.objects.all()
+    completed = CompletedPartnersTask.objects.filter(user_id=user_id, task__in=tasks).values_list('id', flat=True)
 
     serializer = PartnersTasksSerializer(tasks, context={'completed_tasks': completed, 'user_language': user.interface_lang.lang_code}, many=True)
     return JsonResponse({"tasks": serializer.data}, status=status.HTTP_200_OK)
@@ -212,18 +212,18 @@ def complete_partner_task(request):
     user_id = request.data.get('userId')
     task_id = request.data.get('taskId')
     
-    task = PartnersTasks.objects.get(id=task_id)
+    task = PartnersTask.objects.get(id=task_id)
     user = UserData.objects.get(user=user_id)
     completed = True
 
-    if CompletedPartnersTasks.objects.filter(task=task, user=user.user).exists():
+    if CompletedPartnersTask.objects.filter(task=task, user=user.user).exists():
         return JsonResponse({"result": "already completed task"}, status=status.HTTP_403_FORBIDDEN)
 
     if not completed:
         return JsonResponse({"result": "task is not completed"}, status=status.HTTP_403_FORBIDDEN)
 
     user.gold_balance += task.reward_amount
-    CompletedPartnersTasks.objects.update_or_create(task=task, user=user.user)
+    CompletedPartnersTask.objects.update_or_create(task=task, user=user.user)
     user.save()
 
     return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)
@@ -234,18 +234,18 @@ def complete_social_task(request):
     user_id = request.data.get('userId')
     task_id = request.data.get('taskId')
 
-    task = SocialTasks.objects.get(id=task_id)
+    task = SocialTask.objects.get(id=task_id)
     user = UserData.objects.get(user=user_id)
     completed = True
 
-    if CompletedSocialTasks.objects.filter(task=task, user=user.user).exists():
+    if CompletedSocialTask.objects.filter(task=task, user=user.user).exists():
         return JsonResponse({"result": "already completed task"}, status=status.HTTP_403_FORBIDDEN)
 
     if not completed:
         return JsonResponse({"result": "task is not completed"}, status=status.HTTP_403_FORBIDDEN)
 
     user.gold_balance += task.reward_amount
-    CompletedSocialTasks.objects.update_or_create(task=task, user=user.user)
+    CompletedSocialTask.objects.update_or_create(task=task, user=user.user)
     user.save()
 
     return JsonResponse({"result": "ok"}, status=status.HTTP_200_OK)

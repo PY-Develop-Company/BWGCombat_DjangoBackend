@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from user_app.models import UsersTasks
 
-from .models import Rank, TaskTemplate, TaskRoute, Reward, PartnersTasks, SocialTasks, Stage
+from .models import Rank, TaskTemplate, TaskRoute, Reward, PartnersTask, SocialTask, Stage
 
 
 
@@ -10,7 +10,7 @@ class SocialTasksSerializer(serializers.ModelSerializer):
     is_completed = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
 
-    def get_name(self, obj: SocialTasks):
+    def get_name(self, obj: SocialTask):
         user_language = self.context.get('user_language')
         if user_language == 'en':
             return obj.name_en
@@ -26,14 +26,14 @@ class SocialTasksSerializer(serializers.ModelSerializer):
             return obj.name_zh
         raise TypeError("Unknown language: %s" % user_language)
 
-    def get_is_completed(self, obj: SocialTasks):
+    def get_is_completed(self, obj: SocialTask):
         return obj.id in self.context.get('completed_tasks')
 
-    def get_amount(self, obj: SocialTasks):
+    def get_amount(self, obj: SocialTask):
         return obj.reward_amount
 
     class Meta:
-        model = SocialTasks
+        model = SocialTask
         fields = ('id', 'name', 'link', 'amount', 'is_completed')
 
 
@@ -42,13 +42,13 @@ class PartnersTasksSerializer(serializers.ModelSerializer):
     is_completed = serializers.SerializerMethodField()
     button_type = serializers.SerializerMethodField()
 
-    def get_is_completed(self, obj: PartnersTasks):
+    def get_is_completed(self, obj: PartnersTask):
         return obj.id in self.context.get('completed_tasks')
 
-    def get_amount(self, obj: PartnersTasks):
+    def get_amount(self, obj: PartnersTask):
         return obj.reward_amount
 
-    def get_button_type(self, obj: PartnersTasks):
+    def get_button_type(self, obj: PartnersTask):
         user_language = self.context.get('user_language')
         if user_language == 'en':
             return obj.button_type.name_en
@@ -65,7 +65,7 @@ class PartnersTasksSerializer(serializers.ModelSerializer):
         raise TypeError("Unknown language: %s" % user_language)
 
     class Meta:
-        model = PartnersTasks
+        model = PartnersTask
         fields = ('id', 'name', 'button_type', 'link', 'amount', 'is_completed')
 
 

@@ -7,7 +7,7 @@ from django.utils.timezone import now
 from ads_app.models import BannerAdvert, FullscreenAdvert
 from exchanger_app.models import Asset, ExchangePair
 from levels_app.models import (Rank, TaskTemplate, TaskRoute, Reward, \
-                               PartnersTasks, SocialTasks, CompletedSocialTasks, CompletedPartnersTasks, StageTemplate, \
+                               PartnersTask, SocialTask, CompletedSocialTask, CompletedPartnersTask, StageTemplate, \
                                Stage, PartnersButtonTypes)
 from clicker_app.models import EnergyBalanceUpgradeLevel, MulticlickUpgradeLevel
 from user_app.models import User, Language, UserData, Link, Fren
@@ -573,16 +573,16 @@ class Command(BaseCommand):
              "name_ru": "Instagram ru", "name_uk": "Instagram uk", "name_zh": "Instagram zh"}
         ]
         for data in social_tasks:
-            SocialTasks.objects.update_or_create(id=data['id'], defaults=data)
+            SocialTask.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_completed_social_tasks(self):
         tasks = [
-            {"id": 1, "user": User.objects.get(tg_id=123568), "task": SocialTasks.objects.get(id=1)},
-            {"id": 2, "user": User.objects.get(tg_id=123456), "task": SocialTasks.objects.get(id=2)},
-            {"id": 3, "user": User.objects.get(tg_id=123568), "task": SocialTasks.objects.get(id=3)}
+            {"id": 1, "user": User.objects.get(tg_id=123568), "task": SocialTask.objects.get(id=1)},
+            {"id": 2, "user": User.objects.get(tg_id=123456), "task": SocialTask.objects.get(id=2)},
+            {"id": 3, "user": User.objects.get(tg_id=123568), "task": SocialTask.objects.get(id=3)}
         ]
         for data in tasks:
-            CompletedSocialTasks.objects.update_or_create(id=data['id'], defaults=data)
+            CompletedSocialTask.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_partners_tasks(self):
         partners_tasks = [
@@ -590,15 +590,15 @@ class Command(BaseCommand):
             {"id": 2, "name": "Catizen", "button_type": PartnersButtonTypes.objects.get(id=1), "link": "https://t.me/catizenbot", "reward_amount": 3000},
         ]
         for data in partners_tasks:
-            PartnersTasks.objects.update_or_create(id=data['id'], defaults=data)
+            PartnersTask.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_completed_partners_tasks(self):
         tasks = [
-            {"id": 1, "user": User.objects.get(tg_id=123568), "task": PartnersTasks.objects.get(id=1)},
-            {"id": 2, "user": User.objects.get(tg_id=123568), "task": PartnersTasks.objects.get(id=2)},
+            {"id": 1, "user": User.objects.get(tg_id=123568), "task": PartnersTask.objects.get(id=1)},
+            {"id": 2, "user": User.objects.get(tg_id=123568), "task": PartnersTask.objects.get(id=2)},
         ]
         for data in tasks:
-            CompletedPartnersTasks.objects.update_or_create(id=data['id'], defaults=data)
+            CompletedPartnersTask.objects.update_or_create(id=data['id'], defaults=data)
 
     def seed_ads(self):
         banner_ads = [
