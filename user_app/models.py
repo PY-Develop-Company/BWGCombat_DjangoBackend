@@ -130,7 +130,7 @@ class UserData(models.Model):
     last_visited = models.DateTimeField(default=now)
 
     rank = models.ForeignKey(Rank, null=True, on_delete=models.SET_NULL, default=1)
-    current_stage = models.ForeignKey(Stage, null = True, default=1, on_delete=models.SET_NULL)
+    current_stage = models.ForeignKey(Stage, null=True, default=1, on_delete=models.SET_NULL)
 
     multiclick_amount = models.IntegerField(null=True, blank=True, default=2)
     energy_regeneration = models.IntegerField(default=1)
