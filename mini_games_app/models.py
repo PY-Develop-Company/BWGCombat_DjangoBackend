@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class LevelInfo(models.Model):
@@ -13,7 +14,7 @@ class GameResults(models.Model):
     tg_user_id = models.IntegerField()
     level = models.ForeignKey('LevelInfo', on_delete=models.SET_NULL, null=True)
     result = models.CharField(max_length=32)
-    created_date = models.DateTimeField(auto_created=True, auto_now_add=True)
+    created_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:
         return f"{self.tg_user_id} : {self.level.name} : {self.result}"
@@ -22,7 +23,7 @@ class GameResults(models.Model):
 class GameStarted(models.Model):
     tg_user_id = models.IntegerField()
     level_name = models.CharField()
-    created_date = models.DateTimeField(auto_created=True, auto_now_add=True)
+    created_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"{self.tg_user_id} : {self.level_name} : {self.created_date}"
